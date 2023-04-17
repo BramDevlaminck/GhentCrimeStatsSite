@@ -6,6 +6,10 @@ import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
 async function getData(filename) {
   return await fetch("./Datasets/" + filename)
       .then(res => res.json())
+      .catch(() => {
+        console.error("Something went wrong while trying to read the file ./Datasets/" + filename);
+        return []; // return empty array to make sure the awaited data is iterable
+      })
 }
 
 // read the data
@@ -141,6 +145,11 @@ export default {
     return {
       combinedDataDeduplicated
     }
+  },
+  computed: {
+      dataIsAvailable: () => {
+        return combinedDataDeduplicated.length > 0
+      }
   }
 }
 
@@ -150,7 +159,8 @@ export default {
   <div class="container-lg">
     <h1>Statistics page</h1>
   </div>
-  <YearOverviewGraph :combinedData="combinedDataDeduplicated" />
+  <YearOverviewGraph :combinedData="combinedDataDeduplicated" v-if="dataIsAvailable"/>
+  <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>
 
 <style scoped>

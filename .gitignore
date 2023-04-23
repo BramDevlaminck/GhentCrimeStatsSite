@@ -26,9 +26,5 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2018.json
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2019.json
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2020.json
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2021.json
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2022.json
-/Datasets/criminaliteitscijfers-per-wijk-per-maand-gent-2023.json
+/Datasets
+!/Datasets/.gitkeep

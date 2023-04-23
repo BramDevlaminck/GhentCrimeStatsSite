@@ -9,6 +9,3 @@ import "bootstrap"
   <NavBar/>
   <router-view />
 </template>
-
-<script setup>
-</script>

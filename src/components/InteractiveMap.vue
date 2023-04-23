@@ -276,10 +276,10 @@ export default {
             })
             .attr("class", "track-overlay")
             .call(d3.drag()
-                .on("start.interrupt", function (event) {
+                .on("start.interrupt", (event) => {
                     slider.interrupt();
                 })
-                .on("start drag", function (event) {
+                .on("start drag", (event) => {
                     xPositionOnSlider = event.x;
                     updateSlider(positionOnSliderObject.invert(xPositionOnSlider));
                 })

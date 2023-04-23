@@ -1,10 +1,9 @@
 <script>
 import * as d3 from "d3";
 // TODO: change this if needed? not really clean this way
-const WIDTH = window.innerWidth/2;
-const HEIGHT = window.innerHeight/2;
-const HOVER_COLOR = "#d36f80"
-
+const WIDTH = window.innerWidth / 2;
+const HEIGHT = window.innerHeight / 2;
+const HOVER_COLOR = "#d36f80";
 
 
 // function to get a colour given the count in this quarter and the max count across all quarters
@@ -31,8 +30,8 @@ function dataToMapDataFormat(data, quarterGeometryData) {
     }
 
     data.forEach(obj => {
-        const properties = obj["properties"]
-        const quarter = properties["quarter"]
+        const properties = obj["properties"];
+        const quarter = properties["quarter"];
         const currentCount = totalCounts.get(quarter);
         totalCounts.set(quarter, currentCount + properties["total"]);
     });
@@ -51,7 +50,6 @@ function dataToMapDataFormat(data, quarterGeometryData) {
     }
     return result;
 }
-
 
 
 export default {
@@ -91,41 +89,41 @@ export default {
             .style("border-width", "2px")
             .style("border-radius", "5px")
             .style("padding", "5px")
-            .style("position", "absolute")
+            .style("position", "absolute");
 
 
 // -------------------------- effect handlers for the map -----------------
         function mouseOverHandler(event, data) {
-            d3.select(this).attr("fill", HOVER_COLOR)
-            tooltip.style("opacity", 1)
+            d3.select(this).attr("fill", HOVER_COLOR);
+            tooltip.style("opacity", 1);
         }
 
         function mouseMoveHandler(event, data) {
-            updateTooltip(event, data)
+            updateTooltip(event, data);
         }
 
         function mouseOutHandler(event, data) {
-            const properties = data["properties"]
-            const count = properties.count
-            const maxCount = properties.max
+            const properties = data["properties"];
+            const count = properties.count;
+            const maxCount = properties.max;
             const selectedColor = getColour(count, maxCount);
-            d3.select(this).attr("fill", selectedColor)
+            d3.select(this).attr("fill", selectedColor);
 
-            tooltip.style("opacity", 0)
+            tooltip.style("opacity", 0);
         }
 
         function clickHandler(event, data) {
-            updateTooltip(event, data)
+            updateTooltip(event, data);
         }
 
         function updateTooltip(event, data) {
             const properties = data["properties"];
-            const count = properties.count
-            const quarter = properties.quarter
+            const count = properties.count;
+            const quarter = properties.quarter;
             tooltip
                 .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
                 .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px")
+                .style("top", (event.pageY) + "px");
         }
 
         const beginDate = new Date(this.beginDate);
@@ -144,9 +142,9 @@ export default {
             features: [...quarterGeometryData.values()].map(value => {
                 return {
                     geometry: value
-                }
+                };
             })
-        }
+        };
 
         // --------------------- projection and path ----------------------------
         const projection = d3.geoMercator()
@@ -165,10 +163,10 @@ export default {
             .append("path")
             .attr("d", path)
             .attr("fill", (d, i) => {
-                const properties = d["properties"]
-                const count = properties.count
-                const maxCount = properties.max
-                return getColour(count, maxCount)
+                const properties = d["properties"];
+                const count = properties.count;
+                const maxCount = properties.max;
+                return getColour(count, maxCount);
             })
             .attr("stroke", "#FFF")
             .attr("stroke-width", 0.5)
@@ -179,7 +177,7 @@ export default {
 
         //--------------------- dropdown ----------------------------------------
 
-        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes])
+        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
         let currentDataDisplayedBasedOnCategory = allFeatures; // all data of the current category!
         // Function to update the map if a new crime category is chosen
         function updateMapWithNewCrimeCategory(selectedGroup) {
@@ -188,14 +186,14 @@ export default {
             // select the data from the chart that we actually want/need
             if (selectedGroup !== allCategories[0]) {
                 features = features.filter(element => {
-                    return element["properties"]["fact_category"] === selectedGroup
-                })
+                    return element["properties"]["fact_category"] === selectedGroup;
+                });
             }
 
             currentDataDisplayedBasedOnCategory = features;
 
             // filter the data based on date
-            const dataFilteredOnDate = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory)
+            const dataFilteredOnDate = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
 
             // plot the changed map
             map.data(dataToMapDataFormat(dataFilteredOnDate, quarterGeometryData))
@@ -218,18 +216,18 @@ export default {
             }) // text showed in the menu
             .attr("value", function (d) {
                 return d;
-            }) // corresponding value returned by the button
+            }); // corresponding value returned by the button
 
         // Listen to dropdown
         d3.select("#selectButton").on("change", function (d) {
-            updateMapWithNewCrimeCategory(this.value)
+            updateMapWithNewCrimeCategory(this.value);
         });
 
         // ----------------------------- slider ------------------------------
 
         // translate date object to YYYY-MM-DD string
         function dateObjectToYearMonthDay(date) {
-            return date.toISOString().split('T')[0]
+            return date.toISOString().split('T')[0];
         }
 
         // function to format data in d3
@@ -257,7 +255,7 @@ export default {
         const slidersvg = d3.select("#slider_div")
             .append("svg")
             .attr("width", "100%")
-            .attr("height", "100%")
+            .attr("height", "100%");
 
         const slider = slidersvg
             .append("g")
@@ -338,7 +336,7 @@ export default {
             .attr("class", "label")
             .attr("text-anchor", "middle")
             .text(formatDate(beginDate))
-            .attr("transform", "translate(0," + (-25) + ")")
+            .attr("transform", "translate(0," + (-25) + ")");
 
         // this function is called every time the position of the slider changes, here we update the data
         function updateSlider(date) {
@@ -357,7 +355,7 @@ export default {
                     return "0" + month.toString();
                 }
                 return month.toString();
-            }
+            };
 
             // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
             currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
@@ -373,19 +371,19 @@ export default {
         }
 
     }
-}
+};
 </script>
 
 <template>
-  <div>
-      <!-- Dropdown used for all the categories -->
-      <select id="selectButton"></select>
-      <!-- container where the map, tooltip and slider itself will be placed -->
-      <div id="map__container"/>
-      <div id="slider_div"/>
-      <!-- button to play/pause the slider -->
-      <button id="play-button">Play</button>
-  </div>
+    <div>
+        <!-- Dropdown used for all the categories -->
+        <select id="selectButton"></select>
+        <!-- container where the map, tooltip and slider itself will be placed -->
+        <div id="map__container"/>
+        <div id="slider_div"/>
+        <!-- button to play/pause the slider -->
+        <button id="play-button">Play</button>
+    </div>
 </template>
 
 <style scoped>
@@ -407,6 +405,7 @@ export default {
 #play-button:hover {
     background-color: #696969;
 }
+
 /*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
 #slider_div:deep(.ticks) {
     font-size: 10px;

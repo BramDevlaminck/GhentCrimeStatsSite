@@ -64,7 +64,7 @@ allData.forEach(obj => {
     }
 
     const yearMonthAsDateObj = new Date(yearMonth)
-    if (smallestDate == null || yearMonthAsDateObj < smallestDate) {
+    if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
         smallestDate = yearMonthAsDateObj;
     }
     if (biggestDate == null || yearMonthAsDateObj > biggestDate) {

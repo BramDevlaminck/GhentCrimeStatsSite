@@ -121,7 +121,13 @@ export default {
         }
 
         function clickHandler(event, data) {
-            // d3.select("#map__text").text(`You've selected ${d.properties.name} District`)
+            const properties = data["properties"];
+            const count = properties.count
+            const quarter = properties.quarter
+            tooltip
+                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
+                .style("left", ((event.pageX) + 20) + "px")
+                .style("top", (event.pageY) + "px")
         }
 
         const beginDate = new Date(this.beginDate);

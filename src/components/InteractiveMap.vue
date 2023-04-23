@@ -101,13 +101,7 @@ export default {
         }
 
         function mouseMoveHandler(event, data) {
-            const properties = data["properties"];
-            const count = properties.count
-            const quarter = properties.quarter
-            tooltip
-                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px")
+            updateTooltip(event, data)
         }
 
         function mouseOutHandler(event, data) {
@@ -121,6 +115,10 @@ export default {
         }
 
         function clickHandler(event, data) {
+            updateTooltip(event, data)
+        }
+
+        function updateTooltip(event, data) {
             const properties = data["properties"];
             const count = properties.count
             const quarter = properties.quarter

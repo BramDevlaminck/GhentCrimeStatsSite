@@ -1,11 +1,17 @@
 <script>
 
 import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
+import InteractiveMap from "@/components/InteractiveMap.vue";
+import rewind from "@mapbox/geojson-rewind";
 
 // function to read the data
 function getData(filename) {
     return fetch("./Datasets/" + filename)
         .then(res => res.json())
+        .then(res => {
+            rewind(res, true); // use rewind to make sure the geojson is clockwise! if this is not the case the map will not be displayed!
+            return res;
+        })
         .catch(() => {
             console.error("Something went wrong while trying to read the file ./Datasets/" + filename);
             return []; // return empty array to make sure the awaited data is iterable
@@ -96,11 +102,17 @@ const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
 
 export default {
     components: {
+        InteractiveMap,
         YearOverviewGraph
     },
     data() {
         return {
-            combinedData: dataWithoutGeoInformation
+            combinedDataNoGeoInfo: dataWithoutGeoInformation,
+            combinedDataWithGeoInfo: featuresSingle,
+            beginDate: smallestDate,
+            endDate: biggestDate,
+            crimeTypes: crimeTypes,
+            quarterGeometryData: quarterGeometryData
         }
     },
     computed: {
@@ -116,7 +128,11 @@ export default {
     <div class="container-lg">
         <h1>Statistics page</h1>
     </div>
-    <YearOverviewGraph :combinedData="combinedData" v-if="dataIsAvailable"/>
+    <div v-if="dataIsAvailable">
+        <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
+        <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
+                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>
+    </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>
 

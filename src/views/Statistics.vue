@@ -96,7 +96,7 @@ featuresSingle.forEach(datum => {
     datum.properties.formatted_date = monthMapping.get(splittedDate[1]) + " " + splittedDate[2] + " " + splittedDate[0];
 });
 
-// combine it
+// get the properties of the geoJson, this is exactly the data we need for the non-map graphs
 const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
 
 

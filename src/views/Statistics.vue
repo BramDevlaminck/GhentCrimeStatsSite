@@ -15,7 +15,7 @@ function getData(filename) {
         .catch(() => {
             console.error("Something went wrong while trying to read the file ./Datasets/" + filename);
             return []; // return empty array to make sure the awaited data is iterable
-        })
+        });
 }
 
 // load all the data
@@ -30,7 +30,7 @@ const allData = await Promise.all([
     .then(jsonArray => {
         const features = [];
         jsonArray.forEach(dataset => {
-            features.push(...dataset["features"])
+            features.push(...dataset["features"]);
         });
         return features;
     });
@@ -47,11 +47,11 @@ let biggestDate = null;
 
 const entriesMapWithoutDuplicatesPerMonth = new Map();
 allData.forEach(obj => {
-    const properties = obj["properties"]
+    const properties = obj["properties"];
     const quarter = properties["quarter"];
     const crime = properties["fact_category"];
     const yearMonth = properties["jaar_maand"];
-    const count = properties["total"]
+    const count = properties["total"];
     // just create some arbitrary key that is unique for the right cases
     const crimeEntriesKey = quarter + crime + yearMonth;
     // check if there is no entry, or the current entry is "worse" than this object
@@ -63,18 +63,18 @@ allData.forEach(obj => {
         quarters.add(quarter);
     }
 
-    const yearMonthAsDateObj = new Date(yearMonth)
+    const yearMonthAsDateObj = new Date(yearMonth);
     if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
         smallestDate = yearMonthAsDateObj;
     }
     if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
         biggestDate = yearMonthAsDateObj;
     }
-    crimeTypes.add(crime)
+    crimeTypes.add(crime);
 });
 
 // create 1 data array of all the entries in the map that does not contain any duplicates anymore
-const featuresSingle = [...entriesMapWithoutDuplicatesPerMonth.values()]
+const featuresSingle = [...entriesMapWithoutDuplicatesPerMonth.values()];
 
 const monthMapping = new Map(Object.entries({
     "01": "Jan",
@@ -113,14 +113,14 @@ export default {
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData
-        }
+        };
     },
     computed: {
         dataIsAvailable: () => {
-            return dataWithoutGeoInformation.length > 0
+            return dataWithoutGeoInformation.length > 0;
         }
     }
-}
+};
 
 </script>
 

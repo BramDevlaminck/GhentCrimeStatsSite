@@ -404,35 +404,35 @@ export default {
     background-color: #696969;
 }
 /*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
-#slider_div >>> .ticks {
+#slider_div:deep(.ticks) {
     font-size: 10px;
 }
 
-#slider_div >>> .track,
+#slider_div:deep(.track,
 .track-inset,
-.track-overlay {
+.track-overlay) {
     stroke-linecap: round;
 }
 
-#slider_div >>> .track {
+#slider_div:deep(.track) {
     stroke: #000;
     stroke-opacity: 0.3;
     stroke-width: 10px;
 }
 
-#slider_div >>> .track-inset {
+#slider_div:deep(.track-inset) {
     stroke: #dcdcdc;
     stroke-width: 8px;
 }
 
-#slider_div >>> .track-overlay {
+#slider_div:deep(.track-overlay) {
     pointer-events: stroke;
     stroke-width: 50px;
     stroke: transparent;
     cursor: grab;
 }
 
-#slider_div >>> .handle {
+#slider_div:deep(.handle) {
     fill: #fff;
     stroke: #000;
     stroke-opacity: 0.5;

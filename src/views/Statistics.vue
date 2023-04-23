@@ -67,7 +67,7 @@ allData.forEach(obj => {
     if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
         smallestDate = yearMonthAsDateObj;
     }
-    if (biggestDate == null || yearMonthAsDateObj > biggestDate) {
+    if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
         biggestDate = yearMonthAsDateObj;
     }
     crimeTypes.add(crime)

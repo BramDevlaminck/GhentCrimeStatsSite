@@ -94,7 +94,7 @@ export default {
 
 
 // -------------------------- effect handlers for the map -----------------
-        function mouseOverHandler(event, data) {
+        function mouseOverHandler(event, _) {
             d3.select(this).attr("fill", HOVER_COLOR);
             tooltip.style("opacity", 1);
         }
@@ -163,7 +163,7 @@ export default {
             .enter()
             .append("path")
             .attr("d", path)
-            .attr("fill", (d, i) => {
+            .attr("fill", (d, _) => {
                 const properties = d["properties"];
                 const count = properties.count;
                 const maxCount = properties.max;
@@ -198,7 +198,7 @@ export default {
 
             // plot the changed map
             map.data(dataToMapDataFormat(dataFilteredOnDate, quarterGeometryData))
-                .attr("fill", (d, i) => {
+                .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
                     const maxCount = properties.max;
@@ -220,7 +220,7 @@ export default {
             }); // corresponding value returned by the button
 
         // Listen to dropdown
-        d3.select("#selectButton").on("change", function (d) {
+        d3.select("#selectButton").on("change", function (_) {
             updateMapWithNewCrimeCategory(this.value);
         });
 
@@ -276,7 +276,7 @@ export default {
             })
             .attr("class", "track-overlay")
             .call(d3.drag()
-                .on("start.interrupt", (event) => {
+                .on("start.interrupt", (_) => {
                     slider.interrupt();
                 })
                 .on("start drag", (event) => {
@@ -362,7 +362,7 @@ export default {
             const dataToShow = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
 
             map.data(dataToMapDataFormat(dataToShow, quarterGeometryData))
-                .attr("fill", (d, i) => {
+                .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
                     const maxCount = properties.max;

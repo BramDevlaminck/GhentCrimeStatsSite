@@ -62,13 +62,13 @@ export default {
     },
     name: "InteractiveMap",
     mounted() {
-        const svg = d3
-            .select("#map__container")
+        const mapSvg = d3
+            .select("#mapContainer")
             .append("svg")
             .attr("width", "100%")
             .attr("height", "50vh");
 
-        const g = svg.append("g");
+        const g = mapSvg.append("g");
         g.append("rect")
             .attr("width", WIDTH)
             .attr("height", HEIGHT)
@@ -80,8 +80,9 @@ export default {
             .style("pointer-events", "all");
 
         // --------------------------  create a tooltip --------------------
-        const tooltip = d3.select("#map__container")
+        const tooltip = d3.select("#mapContainer")
             .append("div")
+            .style("opacity", 0)
             .style("opacity", 0)
             .attr("class", "tooltip")
             .style("background-color", "white")
@@ -233,7 +234,6 @@ export default {
         // function to format data in d3
         const formatDateIntoYear = d3.timeFormat("%Y");
         const formatDate = d3.timeFormat("%b %Y");
-        const parseDate = d3.timeParse("%m/%d/%y");
 
         const margin = {top: 50, right: 50, bottom: 0, left: 50};
         const width = 960 - margin.left - margin.right;
@@ -243,21 +243,21 @@ export default {
         let xPositionOnSlider = 0;
         const maxXPositionOnSlider = width;
 
-        const playButton = d3.select("#play-button");
+        const playButton = d3.select("#playButton");
 
-        // gives the postion on the sliders as an x-value
+        // gives the position on the sliders as an x-value
         const positionOnSliderObject = d3.scaleTime()
             .domain([beginDate, endDate])
             .range([0, maxXPositionOnSlider])
             .clamp(true);
 
         // create the slider
-        const slidersvg = d3.select("#slider_div")
+        const sliderSvg = d3.select("#sliderDiv")
             .append("svg")
             .attr("width", "100%")
             .attr("height", "100%");
 
-        const slider = slidersvg
+        const slider = sliderSvg
             .append("g")
             .attr("class", "slider")
             .attr("transform", "translate(" + margin.left + "," + height / 5 + ")");
@@ -379,16 +379,17 @@ export default {
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
-        <div id="map__container"/>
-        <div id="slider_div"/>
+        <div id="mapContainer"/>
+        <!-- div where we will place the slider -->
+        <div id="sliderDiv"/>
         <!-- button to play/pause the slider -->
-        <button id="play-button">Play</button>
+        <button id="playButton">Play</button>
     </div>
 </template>
 
 <style scoped>
 
-#play-button {
+#playButton {
     top: 140px;
     left: 50px;
     background: #f08080;
@@ -402,43 +403,43 @@ export default {
     height: 30px;
 }
 
-#play-button:hover {
+#playButton:hover {
     background-color: #696969;
 }
 
 /*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
-#slider_div:deep(.ticks) {
+#sliderDiv:deep(.ticks) {
     font-size: 10px;
 }
 
-#slider_div:deep(.track,
+#sliderDiv:deep(.track,
 .track-inset,
 .track-overlay) {
     stroke-linecap: round;
 }
 
-#slider_div:deep(.track) {
+#sliderDiv:deep(.track) {
     stroke: #000;
     stroke-opacity: 0.3;
     stroke-width: 10px;
 }
 
-#slider_div:deep(.track-inset) {
+#sliderDiv:deep(.track-inset) {
     stroke: #dcdcdc;
     stroke-width: 8px;
 }
 
-#slider_div:deep(.track-overlay) {
+#sliderDiv:deep(.track-overlay) {
     pointer-events: stroke;
     stroke-width: 50px;
     stroke: transparent;
     cursor: grab;
 }
 
-#slider_div:deep(.handle) {
+#sliderDiv:deep(.handle) {
     fill: #fff;
     stroke: #000;
     stroke-opacity: 0.5;
-    stroke-width: 1.25px;
+    stroke-width: 1px;
 }
 </style>

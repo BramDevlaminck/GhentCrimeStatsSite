@@ -1,7 +1,7 @@
 <script>
 
-import * as vl from "vega-lite-api"
-import embed from "vega-embed"
+import * as vl from "vega-lite-api";
+import embed from "vega-embed";
 
 const brush = vl.selectInterval()
     .resolve('global'); // resolve all selections to a single global instance
@@ -38,35 +38,35 @@ const white = {stroke: 'white', strokeWidth: 2};
 
 
 export default {
-  props: { // get the data
-    combinedData: Array
-  },
-  created() { // draw the graph using the data from the prop
-    const graph = vl.data(this.combinedData)
-        .layer(line.params(brush, legend),
-            // add a rule mark to serve as a guideline
-            vl.markRule({color: '#aaa'})
-                .transform(vl.filter(isHovered))
-                .encode(vl.x().month('formatted_data')),
-            line.markCircle().params(hover)
-                .encode(vl.opacity().if(isHovered, vl.value(1)).value(0)),
-            // add white stroked text to provide a legible background for labels
-            base.markText(label, white).encode(vl.text().fieldQ('TotalNumberIncidents')),
-            // add text labels for TotalNumberIncidents
-            base.markText(label).encode(vl.text().fieldQ('TotalNumberIncidents'))
-        )
-        .title("Total Number of Incidents Per Month Per Year")
-        .width(800)
-        .transform(
-            vl.groupby(['year', 'month', 'formatted_date']).aggregate(vl.sum('total').as("TotalNumberIncidents"))
-        );
-    // bind the graph to the div with id graph
-    embed('#graph', graph.toSpec())
-  }
-}
+    props: { // get the data
+        combinedData: Array
+    },
+    created() { // draw the graph using the data from the prop
+        const graph = vl.data(this.combinedData)
+            .layer(line.params(brush, legend),
+                // add a rule mark to serve as a guideline
+                vl.markRule({color: '#aaa'})
+                    .transform(vl.filter(isHovered))
+                    .encode(vl.x().month('formatted_data')),
+                line.markCircle().params(hover)
+                    .encode(vl.opacity().if(isHovered, vl.value(1)).value(0)),
+                // add white stroked text to provide a legible background for labels
+                base.markText(label, white).encode(vl.text().fieldQ('TotalNumberIncidents')),
+                // add text labels for TotalNumberIncidents
+                base.markText(label).encode(vl.text().fieldQ('TotalNumberIncidents'))
+            )
+            .title("Total Number of Incidents Per Month Per Year")
+            .width(800)
+            .transform(
+                vl.groupby(['year', 'month', 'formatted_date']).aggregate(vl.sum('total').as("TotalNumberIncidents"))
+            );
+        // bind the graph to the div with id graph
+        embed('#graph', graph.toSpec());
+    }
+};
 </script>
 
 
 <template>
-  <div id="graph"></div>
+    <div id="graph"></div>
 </template>

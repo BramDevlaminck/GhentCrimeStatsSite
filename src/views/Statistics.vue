@@ -35,6 +35,9 @@ const allData = await Promise.all([
         return features;
     });
 
+const bikeParkingObject = await getData("bike_parkings_per_quarter.json");
+const bikeParkingMap = new Map(Object.entries(bikeParkingObject));
+
 // make sure we only add each quarter once
 const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
 const quarters = new Set(); // set that will contain all the quarters
@@ -122,7 +125,8 @@ export default {
             beginDate: smallestDate,
             endDate: biggestDate,
             crimeTypes: crimeTypes,
-            quarterGeometryData: quarterGeometryData
+            quarterGeometryData: quarterGeometryData,
+            bikeParkingMaps: bikeParkingMap
         };
     },
     computed: {
@@ -155,7 +159,7 @@ export default {
         <button type="button" v-on:click="saveFile()">Save AllData json file</button>
         <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
         <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>
+                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

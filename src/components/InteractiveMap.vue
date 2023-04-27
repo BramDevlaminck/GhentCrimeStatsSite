@@ -1,5 +1,7 @@
 <script>
 import * as d3 from "d3";
+import BikeMap from "@/components/BikeMap.vue";
+import TotalCrimesMap from "@/components/TotalCrimesMap.vue";
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
@@ -24,7 +26,7 @@ function filterDataBasedOnDateString(date, data) {
 // transform the data to the format we use for the map
 function dataToMapDataFormat(data, quarterGeometryData) {
     // count how often something happened per quarter
-    let totalCounts = new Map();
+    const totalCounts = new Map();
     for (const quarter of quarterGeometryData.keys()) {
         totalCounts.set(quarter, 0);
     }
@@ -51,14 +53,38 @@ function dataToMapDataFormat(data, quarterGeometryData) {
     return result;
 }
 
-
 export default {
+    components: {TotalCrimesMap, BikeMap},
     props: {
         allFeatures: Array,
         beginDate: Date,
         endDate: Date,
         crimeTypes: Set,
-        quarterGeometryData: Map
+        quarterGeometryData: Map,
+        bikeParkingPerQuarter: Map,
+    },
+    data() {
+        // get the data but without the data that belongs to an unknown quarter
+        const quarterGeometryDataWithoutUnknown = new Map();
+        for (const [quarter, data] of this.quarterGeometryData) {
+            if (quarter !== "Onbekend") {
+                quarterGeometryDataWithoutUnknown.set(quarter, data);
+            }
+        }
+
+        const quarterGeometrySmall = {
+            type: "FeatureCollection",
+            features: [...quarterGeometryDataWithoutUnknown.values()].map(value => {
+                return {
+                    geometry: value
+                };
+            })
+        };
+        return {
+            allFeaturesWithoutUnknown: this.allFeatures.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
+            quarterGeometrySmall: quarterGeometrySmall
+        }
     },
     name: "InteractiveMap",
     mounted() {
@@ -129,23 +155,9 @@ export default {
 
         const beginDate = new Date(this.beginDate);
         const endDate = new Date(this.endDate);
-        const allFeatures = this.allFeatures.filter(entry => entry["properties"]["quarter"] !== "Onbekend");
-        // get the data but without the data that belongs to an unknown quarter
-        const quarterGeometryData = new Map();
-        for (const [quarter, data] of this.quarterGeometryData) {
-            if (quarter !== "Onbekend") {
-                quarterGeometryData.set(quarter, data);
-            }
-        }
-
-        const quarterGeometrySmall = {
-            type: "FeatureCollection",
-            features: [...quarterGeometryData.values()].map(value => {
-                return {
-                    geometry: value
-                };
-            })
-        };
+        const allFeaturesWithoutUnknown = this.allFeaturesWithoutUnknown;
+        const quarterGeometrySmall = this.quarterGeometrySmall;
+        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown
 
         // --------------------- projection and path ----------------------------
         const projection = d3.geoMercator()
@@ -159,7 +171,7 @@ export default {
         // Draw districts and register event listeners
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(filterDataBasedOnDateString(currentDateString, allFeatures), quarterGeometryData))
+            .data(dataToMapDataFormat(filterDataBasedOnDateString(currentDateString, allFeaturesWithoutUnknown), quarterGeometryDataWithoutUnknown))
             .enter()
             .append("path")
             .attr("d", path)
@@ -179,10 +191,10 @@ export default {
         //--------------------- dropdown ----------------------------------------
 
         const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
-        let currentDataDisplayedBasedOnCategory = allFeatures; // all data of the current category!
+        let currentDataDisplayedBasedOnCategory = allFeaturesWithoutUnknown; // all data of the current category!
         // Function to update the map if a new crime category is chosen
         function updateMapWithNewCrimeCategory(selectedGroup) {
-            let features = allFeatures;
+            let features = allFeaturesWithoutUnknown;
 
             // select the data from the chart that we actually want/need
             if (selectedGroup !== allCategories[0]) {
@@ -197,7 +209,7 @@ export default {
             const dataFilteredOnDate = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
 
             // plot the changed map
-            map.data(dataToMapDataFormat(dataFilteredOnDate, quarterGeometryData))
+            map.data(dataToMapDataFormat(dataFilteredOnDate, quarterGeometryDataWithoutUnknown))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
@@ -361,7 +373,7 @@ export default {
             currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
             const dataToShow = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
 
-            map.data(dataToMapDataFormat(dataToShow, quarterGeometryData))
+            map.data(dataToMapDataFormat(dataToShow, quarterGeometryDataWithoutUnknown))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
@@ -385,6 +397,8 @@ export default {
         <!-- button to play/pause the slider -->
         <button id="playButton">Play</button>
     </div>
+    <BikeMap :all-features="allFeaturesWithoutUnknown" :quarter-geometry-small="quarterGeometrySmall" :bike-parking-per-quarter="bikeParkingPerQuarter" :quarter-geometry-data="quarterGeometryDataWithoutUnknown" />
+    <TotalCrimesMap :all-features="allFeaturesWithoutUnknown" :quarter-geometry-small="quarterGeometrySmall" :quarter-geometry-data="quarterGeometryDataWithoutUnknown" :crime-types="crimeTypes" />
 </template>
 
 <style scoped>

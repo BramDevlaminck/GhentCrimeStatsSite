@@ -3,6 +3,7 @@
 import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
 import InteractiveMap from "@/components/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
+import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
 
 // function to read the data
 function getData(filename) {
@@ -111,10 +112,11 @@ featuresSingle.forEach(datum => {
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
 const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
-
+let currentShownTab = 'maps';
 
 export default {
     components: {
+        SecondaryNavBar,
         InteractiveMap,
         YearOverviewGraph
     },
@@ -126,40 +128,49 @@ export default {
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
-            bikeParkingMaps: bikeParkingMap
+            bikeParkingMaps: bikeParkingMap,
+            currentShownTab: currentShownTab
         };
     },
     computed: {
         dataIsAvailable: () => {
             return dataWithoutGeoInformation.length > 0;
-        }
+        },
     },
     methods: {
+        tabChange (value) {
+            this.currentShownTab = value;
+        },
         saveFile: function() {
             const data = JSON.stringify(allData)
             const blob = new Blob([data], {type: 'text/plain'})
             const e = document.createEvent('MouseEvents'),
-            a = document.createElement('a');
+                a = document.createElement('a');
             a.download = "test1.json";
             a.href = window.URL.createObjectURL(blob);
             a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
             e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             a.dispatchEvent(e);
         }
-    }
+    },
 };
 
 </script>
 
 <template>
+    <SecondaryNavBar @tabSelected="tabChange"/>
     <div class="container-lg">
         <h1>Statistics page</h1>
     </div>
     <div v-if="dataIsAvailable">
-        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-        <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
-        <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
+        <div v-show="currentShownTab === 'other'">
+            <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
+        </div>
+        <div v-show="currentShownTab === 'maps'">
+            <button type="button" v-on:click="saveFile()">Save AllData json file</button>
+            <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
+                            :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
+        </div>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

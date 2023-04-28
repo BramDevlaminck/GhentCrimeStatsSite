@@ -3,6 +3,7 @@
 import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
 import InteractiveMap from "@/components/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
+import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
 
 // function to read the data
 function getData(filename) {
@@ -100,10 +101,11 @@ featuresSingle.forEach(datum => {
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
 const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
-
+let currentShownTab = 'maps';
 
 export default {
     components: {
+        SecondaryNavBar,
         InteractiveMap,
         YearOverviewGraph
     },
@@ -115,12 +117,18 @@ export default {
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
-            bikeParkingMaps: bikeParkingMap
+            bikeParkingMaps: bikeParkingMap,
+            currentShownTab: currentShownTab
         };
     },
     computed: {
         dataIsAvailable: () => {
             return dataWithoutGeoInformation.length > 0;
+        },
+    },
+    methods: {
+        tabChange (value) {
+            this.currentShownTab = value;
         }
     }
 };
@@ -128,13 +136,19 @@ export default {
 </script>
 
 <template>
+    <SecondaryNavBar @tabSelected="tabChange"/>
     <div class="container-lg">
         <h1>Statistics page</h1>
     </div>
     <div v-if="dataIsAvailable">
-        <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
-        <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
+        <div v-show="currentShownTab === 'other'">
+            <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
+        </div>
+        <div v-show="currentShownTab === 'maps'">
+            <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
+                            :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
+        </div>
+
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

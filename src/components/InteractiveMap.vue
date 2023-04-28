@@ -2,6 +2,7 @@
 import * as d3 from "d3";
 import BikeMap from "@/components/BikeMap.vue";
 import TotalCrimesMap from "@/components/TotalCrimesMap.vue";
+import SecondairyNavBar from "@/components/SecondaryNavBar.vue";
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
@@ -54,7 +55,7 @@ function dataToMapDataFormat(data, quarterGeometryData) {
 }
 
 export default {
-    components: {TotalCrimesMap, BikeMap},
+    components: {SecondairyNavBar, TotalCrimesMap, BikeMap},
     props: {
         allFeatures: Array,
         beginDate: Date,

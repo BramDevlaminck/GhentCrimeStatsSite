@@ -2,7 +2,6 @@
 import * as d3 from "d3";
 import BikeMap from "@/components/BikeMap.vue";
 import TotalCrimesMap from "@/components/TotalCrimesMap.vue";
-import SecondairyNavBar from "@/components/SecondaryNavBar.vue";
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
@@ -59,7 +58,7 @@ function dataToMapDataFormat(data, quarterGeometryData) {
 }
 
 export default {
-    components: {SecondairyNavBar, TotalCrimesMap, BikeMap},
+    components: {TotalCrimesMap, BikeMap},
     props: {
         allFeatures: Array,
         beginDate: Date,
@@ -67,29 +66,8 @@ export default {
         crimeTypes: Set,
         quarterGeometryData: Map,
         bikeParkingPerQuarter: Map,
-    },
-    data() {
-        // get the data but without the data that belongs to an unknown quarter
-        const quarterGeometryDataWithoutUnknown = new Map();
-        for (const [quarter, data] of this.quarterGeometryData) {
-            if (quarter !== "Onbekend") {
-                quarterGeometryDataWithoutUnknown.set(quarter, data);
-            }
-        }
-
-        const quarterGeometrySmall = {
-            type: "FeatureCollection",
-            features: [...quarterGeometryDataWithoutUnknown.values()].map(value => {
-                return {
-                    geometry: value
-                };
-            })
-        };
-        return {
-            allFeaturesWithoutUnknown: this.allFeatures.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
-            quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
-            quarterGeometrySmall: quarterGeometrySmall
-        }
+        quarterGeometryDataWithoutUnknown: Map,
+        quarterGeometrySmall: Object
     },
     name: "InteractiveMap",
     mounted() {
@@ -124,7 +102,7 @@ export default {
             .style("position", "absolute");
 
 
-// -------------------------- effect handlers for the map tooltip -----------------
+        // -------------------------- effect handlers for the map tooltip -----------------
         function mouseOverHandler(event, _) {
             d3.select(this).attr("fill", HOVER_COLOR);
             tooltip.style("opacity", 1);
@@ -160,7 +138,7 @@ export default {
 
         const beginDate = new Date(this.beginDate);
         const endDate = new Date(this.endDate);
-        const allFeaturesWithoutUnknown = this.allFeaturesWithoutUnknown;
+        const allFeaturesWithoutUnknown = this.allFeatures;
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown
 
@@ -402,8 +380,6 @@ export default {
         <!-- button to play/pause the slider -->
         <button id="playButton">Play</button>
     </div>
-    <BikeMap :all-features="allFeaturesWithoutUnknown" :quarter-geometry-small="quarterGeometrySmall" :bike-parking-per-quarter="bikeParkingPerQuarter" :quarter-geometry-data="quarterGeometryDataWithoutUnknown" />
-    <TotalCrimesMap :all-features="allFeaturesWithoutUnknown" :quarter-geometry-small="quarterGeometrySmall" :quarter-geometry-data="quarterGeometryDataWithoutUnknown" :crime-types="crimeTypes" />
 </template>
 
 <style scoped>

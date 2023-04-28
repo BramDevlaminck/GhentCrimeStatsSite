@@ -4,6 +4,7 @@ import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
 import InteractiveMap from "@/components/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
 import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
+import Maps from "@/components/Maps.vue";
 
 // function to read the data
 function getData(filename) {
@@ -114,8 +115,27 @@ featuresSingle.forEach(datum => {
 const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
 let currentShownTab = 'maps';
 
+
+// get the data but without the data that belongs to an unknown quarter
+const quarterGeometryDataWithoutUnknown = new Map();
+for (const [quarter, data] of quarterGeometryData) {
+    if (quarter !== "Onbekend") {
+        quarterGeometryDataWithoutUnknown.set(quarter, data);
+    }
+}
+
+const quarterGeometrySmall = {
+    type: "FeatureCollection",
+    features: [...quarterGeometryDataWithoutUnknown.values()].map(value => {
+        return {
+            geometry: value
+        };
+    })
+};
+
 export default {
     components: {
+        Maps,
         SecondaryNavBar,
         InteractiveMap,
         YearOverviewGraph
@@ -129,7 +149,10 @@ export default {
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
             bikeParkingMaps: bikeParkingMap,
-            currentShownTab: currentShownTab
+            currentShownTab: currentShownTab,
+            allFeaturesWithoutUnknown: featuresSingle.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
+            quarterGeometrySmall: quarterGeometrySmall
         };
     },
     computed: {
@@ -163,13 +186,14 @@ export default {
         <h1>Statistics page</h1>
     </div>
     <div v-if="dataIsAvailable">
+        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
         <div v-show="currentShownTab === 'other'">
             <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
         </div>
         <div v-show="currentShownTab === 'maps'">
-            <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-            <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                            :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"/>
+            <Maps :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
+                  :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"
+                    :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown" :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
         </div>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>

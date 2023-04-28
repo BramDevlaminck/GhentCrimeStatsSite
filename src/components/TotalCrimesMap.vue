@@ -48,7 +48,7 @@ function dataToMapDataFormat(data, quarterGeometryData) {
 
 export default {
     props: {
-        allFeatures: Map,
+        allFeatures: Array,
         quarterGeometrySmall: Object,
         quarterGeometryData: Map,
         crimeTypes: Set

@@ -49,7 +49,7 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
 export default {
     props: {
         bikeParkingPerQuarter: Map,
-        allFeatures: Map,
+        allFeatures: Array,
         quarterGeometrySmall: Object,
         quarterGeometryData: Map
     },

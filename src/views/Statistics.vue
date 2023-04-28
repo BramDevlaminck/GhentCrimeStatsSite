@@ -35,7 +35,6 @@ const allData = await Promise.all([
         return features;
     });
 
-
 // make sure we only add each quarter once
 const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
 const quarters = new Set(); // set that will contain all the quarters
@@ -44,6 +43,17 @@ const crimeTypes = new Set(); // set that will contain all the crimeTypes
 // start and end of dataset in time-wise
 let smallestDate = null;
 let biggestDate = null;
+
+const dates = allData.reduce((acc, curr) => {
+    const currDate = new Date(curr.properties.year);
+    acc.min = !acc.min || currDate < acc.min ? currDate : acc.min;
+    acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
+    return acc;
+  }, {});
+console.log(dates);
+smallestDate = dates.min;
+biggestDate = dates.max;
+
 
 const entriesMapWithoutDuplicatesPerMonth = new Map();
 allData.forEach(obj => {
@@ -63,13 +73,13 @@ allData.forEach(obj => {
         quarters.add(quarter);
     }
 
-    const yearMonthAsDateObj = new Date(yearMonth);
-    if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
-        smallestDate = yearMonthAsDateObj;
-    }
-    if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
-        biggestDate = yearMonthAsDateObj;
-    }
+    // const yearMonthAsDateObj = new Date(yearMonth);
+    // if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
+    //     smallestDate = yearMonthAsDateObj;
+    // }
+    // if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
+    //     biggestDate = yearMonthAsDateObj;
+    // }
     crimeTypes.add(crime);
 });
 
@@ -119,6 +129,19 @@ export default {
         dataIsAvailable: () => {
             return dataWithoutGeoInformation.length > 0;
         }
+    },
+    methods: {
+        saveFile: function() {
+            const data = JSON.stringify(allData)
+            const blob = new Blob([data], {type: 'text/plain'})
+            const e = document.createEvent('MouseEvents'),
+            a = document.createElement('a');
+            a.download = "test1.json";
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+            e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
+        }
     }
 };
 
@@ -129,6 +152,7 @@ export default {
         <h1>Statistics page</h1>
     </div>
     <div v-if="dataIsAvailable">
+        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
         <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
         <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
                         :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>

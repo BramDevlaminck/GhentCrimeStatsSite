@@ -21,6 +21,10 @@ function filterDataBasedOnDateString(date, data) {
     return data.filter(entry => entry["properties"]["jaar_maand"] === date);
 }
 
+function filterDataBasedOnYearString(year, data) {
+    return data.filter(entry => entry["properties"]["year"] === year);
+}
+
 // transform the data to the format we use for the map
 function dataToMapDataFormat(data, quarterGeometryData) {
     // count how often something happened per quarter
@@ -93,7 +97,7 @@ export default {
             .style("position", "absolute");
 
 
-// -------------------------- effect handlers for the map -----------------
+// -------------------------- effect handlers for the map tooltip -----------------
         function mouseOverHandler(event, _) {
             d3.select(this).attr("fill", HOVER_COLOR);
             tooltip.style("opacity", 1);

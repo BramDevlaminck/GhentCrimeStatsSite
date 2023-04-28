@@ -37,7 +37,12 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
     const result = [];
     for (const [quarter, total] of totalCounts) {
         result.push({
-            properties: {"quarter": quarter, "count": total, "max": maxCount, "number_of_parkings": bikeParkingPerQuarter.get(quarter)},
+            properties: {
+                "quarter": quarter,
+                "count": total,
+                "max": maxCount,
+                "number_of_parkings": bikeParkingPerQuarter.get(quarter)
+            },
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -157,9 +162,9 @@ export default {
 </script>
 
 <template>
-  <div>
-      <div id="bikeMapContainer"/>
-  </div>
+    <div>
+        <div id="bikeMapContainer"/>
+    </div>
 </template>
 
 

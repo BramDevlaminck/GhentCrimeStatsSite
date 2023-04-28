@@ -1,7 +1,7 @@
 <script>
 import * as d3 from "d3";
-import BikeMap from "@/components/BikeMap.vue";
-import TotalCrimesMap from "@/components/TotalCrimesMap.vue";
+import BikeMap from "@/components/maps/BikeMap.vue";
+import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
@@ -140,7 +140,7 @@ export default {
         const endDate = new Date(this.endDate);
         const allFeaturesWithoutUnknown = this.allFeatures;
         const quarterGeometrySmall = this.quarterGeometrySmall;
-        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown
+        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
 
         // --------------------- projection and path ----------------------------
         const projection = d3.geoMercator()

@@ -94,6 +94,7 @@ export default {
         //--------------------- dropdown ----------------------------------------
 
         const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
+
         // Function to update the map if a new crime category is chosen
         function updateMapWithNewCrimeCategory(selectedGroup) {
             let features = allFeatures;

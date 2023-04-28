@@ -1,10 +1,11 @@
 <script>
 
-import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
-import InteractiveMap from "@/components/InteractiveMap.vue";
+import YearOverviewGraph from "@/components/otherGraphs/YearOverviewGraph.vue";
+import InteractiveMap from "@/components/maps/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
 import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
-import Maps from "@/components/Maps.vue";
+import Maps from "@/components/maps/Maps.vue";
+import OtherGraphs from "@/components/otherGraphs/OtherGraphs.vue";
 
 // function to read the data
 function getData(filename) {
@@ -54,7 +55,7 @@ const dates = allData.reduce((acc, curr) => {
     acc.min = !acc.min || currDate < acc.min ? currDate : acc.min;
     acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
     return acc;
-  }, {});
+}, {});
 console.log(dates);
 smallestDate = dates.min;
 biggestDate = dates.max;
@@ -135,6 +136,7 @@ const quarterGeometrySmall = {
 
 export default {
     components: {
+        OtherGraphs,
         Maps,
         SecondaryNavBar,
         InteractiveMap,
@@ -161,12 +163,12 @@ export default {
         },
     },
     methods: {
-        tabChange (value) {
+        tabChange(value) {
             this.currentShownTab = value;
         },
-        saveFile: function() {
-            const data = JSON.stringify(allData)
-            const blob = new Blob([data], {type: 'text/plain'})
+        saveFile: function () {
+            const data = JSON.stringify(allData);
+            const blob = new Blob([data], {type: 'text/plain'});
             const e = document.createEvent('MouseEvents'),
                 a = document.createElement('a');
             a.download = "test1.json";
@@ -187,14 +189,15 @@ export default {
     </div>
     <div v-if="dataIsAvailable">
         <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-        <div v-show="currentShownTab === 'other'">
-            <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
-        </div>
-        <div v-show="currentShownTab === 'maps'">
-            <Maps :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                  :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData" :bike-parking-per-quarter="bikeParkingMaps"
-                    :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown" :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
-        </div>
+        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo"/>
+        <Maps v-show="currentShownTab === 'maps'"
+              :all-features="combinedDataWithGeoInfo"
+              :begin-date="beginDate"
+              :end-date="endDate"
+              :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
+              :bike-parking-per-quarter="bikeParkingMaps"
+              :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
+              :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

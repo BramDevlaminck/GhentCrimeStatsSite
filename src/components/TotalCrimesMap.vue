@@ -16,34 +16,18 @@ function getColour(count, maxCount) {
 }
 
 // transform the data to the format we use for the map
-function dataToMapDataFormat(data, quarterGeometryData, crimeTypes) {
+function dataToMapDataFormat(data, quarterGeometryData) {
     // count how often something happened per quarter
     const totalCounts = new Map();
     for (const quarter of quarterGeometryData.keys()) {
         totalCounts.set(quarter, 0);
     }
-    console.log(totalCounts);
-
-    const countsPerQuarterPerCrime = new Map();
-    for (const quarter of totalCounts.keys())  {
-        console.log(quarter)
-        const crimeCounts = new Map();
-        for (const crime of crimeTypes) {
-            crimeCounts.set(crime, 0);
-        }
-        countsPerQuarterPerCrime.set(quarter, crimeCounts);
-    }
-    console.log(countsPerQuarterPerCrime);
 
     data.forEach(obj => {
         const properties = obj["properties"];
         const quarter = properties["quarter"];
-        const count = properties["total"];
-        const crime = properties["fact_category"];
         const currentCount = totalCounts.get(quarter);
-        totalCounts.set(quarter, currentCount + count);
-        const currentCountForThisCrime = countsPerQuarterPerCrime.get(quarter).get(crime)
-        countsPerQuarterPerCrime.get(quarter).set(crime, currentCountForThisCrime + count);
+        totalCounts.set(quarter, currentCount + properties["total"]);
     });
 
     // get the max this happens per quarter
@@ -53,7 +37,7 @@ function dataToMapDataFormat(data, quarterGeometryData, crimeTypes) {
     const result = [];
     for (const [quarter, total] of totalCounts) {
         result.push({
-            properties: {"quarter": quarter, "count": total, "max": maxCount, "crimes": countsPerQuarterPerCrime.get(quarter)},
+            properties: {"quarter": quarter, "count": total, "max": maxCount},
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -107,6 +91,49 @@ export default {
             .style("padding", "5px")
             .style("position", "absolute");
 
+        //--------------------- dropdown ----------------------------------------
+
+        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
+        // Function to update the map if a new crime category is chosen
+        function updateMapWithNewCrimeCategory(selectedGroup) {
+            let features = allFeatures;
+
+            // select the data from the chart that we actually want/need
+            if (selectedGroup !== allCategories[0]) {
+                features = features.filter(element => {
+                    return element["properties"]["fact_category"] === selectedGroup;
+                });
+            }
+            console.log(features);
+
+            // plot the changed map
+            map.data(dataToMapDataFormat(features, quarterGeometryData))
+                .attr("fill", (d, _) => {
+                    const properties = d["properties"];
+                    const count = properties.count;
+                    const maxCount = properties.max;
+                    return getColour(count, maxCount);
+                });
+        }
+
+        // add the options to the button
+        d3.select("#selectButtonTotalCrimes")
+            .selectAll('myOptions')
+            .data(allCategories)
+            .enter()
+            .append('option')
+            .text(function (d) {
+                return d;
+            }) // text showed in the menu
+            .attr("value", function (d) {
+                return d;
+            }); // corresponding value returned by the button
+
+        // Listen to dropdown
+        d3.select("#selectButtonTotalCrimes").on("change", function (_) {
+            updateMapWithNewCrimeCategory(this.value);
+        });
+
 
         // -------------------------- effect handlers for the map -----------------
         function mouseOverHandler(event, _) {
@@ -136,13 +163,10 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
-            const crimesWithCount = properties.crimes;
-            // "&nbsp" is a space in html, normal tabs are removed when rendered, using this special character allows to still have this
-            const crimesString = Array.from(crimesWithCount).map(([crime, count]) => `&nbsp&nbsp&nbsp&nbsp${crime}: ${count}`).join("<br>")
             tooltip
-                .html("Regio: " + quarter + "<br>Totaal: " + count + "<br>Aantal voorkomens per feit:<br>" + crimesString)
+                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
                 .style("left", ((event.pageX) + 20) + "px")
-                .style("top", ((event.pageY) - 450) + "px");
+                .style("top", (event.pageY) + "px");
         }
 
         // --------------------- projection and path ----------------------------
@@ -177,13 +201,11 @@ export default {
 
 <template>
     <div>
+        <select id="selectButtonTotalCrimes"></select>
         <div id="totalMapContainer"/>
     </div>
 </template>
 
 
 <style scoped>
-#totalMapContainer:deep(.tab) {
-    tab-size: 4;
-}
 </style>

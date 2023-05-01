@@ -3,6 +3,7 @@
 import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
 import InteractiveMap from "@/components/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
+import TotalBarChart from "@/components/TotalBarChart.vue";
 
 // function to read the data
 function getData(filename) {
@@ -102,6 +103,7 @@ const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
 
 export default {
     components: {
+        TotalBarChart,
         InteractiveMap,
         YearOverviewGraph
     },
@@ -132,6 +134,7 @@ export default {
         <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
         <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
                         :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>
+        <TotalBarChart :all-features="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

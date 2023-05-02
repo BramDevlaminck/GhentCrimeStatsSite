@@ -202,6 +202,7 @@ export default {
                     .style("fill", function (d) {
                         return color(d.date.getFullYear());
                     })
+                    .style("font-size", "80%")
                     .style("opacity", d => d3.select(".year" + d.date.getFullYear()).style("opacity"));
 
                 // set location new line

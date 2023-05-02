@@ -110,7 +110,7 @@ export default {
                 max = 10;
             }
             // rescale x-axis
-            x.domain([0, max]);
+            x.domain([0, max]).nice();
             axis.transition()
                 .duration(2000)
                 .call(d3.axisBottom(x));

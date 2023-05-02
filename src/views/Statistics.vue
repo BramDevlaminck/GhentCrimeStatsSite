@@ -134,7 +134,6 @@ export default {
         <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
         <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
                         :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>
-        <TotalBarChart :all-features="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

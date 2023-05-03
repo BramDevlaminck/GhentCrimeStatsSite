@@ -86,7 +86,6 @@ export default {
         const tooltip = d3.select("#mapContainer")
             .append("div")
             .style("opacity", 0)
-            .style("opacity", 0)
             .attr("class", "tooltip")
             .style("background-color", "white")
             .style("border", "solid")

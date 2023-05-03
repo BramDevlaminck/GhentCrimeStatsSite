@@ -138,7 +138,7 @@ export default {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
-        const map = g.append("g")
+        g.append("g")
             .selectAll("path")
             .data(dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData))
             .enter()

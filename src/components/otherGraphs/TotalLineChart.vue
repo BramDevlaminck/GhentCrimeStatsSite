@@ -1,4 +1,5 @@
 <script>
+import * as d3 from "d3";
 
 function preprocessDataPerYearAndMonth(data) {
 
@@ -19,7 +20,8 @@ function preprocessDataPerYearAndMonth(data) {
 
     const result = [];
     for (const [key, count] of entriesPerYearMonthMap) {
-        result.push({"date": new Date(key + "-01"), "count": count, "month": new Date(key + "-01").getMonth()});
+        const dateObject = new Date(key + "-01")
+        result.push({"date": dateObject, "count": count, "month": dateObject.getMonth()});
     }
     // sort according to date, needed for having clean lines
     result.sort((obj1, obj2) => {
@@ -36,7 +38,6 @@ function preprocessDataPerYearAndMonth(data) {
     return result;
 }
 
-import * as d3 from "d3";
 
 export default {
     props: {
@@ -63,7 +64,7 @@ export default {
                 "translate(" + margin.left + "," + margin.top + ")");
 
         // group the data: I want to draw one line per group
-        const sumstat = d3.group(data, d => d.date.getFullYear());
+        const groupedData = d3.group(data, d => d.date.getFullYear());
 
 
         const x = d3.scaleTime()
@@ -87,7 +88,7 @@ export default {
 
         // color palette
         const res = [];
-        for (const year of sumstat.keys()) {
+        for (const year of groupedData.keys()) {
             res.push(year);
         }
         const color = d3.scaleOrdinal()
@@ -96,7 +97,7 @@ export default {
 
         // Draw the lines
         lineGraph.selectAll(".line")
-            .data(sumstat) // use grouped data for the lines!
+            .data(groupedData) // use grouped data for the lines!
             .enter()
             .append("path")
             .attr("fill", "none")
@@ -104,7 +105,7 @@ export default {
             .attr("class", (d) => "year" + d[0])
             .attr("stroke-width", 1.5)
             .attr("d", function (d) {
-                // extract the values and sort!
+                // extract the values and draw a line with it
                 const values = d[1];
                 return d3.line()
                     .curve(d3.curveMonotoneX)
@@ -127,7 +128,7 @@ export default {
 
 
         // ------------------------- legend --------------------------
-        const labels = [...sumstat.keys()];
+        const labels = [...groupedData.keys()];
         // Add one dot in the legend for each name.
         svg.selectAll("legendDots")
             .data(labels)
@@ -145,7 +146,7 @@ export default {
             .append("text")
             .attr("class", d => "year" + d)
             .attr("x", width + margin.left + margin.right - 300 + 20)
-            .attr("y", (d, i) => 100 + i * 25) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("y", (d, i) => 100 + i * 25) // 100 is where the first label appears. 25 is the distance between labels
             .style("fill", d => color(d))
             .text(d => d)
             .attr("text-anchor", "left")
@@ -154,7 +155,7 @@ export default {
                 const selector = ".year" + data;
                 // is the element currently visible ?
                 const currentOpacity = d3.selectAll(selector).style("opacity");
-                // Change the opacity: from 0 to 1 or from 1 to 0
+                // Change the opacity: from 0.2 to 1 or from 1 to 0.2
                 d3.selectAll(selector).transition().style("opacity", currentOpacity === "1" ? 0.2 : 1);
 
             });

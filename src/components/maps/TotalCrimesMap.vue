@@ -105,7 +105,6 @@ export default {
                     return element["properties"]["fact_category"] === selectedGroup;
                 });
             }
-            console.log(features);
 
             // plot the changed map
             map.data(dataToMapDataFormat(features, quarterGeometryData))

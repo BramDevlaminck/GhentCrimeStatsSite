@@ -1,7 +1,5 @@
 <script>
 
-import YearOverviewGraph from "@/components/otherGraphs/YearOverviewGraph.vue";
-import InteractiveMap from "@/components/maps/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
 import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
 import Maps from "@/components/maps/Maps.vue";
@@ -139,8 +137,6 @@ export default {
         OtherGraphs,
         Maps,
         SecondaryNavBar,
-        InteractiveMap,
-        YearOverviewGraph
     },
     data() {
         return {

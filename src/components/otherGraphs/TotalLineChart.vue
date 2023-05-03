@@ -20,7 +20,7 @@ function preprocessDataPerYearAndMonth(data) {
 
     const result = [];
     for (const [key, count] of entriesPerYearMonthMap) {
-        const dateObject = new Date(key + "-01")
+        const dateObject = new Date(key + "-01");
         result.push({"date": dateObject, "count": count, "month": dateObject.getMonth()});
     }
     // sort according to date, needed for having clean lines

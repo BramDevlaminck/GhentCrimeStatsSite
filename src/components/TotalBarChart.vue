@@ -108,20 +108,24 @@ export default {
             return categoryList;
         }
 
-        function changeCategory(category) {
-            const data = getCategoryData(category);
-
-            let max = Math.max(...data.map(obj => obj.total));
+        function getMaxValue(iterable) {
+            let max = Math.max(...iterable.map(obj => obj.total));
             if (max === 0) {
                 max = 10;
             }
+            return max;
+        }
+
+        function changeCategory(category) {
+            const categoryData = getCategoryData(category);
+            const max = getMaxValue(categoryData);
             // rescale x-axis
             x.domain([0, max]).nice();
             axis.transition()
                 .duration(1000)
                 .call(d3.axisBottom(x));
 
-            const bars = svg.selectAll("rect").data(data);
+            const bars = svg.selectAll("rect").data(categoryData);
 
             bars.join("rect")
                 .transition()
@@ -133,12 +137,13 @@ export default {
                 .attr("fill", "#31688e");
         }
 
-        const data = getCategoryData("Alle Categorieën");
+        const data = getCategoryData(allCategories[0]);
 
         // Add X axis
         const x = d3.scaleLinear()
-            .domain([0, 20])
-            .range([0, WIDTH]);
+            .domain([0, getMaxValue(data)])
+            .range([0, WIDTH])
+            .nice();
 
         const axis = svg.append("g")
             .attr("transform", `translate(0, ${HEIGHT})`)
@@ -185,8 +190,6 @@ export default {
         d3.select("#selectButtonTotalBarChart").on("change", function (_) {
             changeCategory(this.value);
         });
-
-        changeCategory("Alle Categorieën");
     }
 };
 </script>

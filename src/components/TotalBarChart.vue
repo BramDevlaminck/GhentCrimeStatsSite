@@ -10,7 +10,7 @@
 <script>
 import * as d3 from "d3";
 
-const margin = {top: 20, right: 30, bottom: 40, left: 90}
+const margin = {top: 20, right: 30, bottom: 40, left: 90};
 const WIDTH = 960 - margin.left - margin.right;
 const HEIGHT = 320 - margin.top - margin.bottom;
 
@@ -33,22 +33,22 @@ export default {
             .style("padding", "5px")
             .style("position", "absolute");
 
-        const mouseover = function(event, d) {
+        const mouseover = function (event, d) {
             const subgroupName = d.year;
             const subgroupValue = d.total;
             tooltip
                 .html("Year: " + subgroupName + "<br>" + "Monthly average: " + subgroupValue)
-                .style("opacity", 1)
-        }
-        const mousemove = function(event, _) {
-            tooltip.style("transform","translateY(-55%)")
-                .style("left",((event.pageX)+20)+"px")
-                .style("top",(event.pageY)+"px")
-        }
-        const mouseleave = function(_, __) {
+                .style("opacity", 1);
+        };
+        const mousemove = function (event, _) {
+            tooltip.style("transform", "translateY(-55%)")
+                .style("left", ((event.pageX) + 20) + "px")
+                .style("top", (event.pageY) + "px");
+        };
+        const mouseleave = function (_, __) {
             tooltip
-                .style("opacity", 0)
-        }
+                .style("opacity", 0);
+        };
 
         // --------------------------  bar chart --------------------
 
@@ -65,11 +65,11 @@ export default {
         const months = getNumberOfMonths();
 
         function getNumberOfMonths() {
-            const nrOfMonths = {}
+            const nrOfMonths = {};
             for (const year of years) {
                 nrOfMonths[year] = [...new Set(allFeatures.filter(element => {
                     return element["year"] === year;
-                }).map(item => item["month"]))].length
+                }).map(item => item["month"]))].length;
             }
 
             return nrOfMonths;
@@ -85,18 +85,18 @@ export default {
                 counts[year] = 0;
                 months[year] = [...new Set(categoryData.filter(element => {
                     return element["year"] === year;
-                }).map(item => item["month"]))].length
+                }).map(item => item["month"]))].length;
             }
 
             categoryData.forEach(obj => {
                 const year = obj["year"];
                 counts[year] = counts[year] + obj["total"];
-            })
+            });
 
             let categoryList = [];
 
             for (const [year, total] of Object.entries(counts)) {
-                categoryList.push({year: year, total: Math.ceil(total/months[year])});
+                categoryList.push({year: year, total: Math.ceil(total / months[year])});
             }
 
             return categoryList;
@@ -112,7 +112,7 @@ export default {
             // rescale x-axis
             x.domain([0, max]).nice();
             axis.transition()
-                .duration(2000)
+                .duration(1000)
                 .call(d3.axisBottom(x));
 
             const bars = svg.selectAll("rect").data(data);
@@ -132,7 +132,7 @@ export default {
         // Add X axis
         const x = d3.scaleLinear()
             .domain([0, 20])
-            .range([ 0, WIDTH]);
+            .range([0, WIDTH]);
 
         const axis = svg.append("g")
             .attr("transform", `translate(0, ${HEIGHT})`)
@@ -140,7 +140,7 @@ export default {
 
         // Y axis
         const y = d3.scaleBand()
-            .range([ 0, HEIGHT ])
+            .range([0, HEIGHT])
             .domain(data.map(d => d.year))
             .padding(.1);
 
@@ -151,7 +151,7 @@ export default {
         svg.selectAll("myRect")
             .data(data)
             .join("rect")
-            .attr("x", x(0) )
+            .attr("x", x(0))
             .attr("y", d => y(d.year))
             .attr("width", d => x(d.total))
             .attr("height", y.bandwidth())
@@ -182,7 +182,7 @@ export default {
             changeCategory(this.value);
         });
     }
-}
+};
 </script>
 
 <style scoped>

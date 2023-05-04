@@ -21,6 +21,9 @@ export default {
         crimeTypes: Set,
     },
     mounted() {
+
+        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
+
         // --------------------------  create a tooltip --------------------
         const tooltip = d3.select("#totalBarChart")
             .append("div")
@@ -76,9 +79,12 @@ export default {
         }
 
         function getCategoryData(category) {
-            const categoryData = allFeatures.filter(element => {
-                return element["fact_category"] === category;
-            });
+            let categoryData = allFeatures;
+            if (category !== allCategories[0]) {
+                categoryData = categoryData.filter(element => {
+                    return element["fact_category"] === category;
+                });
+            }
 
             let counts = {};
             for (const year of years) {
@@ -127,7 +133,7 @@ export default {
                 .attr("fill", "#31688e");
         }
 
-        const data = getCategoryData("Autodiefstal");
+        const data = getCategoryData("Alle Categorieën");
 
         // Add X axis
         const x = d3.scaleLinear()
@@ -162,8 +168,6 @@ export default {
 
         //--------------------- dropdown ----------------------------------------
 
-        const allCategories = [...this.crimeTypes];
-
         // add the options to the button
         d3.select("#selectButtonTotalBarChart")
             .selectAll('myOptions')
@@ -181,6 +185,8 @@ export default {
         d3.select("#selectButtonTotalBarChart").on("change", function (_) {
             changeCategory(this.value);
         });
+
+        changeCategory("Alle Categorieën");
     }
 };
 </script>

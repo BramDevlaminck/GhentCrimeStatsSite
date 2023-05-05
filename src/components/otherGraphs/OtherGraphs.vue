@@ -1,8 +1,8 @@
 <script>
-import YearOverviewGraph from "@/components/otherGraphs/YearOverviewGraph.vue";
+import TotalLineChart from "@/components/otherGraphs/TotalLineChart.vue";
 
 export default {
-    components: {YearOverviewGraph},
+    components: {TotalLineChart},
     props: {
         combinedData: Array
     },
@@ -12,7 +12,7 @@ export default {
 
 <template>
     <div>
-        <YearOverviewGraph :combinedData="combinedData"/>
+        <TotalLineChart :data="combinedData"/>
     </div>
 </template>
 

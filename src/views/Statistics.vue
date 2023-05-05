@@ -1,9 +1,9 @@
 <script>
 
-import YearOverviewGraph from "@/components/YearOverviewGraph.vue";
-import InteractiveMap from "@/components/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
-import TotalBarChart from "@/components/TotalBarChart.vue";
+import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
+import Maps from "@/components/maps/Maps.vue";
+import OtherGraphs from "@/components/otherGraphs/OtherGraphs.vue";
 
 // function to read the data
 function getData(filename) {
@@ -36,6 +36,8 @@ const allData = await Promise.all([
         return features;
     });
 
+const bikeParkingObject = await getData("bike_parkings_per_quarter.json");
+const bikeParkingMap = new Map(Object.entries(bikeParkingObject));
 
 // make sure we only add each quarter once
 const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
@@ -45,6 +47,17 @@ const crimeTypes = new Set(); // set that will contain all the crimeTypes
 // start and end of dataset in time-wise
 let smallestDate = null;
 let biggestDate = null;
+
+const dates = allData.reduce((acc, curr) => {
+    const currDate = new Date(curr.properties.year);
+    acc.min = !acc.min || currDate < acc.min ? currDate : acc.min;
+    acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
+    return acc;
+}, {});
+console.log(dates);
+smallestDate = dates.min;
+biggestDate = dates.max;
+
 
 const entriesMapWithoutDuplicatesPerMonth = new Map();
 allData.forEach(obj => {
@@ -64,13 +77,6 @@ allData.forEach(obj => {
         quarters.add(quarter);
     }
 
-    const yearMonthAsDateObj = new Date(yearMonth);
-    if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
-        smallestDate = yearMonthAsDateObj;
-    }
-    if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
-        biggestDate = yearMonthAsDateObj;
-    }
     crimeTypes.add(crime);
 });
 
@@ -99,13 +105,31 @@ featuresSingle.forEach(datum => {
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
 const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
+let currentShownTab = 'maps';
 
+
+// get the data but without the data that belongs to an unknown quarter
+const quarterGeometryDataWithoutUnknown = new Map();
+for (const [quarter, data] of quarterGeometryData) {
+    if (quarter !== "Onbekend") {
+        quarterGeometryDataWithoutUnknown.set(quarter, data);
+    }
+}
+
+const quarterGeometrySmall = {
+    type: "FeatureCollection",
+    features: [...quarterGeometryDataWithoutUnknown.values()].map(value => {
+        return {
+            geometry: value
+        };
+    })
+};
 
 export default {
     components: {
-        TotalBarChart,
-        InteractiveMap,
-        YearOverviewGraph
+        OtherGraphs,
+        Maps,
+        SecondaryNavBar,
     },
     data() {
         return {
@@ -114,26 +138,55 @@ export default {
             beginDate: smallestDate,
             endDate: biggestDate,
             crimeTypes: crimeTypes,
-            quarterGeometryData: quarterGeometryData
+            quarterGeometryData: quarterGeometryData,
+            bikeParkingMaps: bikeParkingMap,
+            currentShownTab: currentShownTab,
+            allFeaturesWithoutUnknown: featuresSingle.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
+            quarterGeometrySmall: quarterGeometrySmall
         };
     },
     computed: {
         dataIsAvailable: () => {
             return dataWithoutGeoInformation.length > 0;
+        },
+    },
+    methods: {
+        tabChange(value) {
+            this.currentShownTab = value;
+        },
+        saveFile: function () {
+            const data = JSON.stringify(allData);
+            const blob = new Blob([data], {type: 'text/plain'});
+            const e = document.createEvent('MouseEvents'),
+                a = document.createElement('a');
+            a.download = "test1.json";
+            a.href = window.URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+            e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            a.dispatchEvent(e);
         }
-    }
+    },
 };
 
 </script>
 
 <template>
+    <SecondaryNavBar @tabSelected="tabChange"/>
     <div class="container-lg">
         <h1>Statistics page</h1>
     </div>
     <div v-if="dataIsAvailable">
-        <YearOverviewGraph :combinedData="combinedDataNoGeoInfo"/>
-        <InteractiveMap :all-features="combinedDataWithGeoInfo" :begin-date="beginDate" :end-date="endDate"
-                        :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"/>
+        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
+        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo"/>
+        <Maps v-show="currentShownTab === 'maps'"
+              :all-features="combinedDataWithGeoInfo"
+              :begin-date="beginDate"
+              :end-date="endDate"
+              :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
+              :bike-parking-per-quarter="bikeParkingMaps"
+              :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
+              :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
     </div>
     <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>

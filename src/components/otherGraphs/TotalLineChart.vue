@@ -1,5 +1,8 @@
 <script>
 import * as d3 from "d3";
+import colourScales from '../ColourScales';
+
+const {categoricalScaleColour} = colourScales();
 
 function preprocessDataPerYearAndMonth(data) {
 
@@ -92,9 +95,7 @@ export default {
         for (const year of groupedData.keys()) {
             res.push(year);
         }
-        const color = d3.scaleOrdinal()
-            .domain(res)
-            .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']);
+        const color = categoricalScaleColour(res);
 
         // Draw the lines
         lineGraph.selectAll(".line")

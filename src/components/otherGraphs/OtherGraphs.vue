@@ -4,7 +4,8 @@ import TotalLineChart from "@/components/otherGraphs/TotalLineChart.vue";
 export default {
     components: {TotalLineChart},
     props: {
-        combinedData: Array
+        combinedData: Array,
+        crimeTypes: Set
     },
     name: "OtherGraphs"
 };
@@ -12,7 +13,7 @@ export default {
 
 <template>
     <div>
-        <TotalLineChart :data="combinedData"/>
+        <TotalLineChart :data="combinedData" :crime-types="crimeTypes"/>
     </div>
 </template>
 

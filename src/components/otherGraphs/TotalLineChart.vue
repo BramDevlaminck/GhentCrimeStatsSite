@@ -1,7 +1,7 @@
 <script>
 import * as d3 from "d3";
 
-function preprocessDataPerYearAndMonth(data) {
+function preprocessDataPerYearAndMonth(data, categories) {
 
     const dataEntryToYearMonth = (entry) => entry.getFullYear().toString() + "-" + (entry.getMonth() + 1).toString();
 
@@ -10,18 +10,30 @@ function preprocessDataPerYearAndMonth(data) {
         const date = new Date(obj["jaar_maand"]);
         const key = dataEntryToYearMonth(date);
 
-        let currentCount = 0;
+        let currentCounts;
         if (entriesPerYearMonthMap.has(key)) {
-            currentCount = entriesPerYearMonthMap.get(key);
+            currentCounts = entriesPerYearMonthMap.get(key);
+        } else {
+            currentCounts = new Map();
+            for (const category of categories) {
+                currentCounts.set(category, 0);
+            }
         }
-        currentCount += obj["total"];
-        entriesPerYearMonthMap.set(key, currentCount);
+        const countForThisItem = obj["total"];
+        const category = obj["fact_category"];
+        let totalCount = currentCounts.get("Alle Categorieën");
+        let currentCrimeTypeCount = currentCounts.get(category);
+        currentCounts.set("Alle Categorieën", totalCount + countForThisItem);
+        currentCounts.set(category, currentCrimeTypeCount + countForThisItem);
+        entriesPerYearMonthMap.set(key, currentCounts);
     }
 
     const result = [];
-    for (const [key, count] of entriesPerYearMonthMap) {
+    for (const [key, crimeMap] of entriesPerYearMonthMap) {
         const dateObject = new Date(key + "-01");
-        result.push({"date": dateObject, "count": count, "month": dateObject.getMonth()});
+        for (const [crime, count] of crimeMap) {
+            result.push({"date": dateObject, "count": count, "month": dateObject.getMonth(), "fact_category": crime});
+        }
     }
     // sort according to date, needed for having clean lines
     result.sort((obj1, obj2) => {
@@ -38,14 +50,20 @@ function preprocessDataPerYearAndMonth(data) {
     return result;
 }
 
+function selectCategoryFromData(data, category) {
+    return data.filter(el => el["fact_category"] === category);
+}
+
 
 export default {
     props: {
-        data: Array
+        data: Array,
+        crimeTypes: Set
     },
     name: "TotalLineChart",
     mounted() {
-        const data = preprocessDataPerYearAndMonth(this.data);
+        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
+        const data = preprocessDataPerYearAndMonth(this.data, allCategories);
         const monthFormatter = d3.timeFormat("%b");
         const margin = {top: 10, right: 30, bottom: 30, left: 60},
             width = 1000 - margin.left - margin.right,
@@ -62,10 +80,9 @@ export default {
         const lineGraph = svg.append("g")
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
-
+        let currentDataDisplayedBasedOnCategory = selectCategoryFromData(data, allCategories[0]); // all data of the current category!
         // group the data: I want to draw one line per group
-        const groupedData = d3.group(data, d => d.date.getFullYear());
-
+        let groupedData = d3.group(currentDataDisplayedBasedOnCategory, d => d.date.getFullYear());
 
         const x = d3.scaleTime()
             .domain([new Date("2021-12-31"), new Date("2022-12-01")])
@@ -81,11 +98,14 @@ export default {
 
         // Add Y axis
         const y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => +d.count)])
+            .domain([0, d3.max(currentDataDisplayedBasedOnCategory, d => +d.count)])
             .range([height, 0])
             .nice();
+
+        const yAxis = d3.axisLeft(y);
         lineGraph.append("g")
-            .call(d3.axisLeft(y));
+            .attr("id", "y-axis")
+            .call(yAxis);
 
         // color palette
         const res = [];
@@ -96,29 +116,33 @@ export default {
             .domain(res)
             .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']);
 
+        const lines = new Map();
+
         // Draw the lines
-        lineGraph.selectAll(".line")
+        lineGraph.selectAll(".lines")
             .data(groupedData) // use grouped data for the lines!
             .enter()
             .append("path")
             .attr("fill", "none")
             .attr("stroke", (d) => color(d[0]))
-            .attr("class", (d) => "year" + d[0])
+            .attr("class", (d) => "lines year" + d[0]) // classes are split on " " between elements returned by the function
             .attr("stroke-width", 1.5)
             .attr("d", function (d) {
                 // extract the values and draw a line with it
-                const values = d[1];
-                return d3.line()
+                const [year, values] = d;
+                const line = d3.line()
                     .curve(d3.curveMonotoneX)
                     .x(d => x(new Date(2022, d.month)))
                     .y(d => y(d.count))
                     (values);
+                lines.set(year, line);
+                return line;
             });
 
         // add the dots
-        lineGraph.append("g")
+        const dots = lineGraph.append("g")
             .selectAll("dot")
-            .data(data) // use ungrouped data for the dots!
+            .data(currentDataDisplayedBasedOnCategory) // use ungrouped data for the dots!
             .enter()
             .append("circle")
             .attr("cx", d => x(new Date(2022, d.month)))
@@ -127,6 +151,67 @@ export default {
             .style("fill", d => color(d.date.getFullYear()))
             .attr("class", d => "year" + d.date.getFullYear());
 
+
+        //--------------------- dropdown ----------------------------------------
+
+        // Function to update the chart if a new crime category is chosen
+        function updateMapWithNewCrimeCategory(selectedGroup) {
+            currentDataDisplayedBasedOnCategory = selectCategoryFromData(data, selectedGroup);
+            groupedData = d3.group(currentDataDisplayedBasedOnCategory, d => d.date.getFullYear());
+
+            // update y axis (needs to happen first!)
+            y.domain([0, d3.max(currentDataDisplayedBasedOnCategory, d => +d.count)])
+                .nice();
+            lineGraph.select("#y-axis")
+                .transition()
+                .duration(1000)
+                .call(yAxis);
+
+            // update the lines
+            lineGraph.selectAll("path.lines")
+                .data(groupedData) // use grouped data for the lines!
+                .transition()
+                .duration(1000)
+                .attr("d", function (d) {
+                    // extract the values and draw a line with it
+                    const [year, values] = d;
+                    const line = d3.line()
+                        .curve(d3.curveMonotoneX)
+                        .x(d => x(new Date(2022, d.month)))
+                        .y(d => y(d.count))
+                        (values);
+                    lines.set(year, line);
+                    return line;
+                })
+                .attr("fill", "none")
+                .attr("stroke", (d) => color(d[0]))
+                .attr("class", (d) => "lines year" + d[0]) // lines class + class right year (classes will be split on " ")
+                .attr("stroke-width", 1.5);
+
+            // update the dots
+            dots.data(currentDataDisplayedBasedOnCategory) // use ungrouped data for the dots!
+                .transition()
+                .duration(1000)
+                .attr("cx", d => x(new Date(2022, d.month)))
+                .attr("cy", d => y(d.count))
+                .attr("r", 3)
+                .style("fill", d => color(d.date.getFullYear()))
+                .attr("class", d => "year" + d.date.getFullYear());
+        }
+
+        // add the options to the button
+        d3.select("#selectButtonForLineGraph")
+            .selectAll('myOptions')
+            .data(allCategories)
+            .enter()
+            .append('option')
+            .text(d => d) // text showed in the menu
+            .attr("value", d => d); // corresponding value returned by the button
+
+        // Listen to dropdown
+        d3.select("#selectButtonForLineGraph").on("change", function (_) {
+            updateMapWithNewCrimeCategory(this.value);
+        });
 
         // ------------------------- legend --------------------------
         const labels = [...groupedData.keys()];
@@ -186,7 +271,7 @@ export default {
             const currentMonth = getCurrentMonthFromHover(event);
             if (currentMonth >= 0) { // >= 0 needed since hovering left of the graph could also trigger the line otherwise
                 // select the data of this month
-                const selectedMonthData = data.filter(d => d.month === currentMonth);
+                const selectedMonthData = currentDataDisplayedBasedOnCategory.filter(d => d.month === currentMonth);
                 // calculate the location on the x-axis
                 const monthOnAxis = x(new Date(2022, currentMonth));
                 // remove old labels
@@ -221,6 +306,8 @@ export default {
 </script>
 
 <template>
+  <!-- Dropdown used for all the categories -->
+    <select id="selectButtonForLineGraph"></select>
     <div id="lineChart"/>
 </template>
 

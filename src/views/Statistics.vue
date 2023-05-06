@@ -185,7 +185,7 @@ export default {
     </div>
     <div v-if="dataIsAvailable">
         <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo"/>
+        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
         <Maps v-show="currentShownTab === 'maps'"
               :all-features="combinedDataWithGeoInfo"
               :begin-date="beginDate"

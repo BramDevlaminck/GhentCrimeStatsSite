@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 years=(2018 2019 2020 2021 2022 2023)
 
 for year in ${years[@]}; do

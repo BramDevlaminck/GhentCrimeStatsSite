@@ -6,7 +6,7 @@ export default {
     components: {TotalBarChart, TotalLineChart},
     props: {
         combinedData: Array,
-        crimeTypes: Set,
+        crimeTypes: Set
     },
     name: "OtherGraphs"
 };
@@ -14,7 +14,7 @@ export default {
 
 <template>
     <div>
-        <TotalLineChart :data="combinedData"/>
+        <TotalLineChart :data="combinedData" :crime-types="crimeTypes"/>
         <TotalBarChart :all-features="combinedData" :crime-types="crimeTypes"/>
     </div>
 </template>

@@ -167,7 +167,7 @@ export default {
     <SecondaryNavBar @tabSelected="tabChange"/>
     <div class="container-lg">
         <h1>Statistics page</h1>
-    
+
         <div v-if="dataIsAvailable">
             <button type="button" v-on:click="saveFile()">Save AllData json file</button>
             <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>

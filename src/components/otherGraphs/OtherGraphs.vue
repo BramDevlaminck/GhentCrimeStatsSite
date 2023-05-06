@@ -17,82 +17,92 @@ export default {
         <TotalLineChart :data="combinedData" :crime-types="crimeTypes"/>
         <TotalBarChart :all-features="combinedData" :crime-types="crimeTypes"/>
         <div class="timeline">
-            <div class="empty-block">
-            </div>
-            <div class="divider">
-                <div class="circle"></div>
-            </div>
-            <div class="segment">
+            <div class="segment left">
                 <h3>Lorem ipsum</h3>
                 <p>Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.</p>
             </div>
-            <div class="segment">
+            <div class="segment right">
                 <h3>Lorem ipsum</h3>
                 <p>Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.</p>
             </div>
-            <div class="divider">
-                <div class="circle"></div>
-            </div>
-            <div class="empty-block">
-            </div>
-            <div class="empty-block">
-            </div>
-            <div class="divider">
-                <div class="circle"></div>
-            </div>
-            <div class="segment">
+            <div class="segment left">
                 <h3>Lorem ipsum</h3>
                 <p>Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.</p>
             </div>
-            <div class="segment">
+            <div class="segment right">
                 <h3>Lorem ipsum</h3>
                 <p>Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.</p>
-            </div>
-            <div class="divider">
-                <div class="circle"></div>
-            </div>
-            <div class="empty-block">
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.timeline {
-    width: 80%;
-    height: auto;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
+.left {
+    left: 0;
 }
 
-.timeline {
-    display: grid;
-    grid-template-columns: 1fr 3px 1fr;
-}
-
-.divider {
-    position: relative;
-    width: 3px;
-    background-color: gray;
-    height: 100%;
-}
-
-.circle {
-    position: absolute;
-    top: 0;
+.right {
     left: 50%;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 4px;
     background-color: gray;
-    border-color: gray;
-    border-width: 5px;
-    transform: translateX(-50%);
+    top: 0;
+    bottom: 0;
+    left: 50%;
 }
 
 .segment {
-    margin: 1rem;
+    position: relative;
+    width: 50%;
+    padding: 1rem;
+}
+
+.segment::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: dimgrey;
+    z-index: 1;
+}
+
+.right::after {
+    left: -5.3px;
+}
+
+@media screen and (max-width: 768px){
+    .right {
+        left: 0;
+    }
+
+    .right::after {
+        left: 0;
+    }
+
+    .left::after {
+        right: auto;
+        left: 0;
+    }
+
+    .timeline::after {
+        left: 5px;
+    }
+
+    .segment {
+        width: 100%;
+    }
 }
 
 </style>

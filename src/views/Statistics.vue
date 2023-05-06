@@ -77,13 +77,6 @@ allData.forEach(obj => {
         quarters.add(quarter);
     }
 
-    // const yearMonthAsDateObj = new Date(yearMonth);
-    // if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
-    //     smallestDate = yearMonthAsDateObj;
-    // }
-    // if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
-    //     biggestDate = yearMonthAsDateObj;
-    // }
     crimeTypes.add(crime);
 });
 

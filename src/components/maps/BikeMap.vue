@@ -79,7 +79,6 @@ export default {
         const tooltip = d3.select("#mapContainer")
             .append("div")
             .style("opacity", 0)
-            .style("opacity", 0)
             .attr("class", "tooltip")
             .style("background-color", "white")
             .style("border", "solid")
@@ -132,7 +131,7 @@ export default {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
-        const map = g.append("g")
+        g.append("g")
             .selectAll("path")
             .data(dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData))
             .enter()

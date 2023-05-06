@@ -222,7 +222,9 @@ export default {
 </script>
 
 <template>
-    <div id="lineChart"/>
+    <div id="chartWrapper">
+        <div id="lineChart"/>
+    </div>
 </template>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-    <div id="totalBarCharWrapper">
+    <div id="chartWrapper">
         <!-- Dropdown used for all the categories -->
         <select id="selectButtonTotalBarChart"></select>
         <!-- Barchart itself -->
@@ -195,10 +195,5 @@ export default {
 </script>
 
 <style scoped>
-#totalBarCharWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2em;
-}
+
 </style>

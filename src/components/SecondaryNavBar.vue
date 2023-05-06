@@ -1,18 +1,10 @@
 <template>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-                    aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    <a class="nav-link" aria-current="page" href="#" @click="onClick('maps')">Kaarten</a>
-                    <a class="nav-link" href="#" @click="onClick('other')">Andere Statistieken</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <footer class="choice-bar bg-body-tertiary">
+        <a class="choice-bar-choice" :class="{ active: activeType === 'maps' }" aria-current="page" href="#"
+           @click="onClick('maps')">Kaarten</a>
+        <a class="choice-bar-choice" :class="{ active: activeType === 'other' }" href="#" @click="onClick('other')">Andere
+            Statistieken</a>
+    </footer>
 </template>
 
 <script>
@@ -20,12 +12,39 @@ export default {
     name: "SecondaryNavBar",
     methods: {
         onClick(type) {
+            this.activeType = type;
             this.$emit("tabSelected", type);
+        }
+    },
+    data() {
+        return {
+            activeType: 'maps',
         }
     }
 };
 </script>
 
 <style scoped>
+.choice-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    background-color: dimgrey;
+}
 
+.choice-bar-choice {
+    margin: 10px 10px;
+    color: dimgrey;
+    text-decoration: none;
+    padding: 0.5rem;
+}
+
+.active {
+    text-decoration: underline;
+    color: black;
+}
 </style>

@@ -34,6 +34,7 @@ export default {
     flex-direction: row;
     justify-content: center;
     background-color: dimgrey;
+    z-index: 1000;
 }
 
 .choice-bar-choice {

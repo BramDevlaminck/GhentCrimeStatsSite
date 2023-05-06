@@ -129,7 +129,7 @@ export default {
             .attr("d", function (d) {
                 // extract the values and draw a line with it
                 const [_, values] = d;
-                return  d3.line()
+                return d3.line()
                     .curve(d3.curveMonotoneX)
                     .x(d => x(new Date(2022, d.month)))
                     .y(d => y(d.count))

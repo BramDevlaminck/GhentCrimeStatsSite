@@ -61,7 +61,12 @@ biggestDate = dates.max;
 allData.forEach(obj => {
     const properties = obj["properties"];
     const quarter = properties["quarter"];
-    const crime = properties["fact_category"];
+    let crime = properties["fact_category"];
+    // we have to hard-code this since the datasets of 2018 and 2019 still have the old entries
+    if (crime === "Verkeerongevallen met lichamelijk letsel") {
+        crime = "Verkeersongevallen met lichamelijk letsel";
+        properties["fact_category"] = crime;
+    }
     if (!quarters.has(quarter)) {
         quarterGeometryData.set(quarter, obj["geometry"]);
         quarters.add(quarter);

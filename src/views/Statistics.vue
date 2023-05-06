@@ -167,20 +167,21 @@ export default {
     <SecondaryNavBar @tabSelected="tabChange"/>
     <div class="container-lg">
         <h1>Statistics page</h1>
+
+        <div v-if="dataIsAvailable">
+            <button type="button" v-on:click="saveFile()">Save AllData json file</button>
+            <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
+            <Maps v-show="currentShownTab === 'maps'"
+                  :all-features="combinedDataWithGeoInfo"
+                  :begin-date="beginDate"
+                  :end-date="endDate"
+                  :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
+                  :bike-parking-per-quarter="bikeParkingMaps"
+                  :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
+                  :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
+        </div>
+        <h4 v-if="!dataIsAvailable">No data available</h4>
     </div>
-    <div v-if="dataIsAvailable">
-        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
-        <Maps v-show="currentShownTab === 'maps'"
-              :all-features="combinedDataWithGeoInfo"
-              :begin-date="beginDate"
-              :end-date="endDate"
-              :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
-              :bike-parking-per-quarter="bikeParkingMaps"
-              :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
-              :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
-    </div>
-    <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>
 
 <style scoped>

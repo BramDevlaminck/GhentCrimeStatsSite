@@ -65,7 +65,7 @@ export default {
         const mapSvg = d3
             .select("#mapContainer")
             .append("svg")
-            .attr("width", "100%")
+            .attr("width", "50vw")
             .attr("height", "50vh");
 
         const g = mapSvg.append("g");
@@ -222,8 +222,8 @@ export default {
         const formatDate = d3.timeFormat("%b %Y");
 
         const margin = {top: 50, right: 50, bottom: 0, left: 50};
-        const width = 960 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+        const width = WIDTH - margin.left - margin.right;
+        const height = HEIGHT - margin.top - margin.bottom;
 
         let sliderIsMoving = false;
         let xPositionOnSlider = 0;
@@ -246,7 +246,7 @@ export default {
         const slider = sliderSvg
             .append("g")
             .attr("class", "slider")
-            .attr("transform", "translate(" + margin.left + "," + height / 5 + ")");
+            .attr("transform", "translate(" + margin.left + "," + height / 10 + ")");
 
         // add all the features to the slider
         slider.append("line")
@@ -361,7 +361,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div id="chartWrapper">
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
@@ -391,6 +391,10 @@ export default {
 
 #playButton:hover {
     background-color: #696969;
+}
+
+#sliderDiv {
+    width: 50vw;
 }
 
 /*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/

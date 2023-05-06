@@ -186,6 +186,6 @@ export default {
 
 <style scoped>
 .wrapper{
-    margin-bottom: 4rem;
+    padding-bottom: 4rem;
 }
 </style>

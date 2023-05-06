@@ -164,8 +164,7 @@ export default {
 </script>
 
 <template>
-    <SecondaryNavBar @tabSelected="tabChange"/>
-    <div class="container-lg">
+    <div class="container-lg wrapper">
         <h1>Statistics page</h1>
 
         <div v-if="dataIsAvailable">
@@ -182,8 +181,11 @@ export default {
         </div>
         <h4 v-if="!dataIsAvailable">No data available</h4>
     </div>
+    <SecondaryNavBar @tabSelected="tabChange"/>
 </template>
 
 <style scoped>
-
+.wrapper{
+    padding-bottom: 4rem;
+}
 </style>

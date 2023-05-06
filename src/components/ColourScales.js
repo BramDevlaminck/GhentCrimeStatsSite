@@ -27,7 +27,9 @@ export default function colourScales() {
     }
 
 
-    // change is the improvement/worsening, maxWorsening is the value should be completely red, maxImprovement is what should be completely green
+    // change is the improvement/worsening,
+    // maxWorsening is the value that should be completely red,
+    // maxImprovement is the value that should be completely green
     function differentialColour(change, maxWorsening, maxImprovement) {
         // TODO: this is untested, so the scaling for what needs to be red or green can be totally off
         //  fraction == 0 => totally red

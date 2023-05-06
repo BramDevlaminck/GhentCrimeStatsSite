@@ -1,5 +1,8 @@
 <script>
 import * as d3 from "d3";
+import colourScales from '../ColourScales';
+
+const {categoricalScaleColour} = colourScales();
 
 function preprocessDataPerYearAndMonth(data, categories) {
 
@@ -112,11 +115,7 @@ export default {
         for (const year of groupedData.keys()) {
             res.push(year);
         }
-        const color = d3.scaleOrdinal()
-            .domain(res)
-            .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']);
-
-        const lines = new Map();
+        const color = categoricalScaleColour(res);
 
         // Draw the lines
         lineGraph.selectAll(".lines")
@@ -129,14 +128,12 @@ export default {
             .attr("stroke-width", 1.5)
             .attr("d", function (d) {
                 // extract the values and draw a line with it
-                const [year, values] = d;
-                const line = d3.line()
+                const [_, values] = d;
+                return  d3.line()
                     .curve(d3.curveMonotoneX)
                     .x(d => x(new Date(2022, d.month)))
                     .y(d => y(d.count))
                     (values);
-                lines.set(year, line);
-                return line;
             });
 
         // add the dots
@@ -174,14 +171,12 @@ export default {
                 .duration(1000)
                 .attr("d", function (d) {
                     // extract the values and draw a line with it
-                    const [year, values] = d;
-                    const line = d3.line()
+                    const [_, values] = d;
+                    return d3.line()
                         .curve(d3.curveMonotoneX)
                         .x(d => x(new Date(2022, d.month)))
                         .y(d => y(d.count))
                         (values);
-                    lines.set(year, line);
-                    return line;
                 })
                 .attr("fill", "none")
                 .attr("stroke", (d) => color(d[0]))

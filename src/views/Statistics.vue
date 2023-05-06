@@ -54,23 +54,18 @@ const dates = allData.reduce((acc, curr) => {
     acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
     return acc;
 }, {});
-console.log(dates);
 smallestDate = dates.min;
 biggestDate = dates.max;
 
 
-const entriesMapWithoutDuplicatesPerMonth = new Map();
 allData.forEach(obj => {
     const properties = obj["properties"];
     const quarter = properties["quarter"];
-    const crime = properties["fact_category"];
-    const yearMonth = properties["jaar_maand"];
-    const count = properties["total"];
-    // just create some arbitrary key that is unique for the right cases
-    const crimeEntriesKey = quarter + crime + yearMonth;
-    // check if there is no entry, or the current entry is "worse" than this object
-    if (!entriesMapWithoutDuplicatesPerMonth.has(crimeEntriesKey) || entriesMapWithoutDuplicatesPerMonth.get(crimeEntriesKey)["properties"]["total"] < count) {
-        entriesMapWithoutDuplicatesPerMonth.set(crimeEntriesKey, obj);
+    let crime = properties["fact_category"];
+    // we have to hard-code this since the datasets of 2018 and 2019 still have the old entries
+    if (crime === "Verkeerongevallen met lichamelijk letsel") {
+        crime = "Verkeersongevallen met lichamelijk letsel";
+        properties["fact_category"] = crime;
     }
     if (!quarters.has(quarter)) {
         quarterGeometryData.set(quarter, obj["geometry"]);
@@ -79,9 +74,6 @@ allData.forEach(obj => {
 
     crimeTypes.add(crime);
 });
-
-// create 1 data array of all the entries in the map that does not contain any duplicates anymore
-const featuresSingle = [...entriesMapWithoutDuplicatesPerMonth.values()];
 
 const monthMapping = new Map(Object.entries({
     "01": "Jan",
@@ -98,13 +90,13 @@ const monthMapping = new Map(Object.entries({
     "12": "Dec",
 }));
 
-featuresSingle.forEach(datum => {
+allData.forEach(datum => {
     const splittedDate = datum.properties.jaar_maand.split("-");
     datum.properties.formatted_date = monthMapping.get(splittedDate[1]) + " " + splittedDate[2] + " " + splittedDate[0];
 });
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
-const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
+const dataWithoutGeoInformation = allData.map(entry => entry.properties);
 let currentShownTab = 'maps';
 
 
@@ -134,14 +126,14 @@ export default {
     data() {
         return {
             combinedDataNoGeoInfo: dataWithoutGeoInformation,
-            combinedDataWithGeoInfo: featuresSingle,
+            combinedDataWithGeoInfo: allData,
             beginDate: smallestDate,
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
             bikeParkingMaps: bikeParkingMap,
             currentShownTab: currentShownTab,
-            allFeaturesWithoutUnknown: featuresSingle.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            allFeaturesWithoutUnknown: allData.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
             quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
             quarterGeometrySmall: quarterGeometrySmall
         };

@@ -51,8 +51,8 @@ export default {
         const data = preprocessDataPerYearAndMonth(this.data);
         const monthFormatter = d3.timeFormat("%b");
         const margin = {top: 10, right: 30, bottom: 30, left: 60},
-            width = 1000 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+            width = Math.min(window.innerWidth, 1000) - margin.left - margin.right,
+            height = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
         const svg = d3.select("#lineChart")
@@ -222,7 +222,9 @@ export default {
 </script>
 
 <template>
-    <div id="lineChart"/>
+    <div id="chartWrapper">
+        <div id="lineChart"/>
+    </div>
 </template>
 
 <style scoped>

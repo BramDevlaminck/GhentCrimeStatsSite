@@ -56,7 +56,7 @@ export default {
         const mapSvg = d3
             .select("#totalMapContainer")
             .append("svg")
-            .attr("width", "100%")
+            .attr("width", "50vw")
             .attr("height", "50vh");
 
         const g = mapSvg.append("g");
@@ -193,7 +193,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div id="chartWrapper">
         <select id="selectButtonTotalCrimes"></select>
         <div id="totalMapContainer"/>
     </div>

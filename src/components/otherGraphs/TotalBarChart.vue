@@ -1,5 +1,5 @@
 <template>
-    <div id="totalBarCharWrapper">
+    <div id="chartWrapper">
         <!-- Dropdown used for all the categories -->
         <select id="selectButtonTotalBarChart"></select>
         <!-- Barchart itself -->
@@ -10,9 +10,9 @@
 <script>
 import * as d3 from "d3";
 
-const margin = {top: 20, right: 30, bottom: 40, left: 90};
-const WIDTH = 960 - margin.left - margin.right;
-const HEIGHT = 320 - margin.top - margin.bottom;
+const margin = {top: 10, right: 30, bottom: 40, left: 60};
+const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;
+const HEIGHT = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
 
 export default {
     name: "TotalBarChart",
@@ -195,10 +195,5 @@ export default {
 </script>
 
 <style scoped>
-#totalBarCharWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2em;
-}
+
 </style>

@@ -36,7 +36,7 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
                 "quarter": quarter,
                 "count": total,
                 "max": maxCount,
-                "maxBikeParkings": maxBikeParkings,
+                "max_bike_parkings": maxBikeParkings,
                 "number_of_parkings": bikeParkingPerQuarter.get(quarter)
             },
             type: "Feature",
@@ -56,6 +56,19 @@ function setLabelText(labelId, labelBoolean) {
     d3.select(`#${labelId}`).text(text);
 }
 
+function getInfoForColouringMap(data, conditional) {
+    const properties = data["properties"];
+    let count;
+    let maxCount;
+    if (conditional) {
+        count = properties.number_of_parkings;
+        maxCount = properties.max_bike_parkings;
+    } else {
+        count = properties.count;
+        maxCount = properties.max;
+    }
+    return [count, maxCount];
+}
 
 export default {
     props: {
@@ -116,17 +129,7 @@ export default {
         }
 
         function mouseOutHandler(event, data) {
-            const properties = data["properties"];
-            let count;
-            let max;
-            if (showNumberOfBikeParkings) {
-                count = properties.number_of_parkings;
-                max = properties.maxBikeParkings;
-            } else {
-                count = properties.count;
-                max = properties.max;
-            }
-
+            const [count, max] = getInfoForColouringMap(data, showNumberOfBikeParkings);
             const selectedColor = linearScaleColour(count, max);
             d3.select(this).attr("fill", selectedColor);
 
@@ -164,16 +167,7 @@ export default {
             .append("path")
             .attr("d", path)
             .attr("fill", (d, _) => {
-                const properties = d["properties"];
-                let count;
-                let max;
-                if (showNumberOfBikeParkings) {
-                    count = properties.number_of_parkings;
-                    max = properties.maxBikeParkings;
-                } else {
-                    count = properties.count;
-                    max = properties.max;
-                }
+                const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
                 return linearScaleColour(count, max);
             })
             .attr("stroke", "#FFF")
@@ -191,16 +185,7 @@ export default {
             showNumberOfBikeParkings = d3.select("#mapToggle").property("checked");
             map.data(dataInMapFormat)
                 .attr("fill", (d, _) => {
-                    const properties = d["properties"];
-                    let count;
-                    let max;
-                    if (showNumberOfBikeParkings) {
-                        count = properties.number_of_parkings;
-                        max = properties.maxBikeParkings;
-                    } else {
-                        count = properties.count;
-                        max = properties.max;
-                    }
+                    const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
                     return linearScaleColour(count, max);
                 });
             setLabelText("currentlyShowing", showNumberOfBikeParkings);

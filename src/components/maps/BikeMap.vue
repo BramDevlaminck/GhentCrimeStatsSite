@@ -65,9 +65,6 @@ export default {
         quarterGeometryData: Map
     },
     name: "BikeMap",
-    data() {
-
-    },
     mounted() {
         let showNumberOfBikeParkings = false;
         const allFeatures = this.allFeatures.filter(feature => feature["properties"]["fact_category"] === "Fietsdiefstal");

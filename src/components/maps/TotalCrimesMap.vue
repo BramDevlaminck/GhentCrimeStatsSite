@@ -236,7 +236,7 @@ export default {
 <template>
     <div id="textChartWrapper">
         <div id="text-next-to-slider">
-            <p>Opnieuw zijn er vooral veel gerigstreerde feiten in de <b>binnenstad</b> zijn. Dit valt te verwachten aangezien opnieuw vooral daar veel studenten en toeristen zijn. Dit zorgt voor een grote drukte en dus ook een grote kans op mensen die verkeerd parkeren, ongevallen die gebeuren, zakkenrollers,…</p>
+            <p>Ook hier zien we vooral veel geregistreerde feiten in de <b>binnenstad</b>. Dit valt te verwachten aangezien we hier vooral veel studenten en toeristen vinden. Dit zorgt voor een grote drukte en dus ook een grote kans op mensen die verkeerd parkeren, ongevallen die gebeuren, zakkenrollers,…</p>
             <p>
                 Als we ons focussen op de wijken rond de binnenstad valt vooral wijk <b>Brugse Poort - Rooigem</b> op.
                 Deze heeft duidelijk meer <b>geregistreerde feiten te hebben dan de omliggende wijken</b>.

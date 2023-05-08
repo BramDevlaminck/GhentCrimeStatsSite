@@ -39,7 +39,7 @@ export default {
                         :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
                         :quarter-geometry-small="quarterGeometrySmall"/>
         <h1>
-            Kaart met fietsendiefstal
+            Kaart met fietsdiefstal
         </h1>
         <h5>
             Deze kaart geeft een overzicht van Gent met daarop het aantal fietsdiefstallen per wijk.

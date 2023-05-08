@@ -235,6 +235,37 @@ export default {
 
 <template>
     <div id="textChartWrapper">
+        <div id="text-next-to-slider">
+            <p>Opnieuw zijn er vooral veel gerigstreerde feiten in de <b>binnenstad</b> zijn. Dit valt te verwachten aangezien opnieuw vooral daar veel studenten en toeristen zijn. Dit zorgt voor een grote drukte en dus ook een grote kans op mensen die verkeerd parkeren, ongevallen die gebeuren, zakkenrollers,…</p>
+            <p>
+                Als we ons focussen op de wijken rond de binnenstad valt vooral wijk <b>Brugse Poort - Rooigem</b> op.
+                Deze heeft duidelijk meer <b>geregistreerde feiten te hebben dan de omliggende wijken</b>.
+                Dit blijkt een erg <b>dicht bebouwde</b> wijk te zijn (bebouwingsgraad van 26.5% terwijl het gemiddelde in gent 13.3% is). Bovendien is het een cultureel multi-diverse wijk waar mensen vaak slechts enkele jaren wonen.
+            </p>
+            <p>
+                Zelfs van binnen de wijk geef <b>50% van de inwoners aan dat ze vaak buurthinder ondervinden</b>.
+                Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen bij inwoners (<a href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>).
+            </p>
+            <ul>
+                <li>1/5 geeft aan bewust plekken in hun buurt te vermijden</li>
+                <li>1/3 geeft meldingen over drugs-dealing en gebruik</li>
+                <li>7/10 klaagt over zwerfvuil, sluikstoren en hondenpoep</li>
+            </ul>
+            <p>
+                Onze data bevestigd dit ook (selecteer zelf de juiste categorie(ën) om dit te zien).
+            </p>
+            <ul>
+                <li>Veel last van sluikstorten</li>
+                <li>Veel bromfiets- en motordiefstal</li>
+                <li>Meer diefstal gewapanderhand dan in omliggende wijken</li>
+            </ul>
+            <p>
+                Deze wijk is duidelijk geen rustige buurt om te wonen. Het is echter belangrijk dit in context te plaatsen van het aantal inwoners.
+                <b>Wanneer we de data normaliseren naar het aantal inwoners blijkt dit niet uitzonderlijk hoog te zijn</b>. Dit is zelfs vergelijkbaar met de omliggende wijken.
+                Dit kunt u zelf nagaan door de toggle boven de grafiek te gebruiken.
+            </p>
+        </div>
+
         <div id="chartWrapper">
             <div id="toggleDiv">
                 <!-- Rounded switch -->
@@ -247,9 +278,7 @@ export default {
             <select id="selectButtonTotalCrimes"></select>
             <div id="totalMapContainer"/>
         </div>
-        <p id="text-next-to-slider">
-            Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.
-        </p>
+
     </div>
 </template>
 

@@ -184,7 +184,7 @@ export default {
 </script>
 
 <template>
-    <div class="container-lg wrapper">
+    <div class="wrapper">
         <div v-if="dataIsAvailable">
             <OtherGraphs v-show="currentShownTab === 'other'"
                          :combinedData="combinedDataNoGeoInfo"
@@ -208,6 +208,8 @@ export default {
 
 <style scoped>
 .wrapper {
+    margin: 1rem auto auto;
     padding-bottom: 4rem;
+    width: 75%;
 }
 </style>

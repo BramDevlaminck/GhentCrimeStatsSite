@@ -11,7 +11,7 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <router-link class="nav-link" aria-current="page" to="/">Introductie</router-link>
-                    <router-link class="nav-link" aria-current="page" to="/statistics">Statistiek</router-link>
+                    <router-link class="nav-link" aria-current="page" to="/statistics">Statistieken</router-link>
                     <router-link class="nav-link" aria-current="page" to="/about">Info</router-link>
                 </div>
             </div>

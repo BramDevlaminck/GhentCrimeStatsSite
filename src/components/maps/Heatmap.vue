@@ -118,7 +118,7 @@ export default {
         const crimes = [...this.crimeTypes];
 
         // set the dimensions and margins of the graph
-        const margin = {top: 400, right: 25, bottom: 30, left: 300},
+        const margin = {top: 400, right: 25, bottom: 25, left: 300},
             width = 900 - margin.left - margin.right,
             height = 800 - margin.top - margin.bottom;
 

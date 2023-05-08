@@ -231,12 +231,14 @@ export default {
 
 <template>
     <div id="chartWrapper">
-        <p>Normaliseer data met aantal inwoners in deze wijk</p>
-        <!-- Rounded switch -->
-        <label class="switch">
-            <input type="checkbox" id="totalCrimesMapToggle">
-            <span class="slider round"></span>
-        </label>
+        <div id="toggleDiv">
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox" id="totalCrimesMapToggle">
+                <span class="slider round"></span>
+            </label>
+            <p id="currentlyShowing">Normaliseer data met aantal inwoners in deze wijk</p>
+        </div>
         <select id="selectButtonTotalCrimes"></select>
         <div id="totalMapContainer"/>
     </div>
@@ -305,5 +307,17 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+
+#toggleDiv {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1em;
+    align-items: center;
+}
+
+#currentlyShowing {
+    margin: 0;
 }
 </style>

@@ -24,6 +24,7 @@
     .navbar-inner-wrapper {
         max-width: 75%;
         padding-bottom: 0.5rem;
+        padding-top: 0.5rem;
         border-bottom: 2px solid black;
         margin: auto;
         background-color: white !important;
@@ -31,6 +32,7 @@
 
     .navbar {
         background-color: transparent !important;
+        padding: 0;
     }
 
     .navbar-nav {

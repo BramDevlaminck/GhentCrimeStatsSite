@@ -46,16 +46,6 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
     return result;
 }
 
-function setLabelText(labelId, labelBoolean) {
-    let text;
-    if (labelBoolean) {
-        text = "Kaartkleur aan de hand van aantal fietsenstallingen";
-    } else {
-        text = "Kaartkleur aan de hand van aantal fietsdiefstallen";
-    }
-    d3.select(`#${labelId}`).text(text);
-}
-
 function getInfoForColouringMap(data, conditional) {
     const properties = data["properties"];
     let count;
@@ -177,9 +167,6 @@ export default {
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
 
-        // set initial label for toggle
-        setLabelText("currentlyShowing", showNumberOfBikeParkings);
-
         // listen to toggle
         d3.select("#mapToggle").on("change", function (_) {
             showNumberOfBikeParkings = d3.select("#mapToggle").property("checked");
@@ -188,7 +175,6 @@ export default {
                     const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
                     return linearScaleColour(count, max);
                 });
-            setLabelText("currentlyShowing", showNumberOfBikeParkings);
         });
     }
 };
@@ -196,12 +182,14 @@ export default {
 
 <template>
     <div id="chartWrapper">
-        <p id="currentlyShowing"/>
-        <!-- Rounded switch -->
-        <label class="switch">
-            <input type="checkbox" id="mapToggle">
-            <span class="slider round"></span>
-        </label>
+        <div id="toggleDiv">
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox" id="mapToggle">
+                <span class="slider round"></span>
+            </label>
+            <p id="currentlyShowing">Kaartkleur aan de hand van aantal fietsenstallingen</p>
+        </div>
         <div id="bikeMapContainer"/>
     </div>
 </template>
@@ -269,5 +257,11 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+#toggleDiv {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1em;
 }
 </style>

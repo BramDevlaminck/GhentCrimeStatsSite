@@ -263,7 +263,6 @@ export default {
         function getCurrentMonthFromHover(event) {
             const [xCoordinate, _] = d3.pointer(event);
             const ratio = xCoordinate / (effectiveLineGraphWidth + margin.left);
-            console.log(Math.round(ratio * 12) - 1)
             return Math.round(ratio * 12) - 1;
         }
 

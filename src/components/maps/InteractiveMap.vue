@@ -160,11 +160,6 @@ export default {
         quarterGeometrySmall: Object
     },
     name: "InteractiveMap",
-    methods: {
-        getAllYearMax() {
-
-        }
-    },
     mounted() {
 
         //------ MAP  ------

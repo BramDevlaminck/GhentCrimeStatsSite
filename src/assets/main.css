@@ -1,0 +1,19 @@
+#app{
+    min-height: 100vh;
+}
+
+#chartWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2em;
+}
+
+#textChartWrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+#text-next-to-slider {
+    margin-top: 4rem;
+}

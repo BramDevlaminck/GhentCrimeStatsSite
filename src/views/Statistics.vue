@@ -1,7 +1,5 @@
 <script>
 
-import YearOverviewGraph from "@/components/otherGraphs/YearOverviewGraph.vue";
-import InteractiveMap from "@/components/maps/InteractiveMap.vue";
 import rewind from "@mapbox/geojson-rewind";
 import SecondaryNavBar from "@/components/SecondaryNavBar.vue";
 import Maps from "@/components/maps/Maps.vue";
@@ -40,6 +38,25 @@ const allData = await Promise.all([
 
 const bikeParkingObject = await getData("bike_parkings_per_quarter.json");
 const bikeParkingMap = new Map(Object.entries(bikeParkingObject));
+const numberOfResidentsPerQuarter = await getData("bevolkingsaantal-per-wijk-per-jaar-gent.geojson").then(
+    res => {
+        return res["features"].map(obj => {
+            const property = obj["properties"];
+            const numberOfResidents = property.valuestring;
+            let quarter = property.wijk;
+            // handle edge the 2 coses where the quarter is written differently in this dataset
+            if (quarter === "Stationsbuurt-Noord") {
+                quarter = "Stationsbuurt Noord";
+            } else if (quarter === "Stationsbuurt-Zuid") {
+                quarter =  "Stationsbuurt Zuid";
+            } else if (quarter === null) { // some data does not belong to a quarter, so we just ignore those entries and remove them later with the filter operation
+                return [];
+            }
+            return [quarter, numberOfResidents];
+        }).filter(entry => entry.length !== 0);
+    }
+);
+const numberOfResidentsPerQuarterMap = new Map(numberOfResidentsPerQuarter);
 
 // make sure we only add each quarter once
 const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
@@ -56,41 +73,26 @@ const dates = allData.reduce((acc, curr) => {
     acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
     return acc;
 }, {});
-console.log(dates);
 smallestDate = dates.min;
 biggestDate = dates.max;
 
 
-const entriesMapWithoutDuplicatesPerMonth = new Map();
 allData.forEach(obj => {
     const properties = obj["properties"];
     const quarter = properties["quarter"];
-    const crime = properties["fact_category"];
-    const yearMonth = properties["jaar_maand"];
-    const count = properties["total"];
-    // just create some arbitrary key that is unique for the right cases
-    const crimeEntriesKey = quarter + crime + yearMonth;
-    // check if there is no entry, or the current entry is "worse" than this object
-    if (!entriesMapWithoutDuplicatesPerMonth.has(crimeEntriesKey) || entriesMapWithoutDuplicatesPerMonth.get(crimeEntriesKey)["properties"]["total"] < count) {
-        entriesMapWithoutDuplicatesPerMonth.set(crimeEntriesKey, obj);
+    let crime = properties["fact_category"];
+    // we have to hard-code this since the datasets of 2018 and 2019 still have the old entries
+    if (crime === "Verkeerongevallen met lichamelijk letsel") {
+        crime = "Verkeersongevallen met lichamelijk letsel";
+        properties["fact_category"] = crime;
     }
     if (!quarters.has(quarter)) {
         quarterGeometryData.set(quarter, obj["geometry"]);
         quarters.add(quarter);
     }
 
-    // const yearMonthAsDateObj = new Date(yearMonth);
-    // if (smallestDate === null || yearMonthAsDateObj < smallestDate) {
-    //     smallestDate = yearMonthAsDateObj;
-    // }
-    // if (biggestDate === null || yearMonthAsDateObj > biggestDate) {
-    //     biggestDate = yearMonthAsDateObj;
-    // }
     crimeTypes.add(crime);
 });
-
-// create 1 data array of all the entries in the map that does not contain any duplicates anymore
-const featuresSingle = [...entriesMapWithoutDuplicatesPerMonth.values()];
 
 const monthMapping = new Map(Object.entries({
     "01": "Jan",
@@ -107,13 +109,13 @@ const monthMapping = new Map(Object.entries({
     "12": "Dec",
 }));
 
-featuresSingle.forEach(datum => {
+allData.forEach(datum => {
     const splittedDate = datum.properties.jaar_maand.split("-");
     datum.properties.formatted_date = monthMapping.get(splittedDate[1]) + " " + splittedDate[2] + " " + splittedDate[0];
 });
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
-const dataWithoutGeoInformation = featuresSingle.map(entry => entry.properties);
+const dataWithoutGeoInformation = allData.map(entry => entry.properties);
 let currentShownTab = 'maps';
 
 
@@ -139,22 +141,21 @@ export default {
         OtherGraphs,
         Maps,
         SecondaryNavBar,
-        InteractiveMap,
-        YearOverviewGraph
     },
     data() {
         return {
             combinedDataNoGeoInfo: dataWithoutGeoInformation,
-            combinedDataWithGeoInfo: featuresSingle,
+            combinedDataWithGeoInfo: allData,
             beginDate: smallestDate,
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
             bikeParkingMaps: bikeParkingMap,
             currentShownTab: currentShownTab,
-            allFeaturesWithoutUnknown: featuresSingle.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            allFeaturesWithoutUnknown: allData.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
             quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
-            quarterGeometrySmall: quarterGeometrySmall
+            quarterGeometrySmall: quarterGeometrySmall,
+            numberOfResidentsPerQuarterMap: numberOfResidentsPerQuarterMap
         };
     },
     computed: {
@@ -183,25 +184,30 @@ export default {
 </script>
 
 <template>
+    <div class="container-lg wrapper">
+        <div v-if="dataIsAvailable">
+            <OtherGraphs v-show="currentShownTab === 'other'"
+                         :combinedData="combinedDataNoGeoInfo"
+                         :crime-types="crimeTypes"/>
+            <Maps v-show="currentShownTab === 'maps'"
+                  :all-features="combinedDataWithGeoInfo"
+                  :begin-date="beginDate"
+                  :end-date="endDate"
+                  :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
+                  :bike-parking-per-quarter="bikeParkingMaps"
+                  :quarter-geometry-small="quarterGeometrySmall"
+                  :all-features-without-unknown="allFeaturesWithoutUnknown"
+                  :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
+                  :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
+            <button class="btn btn-outline-dark" type="button" v-on:click="saveFile()">Save AllData json file</button>
+        </div>
+        <h4 v-if="!dataIsAvailable">No data available</h4>
+    </div>
     <SecondaryNavBar @tabSelected="tabChange"/>
-    <div class="container-lg">
-        <h1>Statistics page</h1>
-    </div>
-    <div v-if="dataIsAvailable">
-        <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-        <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo"/>
-        <Maps v-show="currentShownTab === 'maps'"
-              :all-features="combinedDataWithGeoInfo"
-              :begin-date="beginDate"
-              :end-date="endDate"
-              :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
-              :bike-parking-per-quarter="bikeParkingMaps"
-              :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
-              :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
-    </div>
-    <h4 v-if="!dataIsAvailable">No data available</h4>
 </template>
 
 <style scoped>
-
+.wrapper {
+    padding-bottom: 4rem;
+}
 </style>

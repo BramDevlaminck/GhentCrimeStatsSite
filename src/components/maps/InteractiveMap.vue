@@ -3,6 +3,7 @@
 import * as d3 from "d3";
 import BikeMap from "@/components/maps/BikeMap.vue";
 import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
+import { max } from "d3";
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
@@ -62,54 +63,101 @@ function yearArrayToDateArray(years){
     return years.map(year => new Date(year));
 }
 
-// ------ Data processing  ------
-function dataToMapDataFormat(data, quarterGeometryData) {
+function constructCountsPerYear(data, quarterGeometryData){
     // count how often something happened per quarter
-    const totalCounts = new Map();
-    for (const quarter of quarterGeometryData.keys()) {
-        totalCounts.set(quarter, new Map());
+    const yearCounts = new Map();
+    
+    const years = getUniqueYears(data);
+    for (const year of years){
+        const quarterCounts = new Map();
+
+        for (const quarter of quarterGeometryData.keys()) {
+            quarterCounts.set(quarter, new Map());
+            yearCounts.set(year, quarterCounts);
+        }
     }
 
+    // yearCounts should have the following structure:
+    /* Map (year, Map(quarter, Map(month, total)))
+     */
 
     data.forEach(obj => {
         // console.log(obj);
         const properties = obj["properties"];
         const quarter = properties["quarter"];
         const month = properties["month"];
-        // const records = totalCounts.get(quarter)[0]
-        const currentCountMap = totalCounts.get(quarter);
-        if (currentCountMap.has(month)){
-            currentCountMap.set(month, currentCountMap.get(month)+ properties["total"]);
+        const year = properties["year"];
+
+        const currentCountMap = yearCounts.get(year);
+       
+
+        const currentMonthCount = currentCountMap.get(quarter);
+        // console.log(currentMonthCount);
+        if (currentMonthCount.has(month)){
+            currentMonthCount.set(month, currentMonthCount.get(month) + properties["total"]);
         } else {
-            currentCountMap.set(month, properties["total"])
+            currentMonthCount.set(month, properties['total']);
         }
-        
-        totalCounts.set(quarter,  currentCountMap);
-        // totalCounts.set(quarter, [records + 1, currentCount + properties["total"]]);
+        currentCountMap.set(quarter, currentMonthCount);
+        yearCounts.set(year, currentCountMap);
     });
+    return yearCounts;
+}
 
-    const averages = new Map();
-    for (const [neighborhood, data] of totalCounts) {
-        let total = 0;
-        
+function constructAvgsFromCounts(yearCounts){
+    const yearAverages = new Map();
+
+    for (const [year, quarters] of yearCounts) {
+        yearAverages.set(year, new Map());
+        const quarterAvgs = yearAverages.get(year); 
         // Iterate over each month's count for the current neighborhood
-        for (const [month, count] of data) {
-            total += count;
+        for (const [quarter, months] of quarters) {
+            let total = 0;
+            for (const [month, count] of months) {
+                total += count;
+            }
+            // Calculate the monthly average for the current neighborhood
+            const average = total / months.size;
+            
+            // Add the average to the new Map
+            quarterAvgs.set(quarter, average);    
         }
-        
-        // Calculate the monthly average for the current neighborhood
-        const average = total / data.size;
-        
-        // Add the average to the new Map
-        averages.set(neighborhood, average);
-    }
+        yearAverages.set(year, quarterAvgs);
 
-    // get the max. this happens per quarter
-    const maxAvg = Math.max(...averages.values());
+    }
+    return yearAverages;
+}
+
+function getAllYearMax (data, quarterGeometryData){
+    // count how often something happened per quarter
+    const yearCounts = constructCountsPerYear(data, quarterGeometryData);
+    // console.log(yearCounts);
+    const yearAvgs = constructAvgsFromCounts(yearCounts);
+    // console.log(yearAvgs);
+
+    const maxAvgPerYear = new Map();
+    for (const [year, quarters] of yearAvgs) {
+        const maxAvg = Math.max(...quarters.values());
+        maxAvgPerYear.set(year, maxAvg);
+    }
+    
+
+    // console.log(quarterCounts);
+    return Math.max(...maxAvgPerYear.values());
+}
+
+// ------ Data processing  ------
+function dataToMapDataFormat(data, quarterGeometryData, maxAvg, year = "2018") {
+    // count how often something happened per quarter
+    const yearCounts = constructCountsPerYear(data, quarterGeometryData);
+    // console.log(yearCounts);
+
+    const currentYearAvgs = constructAvgsFromCounts(yearCounts).get(year);
+    // console.log(currentYearAvgs);
 
     // create the result array in the right format and return it
     const result = [];
-    for (const [quarter, avg] of averages) {
+    for (const [quarter, avg] of currentYearAvgs) {
         result.push({
             properties: {"quarter": quarter, "count": avg, "max": maxAvg},
             type: "Feature",
@@ -132,6 +180,11 @@ export default {
         quarterGeometrySmall: Object
     },
     name: "InteractiveMap",
+    methods: {
+        getAllYearMax(){
+            
+        }
+    },
     mounted() {
 
         //------ MAP  ------
@@ -208,6 +261,10 @@ export default {
         const allFeaturesWithoutUnknown = this.allFeatures;
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
+
+        // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
+        let maxAvg = getAllYearMax(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown);
+        // console.log(maxAvg);
         // VIEW
         const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client 
 
@@ -221,7 +278,7 @@ export default {
         // Draw districts and register event listeners
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(filterDataBasedOnYearString(currentYear, allFeaturesWithoutUnknown), quarterGeometryDataWithoutUnknown))
+            .data(dataToMapDataFormat(filterDataBasedOnYearString(currentYear, allFeaturesWithoutUnknown), quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
             .enter()
             .append("path")
             .attr("d", path)
@@ -253,13 +310,15 @@ export default {
             }
 
             currentDataDisplayedBasedOnCategory = features;
+            maxAvg = getAllYearMax(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown); 
+            // console.log(maxAvg);    
 
             // filter the data based on YEAR
             const dataFilteredOnYear = filterDataBasedOnYearString(currentYear, currentDataDisplayedBasedOnCategory);
 
 
             // plot the changed map
-            map.data(dataToMapDataFormat(dataFilteredOnYear, quarterGeometryDataWithoutUnknown))
+            map.data(dataToMapDataFormat(dataFilteredOnYear, quarterGeometryDataWithoutUnknown, maxAvg,currentYear))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
@@ -295,8 +354,7 @@ export default {
         
         //translate date obj to Year string (e.g: "2018")
         function dateToYearString(date){
-            // console.log(date.getFullYear());
-            return date.getUTCFullYear().toString();
+            return date.getFullYear().toString();
         }
 
         // function to format data in d3
@@ -485,8 +543,11 @@ export default {
             // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
             // currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
             currentYear = year.toString();
+
+
+
             const dataToShow = filterDataBasedOnYearString(year.toString(), currentDataDisplayedBasedOnCategory);
-            map.data(dataToMapDataFormat(dataToShow, quarterGeometryDataWithoutUnknown))
+            map.data(dataToMapDataFormat(dataToShow, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;

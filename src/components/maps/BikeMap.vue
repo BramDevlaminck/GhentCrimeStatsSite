@@ -5,7 +5,7 @@ import colourScales from '../ColourScales';
 const {linearScaleColour} = colourScales();
 
 // TODO: change this if needed? not really clean this way
-const WIDTH = window.innerWidth / 2;
+const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#d36f80";
 
@@ -78,7 +78,7 @@ export default {
         const mapSvg = d3
             .select("#bikeMapContainer")
             .append("svg")
-            .attr("width", "50vw")
+            .attr("width", "25vw")
             .attr("height", "50vh");
 
         const g = mapSvg.append("g");
@@ -182,16 +182,21 @@ export default {
 </script>
 
 <template>
-    <div id="chartWrapper">
-        <div id="toggleDiv">
-            <!-- Rounded switch -->
-            <label class="switch">
-                <input type="checkbox" id="mapToggle">
-                <span class="slider round"></span>
-            </label>
-            <p id="currentlyShowing">Kaartkleur aan de hand van aantal fietsenstallingen</p>
+    <div id="textChartWrapper">
+        <div id="chartWrapper">
+            <div id="toggleDiv">
+                <!-- Rounded switch -->
+                <label class="switch">
+                    <input type="checkbox" id="mapToggle">
+                    <span class="slider round"></span>
+                </label>
+                <p id="currentlyShowing">Kaartkleur aan de hand van aantal fietsenstallingen</p>
+            </div>
+            <div id="bikeMapContainer"/>
         </div>
-        <div id="bikeMapContainer"/>
+        <p id="text-next-to-slider">
+            Lorem ipsum dolor sit amet, quo ei simul congue exerci, ad nec admodum perfecto mnesarchum, vim ea mazim fierent detracto. Ea quis iuvaret expetendis his, te elit voluptua dignissim per, habeo iusto primis ea eam.
+        </p>
     </div>
 </template>
 

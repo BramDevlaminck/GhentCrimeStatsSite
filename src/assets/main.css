@@ -1,3 +1,7 @@
+#app{
+    min-height: 100vh;
+}
+
 #chartWrapper {
     display: flex;
     flex-direction: column;
@@ -5,6 +9,11 @@
     margin: 2em;
 }
 
-#app{
-    min-height: 100vh;
+#textChartWrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+#text-next-to-slider {
+    margin-top: 4rem;
 }

@@ -185,10 +185,7 @@ export default {
 
 <template>
     <div class="container-lg wrapper">
-        <h1>Statistics page</h1>
-
         <div v-if="dataIsAvailable">
-            <button type="button" v-on:click="saveFile()">Save AllData json file</button>
             <OtherGraphs v-show="currentShownTab === 'other'"
                          :combinedData="combinedDataNoGeoInfo"
                          :crime-types="crimeTypes"/>
@@ -202,6 +199,7 @@ export default {
                   :all-features-without-unknown="allFeaturesWithoutUnknown"
                   :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
                   :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
+            <button class="btn btn-outline-dark" type="button" v-on:click="saveFile()">Save AllData json file</button>
         </div>
         <h4 v-if="!dataIsAvailable">No data available</h4>
     </div>

@@ -214,7 +214,7 @@ export default {
                 (verken dit zeker zelf eens aan de hand van Google Streetview!)
             </p>
             <p>
-                Dit komt omdat de bestaande fietsenstallingen vaak <b>vol</b> zitten, of is de dichtste fietsenstalling <b>niet vlakbij</b> het restaurantje,… is waar men wil zitten.
+                Dit komt omdat de bestaande fietsenstallingen vaak <b>vol</b> zitten, of omdat de dichtste fietsenstalling <b>niet vlakbij</b> het restaurantje,… is waar men wil zitten.
                 In de stationsbuurt is dit een minder probleem aangezien de meeste mensen die hun fiets hier willen plaatsen allemaal op dezelfde plaats moeten zijn: station Gent Sint-Pieters, de <b>grote fietsenstalling bij het station is dus ideaal gepositioneerd</b>.
             </p>
         </div>

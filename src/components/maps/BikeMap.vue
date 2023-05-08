@@ -198,7 +198,7 @@ export default {
             <p>
                 Zoals te verwachten is vooral in de <b>binnenstad</b> veel diefstal van fietsen.
                 Er valt echter op dat er <b>geen verband</b> is tussen de plaats waar het <b>meeste diefstallen</b> (in de binnenstad) zijn en het <b>meeste fietsenstallingen</b> (stationsbuurt noord).
-                Dit kan je zelf nagaan door de kleur-schaal aan te passen aan de hand van de toggle boven de grafiek.
+                Dit kan je zelf nagaan door de kleurschaal aan te passen aan de hand van de toggle boven de grafiek.
             </p>
             <p>
                 We vermoeden dat dit te maken heeft met het feit dat fietsen in de fietsenstalling bij station Gent Sint-Pieters deels overdekt kunnen staan.

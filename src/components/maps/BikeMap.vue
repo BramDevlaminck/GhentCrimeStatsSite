@@ -207,7 +207,7 @@ export default {
                 Ook zijn zeker niet al deze fietsenstallingen even druk bezocht, vaak zijn dit bv. 5 plaatsen langs de straat in een rustigere buurt of <b>hangen fietsen vast aan andere objecten</b>.
             </p>
             <p>
-                Bovendien worden fietsen niet altijd aan de fietsenstallingen vast gemaakt.
+                Bovendien worden fietsen niet altijd aan de fietsenstallingen vastgemaakt.
                 Zo'n <i>niet bestaande</i> fietsenstalling kan bijvoorbeeld <a href="https://goo.gl/maps/73K9wmAtwmy2cKkS9">hier</a> teruggevonden worden.
                 Volgens de dataset (<a href="https://data.stad.gent/explore/dataset/fietsenstallingen-gent/table/">bron</a>) is dit een fietsenstalling voor 2 fietsen. Dit is niet alleen heel klein, maar op Google Streetview is hier niet eens een fietsenstalling zichtbaar.
                 Er zijn echter wel veel fietsen zichtbaar die vast hangen aan een rail, paaltjes,...

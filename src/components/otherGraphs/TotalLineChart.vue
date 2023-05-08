@@ -69,13 +69,14 @@ export default {
         const data = preprocessDataPerYearAndMonth(this.data, allCategories);
         const monthFormatter = d3.timeFormat("%b");
         const margin = {top: 10, right: 30, bottom: 30, left: 60},
-            width = Math.min(window.innerWidth, 1000) - margin.left - margin.right,
+            svgWidth = Math.min(window.innerWidth, 1000) - margin.left - margin.right,
             height = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
+        const effectiveLineGraphWidth = svgWidth - 100;
 
         // append the svg object to the body of the page
         const svg = d3.select("#lineChart")
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
+            .attr("width", svgWidth + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .on("mouseover", mouseOverHandler)
             .on("mousemove", mouseMoveHandler)
@@ -83,13 +84,14 @@ export default {
         const lineGraph = svg.append("g")
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
+
         let currentDataDisplayedBasedOnCategory = selectCategoryFromData(data, allCategories[0]); // all data of the current category!
         // group the data: I want to draw one line per group
         let groupedData = d3.group(currentDataDisplayedBasedOnCategory, d => d.date.getFullYear());
 
         const x = d3.scaleTime()
             .domain([new Date("2021-12-31"), new Date("2022-12-01")])
-            .range([0, width]);
+            .range([0, effectiveLineGraphWidth]);
 
         const xAxis = d3.axisBottom(x)
             .tickFormat(monthFormatter)
@@ -109,6 +111,15 @@ export default {
         lineGraph.append("g")
             .attr("id", "y-axis")
             .call(yAxis);
+
+        // Y axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -margin.left + 80)
+            .attr("x", -margin.top - 80)
+            .text("Aantal voorvallen")
+            .style("font-size", "80%");
 
         // color palette
         const res = [];
@@ -216,7 +227,7 @@ export default {
             .enter()
             .append("circle")
             .attr("class", d => "year" + d)
-            .attr("cx", width + margin.left + margin.right - 300)
+            .attr("cx", effectiveLineGraphWidth + margin.left + margin.right)
             .attr("cy", (d, i) => 100 + i * 25) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("r", 7)
             .style("fill", d => color(d));
@@ -226,10 +237,11 @@ export default {
             .enter()
             .append("text")
             .attr("class", d => "year" + d)
-            .attr("x", width + margin.left + margin.right - 300 + 20)
+            .attr("x", effectiveLineGraphWidth + margin.left + margin.right + 20)
             .attr("y", (d, i) => 100 + i * 25) // 100 is where the first label appears. 25 is the distance between labels
             .style("fill", d => color(d))
             .text(d => d)
+            .style("font-size", "90%")
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
             .on("click", function (event, data) {
@@ -250,13 +262,14 @@ export default {
         // extract the current month (as integer between 0-11) from a pointer event
         function getCurrentMonthFromHover(event) {
             const [xCoordinate, _] = d3.pointer(event);
-            const ratio = xCoordinate / (width + margin.left + margin.right);
+            const ratio = xCoordinate / (effectiveLineGraphWidth + margin.left);
             return Math.round(ratio * 12) - 1;
         }
 
         // show the hover tips
         function mouseOverHandler(event) {
-            if (getCurrentMonthFromHover(event) >= 0) { // >= 0 needed since hovering left of the graph could also trigger the line otherwise
+            const monthIndex = getCurrentMonthFromHover(event);
+            if (monthIndex >= 0 && monthIndex < 12) { // >= 0 needed since hovering left of the graph could also trigger the line otherwise
                 hoverLine.style('display', 'block');
             }
         }
@@ -264,7 +277,7 @@ export default {
         // show the right information on hover
         function mouseMoveHandler(event) {
             const currentMonth = getCurrentMonthFromHover(event);
-            if (currentMonth >= 0) { // >= 0 needed since hovering left of the graph could also trigger the line otherwise
+            if (currentMonth >= 0 && currentMonth < 12) { // >= 0 needed since hovering left of the graph could also trigger the line otherwise
                 // select the data of this month
                 const selectedMonthData = currentDataDisplayedBasedOnCategory.filter(d => d.month === currentMonth);
                 // calculate the location on the x-axis

@@ -149,7 +149,7 @@ export default {
         const dataInMapFormat = dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData);
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData))
+            .data(dataInMapFormat)
             .enter()
             .append("path")
             .attr("d", path)

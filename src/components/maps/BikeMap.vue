@@ -263,5 +263,10 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: row;
     column-gap: 1em;
+    align-items: center;
+}
+
+#currentlyShowing {
+    margin: 0;
 }
 </style>

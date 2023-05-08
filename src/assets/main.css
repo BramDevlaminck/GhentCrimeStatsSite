@@ -58,7 +58,7 @@
     left: -5.3px;
 }
 
-@media screen and (max-width: 768px){
+@media screen and (max-width: 67.5rem){
     .right {
         left: 0;
     }

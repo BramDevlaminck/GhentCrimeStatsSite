@@ -57,6 +57,10 @@ function selectCategoryFromData(data, category) {
     return data.filter(el => el["fact_category"] === category);
 }
 
+// vague function that gets the bbox of a selection and adds it to the data
+function getTextBox(selection) {
+    selection.each(function(d) { d.bbox = this.getBBox(); })
+}
 
 export default {
     props: {
@@ -282,14 +286,17 @@ export default {
                 const selectedMonthData = currentDataDisplayedBasedOnCategory.filter(d => d.month === currentMonth);
                 // calculate the location on the x-axis
                 const monthOnAxis = x(new Date(2022, currentMonth));
-                // remove old labels
-                hoverLine.selectAll('text')
+                // remove old labels and boxes
+                hoverLine.selectAll('g')
                     .remove();
-                // set new labels
-                hoverLine.selectAll('text')
+                // create new groups that will later contain the rectangle and text
+                const labels = hoverLine.selectAll('g')
                     .data(selectedMonthData)
                     .enter()
-                    .append('text')
+                    .append("g");
+
+                // draw the label
+                labels.append('text')
                     .text(d => d.count)
                     .attr("x", (_) => 8) // place label 8 pixels to the right of the dot
                     .attr("y", d => y(d.count))
@@ -298,7 +305,16 @@ export default {
                         return color(d.date.getFullYear());
                     })
                     .style("font-size", "80%")
-                    .style("opacity", d => d3.select(".year" + d.date.getFullYear()).style("opacity"));
+                    .style("opacity", d => d3.select(".year" + d.date.getFullYear()).style("opacity"))
+                    .call(getTextBox);
+
+                // draw box with white background
+                labels.insert("rect", "text")
+                    .attr("width", d =>  d.bbox.width + 2) // increase a bit in size since a bit of spill is visible otherwise
+                    .attr("height", d => d.bbox.height)
+                    .attr("x", (_) => 8) // place label 8 pixels to the right of the dot
+                    .attr("y", d => y(d.count) - d.bbox.height + 3) // do + 3 to center the rectangle height-wise
+                    .style("fill", "white")
 
                 // set location new line
                 hoverLine.attr('transform', `translate(${monthOnAxis},${0})`);

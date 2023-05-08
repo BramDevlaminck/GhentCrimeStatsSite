@@ -10,9 +10,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <router-link class="nav-link" aria-current="page" to="/">Introduction</router-link>
-                    <router-link class="nav-link" aria-current="page" to="/statistics">Statistics</router-link>
-                    <router-link class="nav-link" aria-current="page" to="/about">About</router-link>
+                    <router-link class="nav-link" aria-current="page" to="/">Introductie</router-link>
+                    <router-link class="nav-link" aria-current="page" to="/statistics">Statistiek</router-link>
+                    <router-link class="nav-link" aria-current="page" to="/about">Info</router-link>
                 </div>
             </div>
         </div>

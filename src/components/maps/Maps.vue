@@ -43,7 +43,7 @@ export default {
         </h1>
         <h5>
             Deze kaart geeft een overzicht van Gent met daarop het aantal fietsdiefstallen per wijk.
-            Door de slider te activeren krijg je een overzicht van waar de meeste plaatsen zijn voor fietsen.
+            Door de slider te activeren krijg je een overzicht van waar het grootste aantal parkeerplaatsen zijn voor fietsen.
         </h5>
         <BikeMap :all-features="allFeaturesWithoutUnknown"
                  :quarter-geometry-small="quarterGeometrySmall"

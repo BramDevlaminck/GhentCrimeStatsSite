@@ -149,7 +149,7 @@ export default {
         const dataInMapFormat = dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData);
         const map = g.append("g")
             .selectAll("path")
-            .data(dataInMapFormat)
+            .data(dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData))
             .enter()
             .append("path")
             .attr("d", path)
@@ -173,6 +173,10 @@ export default {
                     return linearScaleColour(count, max);
                 });
         });
+    },
+    beforeUnmount() {
+        // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
+        d3.selectAll('#bikeMapContainer svg').remove();
     }
 };
 </script>

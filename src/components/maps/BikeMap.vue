@@ -209,8 +209,8 @@ export default {
             <p>
                 Bovendien worden fietsen niet altijd aan de fietsenstallingen vastgemaakt.
                 Zo'n <i>niet bestaande</i> fietsenstalling kan bijvoorbeeld <a href="https://goo.gl/maps/73K9wmAtwmy2cKkS9">hier</a> teruggevonden worden.
-                Volgens de dataset (<a href="https://data.stad.gent/explore/dataset/fietsenstallingen-gent/table/">bron</a>) is dit een fietsenstalling voor 2 fietsen. Dit is niet alleen heel klein, maar op Google Streetview is hier niet eens een fietsenstalling zichtbaar.
-                Er zijn echter wel veel fietsen zichtbaar die vast hangen aan een rail, paaltjes,...
+                Volgens de dataset (<a href="https://data.stad.gent/explore/dataset/fietsenstallingen-gent/table/">bron</a>) is dit een fietsenstalling met een capaciteit van 2.
+                Dit allemaal terwijl er veel fietsen zichtbaar zijn die vast hangen aan een rail, paaltjes,...
                 (verken dit zeker zelf eens aan de hand van Google Streetview!)
             </p>
             <p>

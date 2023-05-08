@@ -120,7 +120,7 @@ export default {
         // set the dimensions and margins of the graph
         const margin = {top: 400, right: 25, bottom: 30, left: 300},
             width = 900 - margin.left - margin.right,
-            height = 900 - margin.top - margin.bottom;
+            height = 800 - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
         const svg = d3.select("#heatmap")

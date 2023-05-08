@@ -239,17 +239,20 @@ export default {
             <p>
                 Ook hier zien we vooral veel geregistreerde feiten in de <b>binnenstad</b>.
                 Dit valt te verwachten aangezien we hier veel studenten en toeristen terug te vinden zijn.
-                Dit zorgt voor een grote drukte en dus ook een grotere kans op mensen die verkeerd parkeren, ongevallen die gebeuren, zakkenrollers,…
+                Dit zorgt voor een grote drukte en dus ook een grotere kans op mensen die verkeerd parkeren, ongevallen
+                die gebeuren, zakkenrollers,…
             </p>
             <p>
                 Als we ons focussen op de wijken rond de binnenstad valt vooral wijk <b>Brugse Poort - Rooigem</b> op.
                 Deze heeft duidelijk meer <b>geregistreerde feiten te hebben dan de omliggende wijken</b>.
-                Dit blijkt een erg <b>dicht bebouwde</b> wijk te zijn (bebouwingsgraad van 26.5% terwijl het gemiddelde in Gent 13.3% is).
+                Dit blijkt een erg <b>dicht bebouwde</b> wijk te zijn (bebouwingsgraad van 26.5% terwijl het gemiddelde
+                in Gent 13.3% is).
                 Bovendien is het een cultureel multi-diverse wijk waar mensen vaak slechts enkele jaren wonen.
             </p>
             <p>
                 Zelfs van binnen de wijk geeft <b>50% van de inwoners aan dat ze vaak buurthinder ondervinden</b>.
-                Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen (<a href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>).
+                Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen (<a
+                    href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>).
             </p>
             <ul>
                 <li>1/5 geeft aan bewust plekken in hun buurt te vermijden</li>
@@ -264,10 +267,13 @@ export default {
                 <li>Sluikstorten</li>
                 <li>Bromfiets- en motordiefstal</li>
                 <li>Diefstal gewapenderhand</li>
+                <li>Diefstal uit of aan voertuigen</li>
             </ul>
             <p>
-                Deze wijk is duidelijk geen rustige buurt om te wonen. Het is echter belangrijk dit in context te plaatsen van het aantal inwoners.
-                <b>Wanneer we de data normaliseren naar het aantal inwoners blijkt dit niet uitzonderlijk hoog te zijn</b>. Dit is zelfs vergelijkbaar met de omliggende wijken.
+                Deze wijk is duidelijk geen rustige buurt om te wonen. Het is echter belangrijk dit in context te
+                plaatsen van het aantal inwoners.
+                <b>Wanneer we de data normaliseren naar het aantal inwoners blijkt dit niet uitzonderlijk hoog te
+                    zijn</b>. Dit is zelfs vergelijkbaar met de omliggende wijken.
                 Dit kunt u zelf nagaan door de toggle boven de grafiek te gebruiken.
             </p>
         </div>

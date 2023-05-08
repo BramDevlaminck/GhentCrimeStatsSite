@@ -118,7 +118,7 @@ export default {
         const crimes = [...this.crimeTypes];
 
         // set the dimensions and margins of the graph
-        const margin = {top: 400, right: 25, bottom: 25, left: 300},
+        const margin = {top: 350, right: 25, bottom: 25, left: 250},
             width = 900 - margin.left - margin.right,
             height = 800 - margin.top - margin.bottom;
 
@@ -145,7 +145,7 @@ export default {
             .domain(quarters)
             .padding(0.05);
         svg.append("g")
-            .style("font-size", 15)
+            .style("font-size", 80 + "%")
             .call(d3.axisBottom(x).tickSize(0))
             .selectAll("text")
             .attr("y", 0)
@@ -161,7 +161,7 @@ export default {
             .domain(crimes)
             .padding(0.05);
         svg.append("g")
-            .style("font-size", 15)
+            .style("font-size", 80 + "%")
             .call(d3.axisLeft(y).tickSize(0))
             .select(".domain").remove();
 

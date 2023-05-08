@@ -305,7 +305,10 @@ export default {
                         return color(d.date.getFullYear());
                     })
                     .style("font-size", "80%")
-                    .style("opacity", d => d3.select(".year" + d.date.getFullYear()).style("opacity"))
+                    .style("opacity", d => {
+                        const line_opacity = d3.select(".year" + d.date.getFullYear()).style("opacity");
+                        return line_opacity === "1"? 1: 0; // completely hide the label if the graph is faded
+                    })
                     .call(getTextBox);
 
                 // draw box with white background
@@ -315,6 +318,10 @@ export default {
                     .attr("x", (_) => 8) // place label 8 pixels to the right of the dot
                     .attr("y", d => y(d.count) - d.bbox.height + 3) // do + 3 to center the rectangle height-wise
                     .style("fill", "white")
+                    .style("opacity", d => {
+                        const line_opacity = d3.select(".year" + d.date.getFullYear()).style("opacity");
+                        return line_opacity === "1"? 1: 0; // completely hide the label if the graph is faded
+                    });
 
                 // set location new line
                 hoverLine.attr('transform', `translate(${monthOnAxis},${0})`);

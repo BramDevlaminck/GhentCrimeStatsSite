@@ -53,7 +53,7 @@ export default {
             Misdrijven per categorie
         </h1>
         <h5>
-            Deze kaart geeft een overzicht van het aantal misdrijven van een bepaalde categorie, deze categorie kan je selecteren in de dropdown.
+            Deze kaart geeft een overzicht van het aantal misdrijven van een bepaalde categorie over alle jaren heen. De gewenste categorie kan je selecteren via de dropdown.
             Door de slider te activeren zal de data genormaliseerd worden ten opzichte van het aantal inwoners in de wijk.
         </h5>
         <TotalCrimesMap :all-features="allFeaturesWithoutUnknown"

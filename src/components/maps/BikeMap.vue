@@ -204,7 +204,7 @@ export default {
                 We vermoeden dat dit te maken heeft met het feit dat fietsen in de fietsenstalling bij station Gent Sint-Pieters deels overdekt kunnen staan.
                 In combinatie met het feit dat aan het station bijna altijd beweging is van andere pendelaars, studenten en politieagenten.
                 In de binnenstad zijn dan wel veel fietsenstallingen, maar dit zijn vaak erg <b>kleine fietsenstallingen</b> die <b>verspreid</b> zijn doorheen het centrum.
-                Ook zijn zeker niet al deze fietsenstallingen even druk bezocht, vaak zijn dit bv. 5 plaatsen langs de straat in een rustigere buurt.of <b>hangen fietsen vast aan andere objecten</b>.
+                Ook zijn zeker niet al deze fietsenstallingen even druk bezocht, vaak zijn dit bv. 5 plaatsen langs de straat in een rustigere buurt of <b>hangen fietsen vast aan andere objecten</b>.
             </p>
             <p>
                 Bovendien worden fietsen niet altijd aan de fietsenstallingen vast gemaakt.

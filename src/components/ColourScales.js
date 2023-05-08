@@ -28,24 +28,14 @@ export default function colourScales() {
 
 
     // change is the improvement/worsening,
-    // maxWorsening is the value that should be completely red,
-    // maxImprovement is the value that should be completely green
+    // maxPosChange is the value that should be completely red,
+    // maxNegChange is the value that should be completely green
     function differentialColour(change, maxNegChange, maxPosChange) {
-        // TODO: this is untested, so the scaling for what needs to be red or green can be totally off
-        //  fraction == 0 => totally red
-        //  fraction == 1 => totally green
-        //  fraction == 0.5 => neutral colour
         let fraction = 0.5;
         if (change > 0) {
             fraction = 0.5 - change / (maxPosChange * 2);
-            if (fraction > 0.5) {
-                console.log("wronga" + maxPosChange);
-            }
         } else if (change < 0) {
             fraction = 0.5 + change / (maxNegChange * 2);
-            if (fraction < 0.5) {
-                console.log("wrongb" + maxNegChange);
-            }
         }
         return d3.interpolateRdYlGn(fraction);
     }

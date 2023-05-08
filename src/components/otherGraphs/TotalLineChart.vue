@@ -107,7 +107,7 @@ export default {
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
 
-        // Add Y axis
+        // Add y-axis
         const y = d3.scaleLinear()
             .domain([0, d3.max(currentDataDisplayedBasedOnCategory, d => +d.count)])
             .range([height, 0])
@@ -118,7 +118,7 @@ export default {
             .attr("id", "y-axis")
             .call(yAxis);
 
-        // Y axis label:
+        // y-axis label:
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("transform", "rotate(-90)")
@@ -173,7 +173,7 @@ export default {
             currentDataDisplayedBasedOnCategory = selectCategoryFromData(data, selectedGroup);
             groupedData = d3.group(currentDataDisplayedBasedOnCategory, d => d.date.getFullYear());
 
-            // update y axis (needs to happen first!)
+            // update y-axis (needs to happen first!)
             y.domain([0, d3.max(currentDataDisplayedBasedOnCategory, d => +d.count)])
                 .nice();
             lineGraph.select("#y-axis")

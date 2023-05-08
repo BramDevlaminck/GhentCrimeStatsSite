@@ -14,7 +14,8 @@ export default {
         bikeParkingPerQuarter: Map,
         allFeaturesWithoutUnknown: Array,
         quarterGeometryDataWithoutUnknown: Map,
-        quarterGeometrySmall: Object
+        quarterGeometrySmall: Object,
+        numberOfResidentsPerQuarterMap: Map
     },
     name: "Maps"
 };
@@ -37,7 +38,8 @@ export default {
         <TotalCrimesMap :all-features="allFeaturesWithoutUnknown"
                         :quarter-geometry-small="quarterGeometrySmall"
                         :quarter-geometry-data="quarterGeometryDataWithoutUnknown"
-                        :crime-types="crimeTypes"/>
+                        :crime-types="crimeTypes"
+                        :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
     </div>
 </template>
 

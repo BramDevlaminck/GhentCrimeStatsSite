@@ -1,6 +1,7 @@
 <script>
 import * as d3 from "d3";
-import colourScales  from '../ColourScales'
+import colourScales from '../ColourScales';
+
 const {linearScaleColour} = colourScales();
 
 // TODO: change this if needed? not really clean this way
@@ -9,7 +10,7 @@ const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#d36f80";
 
 // transform the data to the format we use for the map
-function dataToMapDataFormat(data, quarterGeometryData) {
+function dataToMapDataFormat(data, quarterGeometryData, numberOfResidentsPerQuarterMap) {
     // count how often something happened per quarter
     const totalCounts = new Map();
     for (const quarter of quarterGeometryData.keys()) {
@@ -25,17 +26,42 @@ function dataToMapDataFormat(data, quarterGeometryData) {
 
     // get the max this happens per quarter
     const maxCount = Math.max(...totalCounts.values());
+    const maxNumberOfRelativeCrimesPerQuarter = Math.max(...[...totalCounts.keys()]
+        .map(quarter => totalCounts.get(quarter) / numberOfResidentsPerQuarterMap.get(quarter))
+    );
 
     // create the result array in the right format and return it
     const result = [];
     for (const [quarter, total] of totalCounts) {
+        const numberOfResidents = numberOfResidentsPerQuarterMap.get(quarter);
         result.push({
-            properties: {"quarter": quarter, "count": total, "max": maxCount},
+            properties: {
+                "quarter": quarter,
+                "count": total,
+                "max": maxCount,
+                "numberOfResidents": numberOfResidents,
+                "relativeCrimesPerQuarter": total / numberOfResidents,
+                "maxNumberOfRelativeCrimesPerQuarter": maxNumberOfRelativeCrimesPerQuarter
+            },
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
     }
     return result;
+}
+
+function getInfoForColouringMap(data, conditional) {
+    const properties = data["properties"];
+    let count;
+    let maxCount;
+    if (conditional) {
+        count = properties.relativeCrimesPerQuarter;
+        maxCount = properties.maxNumberOfRelativeCrimesPerQuarter;
+    } else {
+        count = properties.count;
+        maxCount = properties.max;
+    }
+    return [count, maxCount];
 }
 
 
@@ -44,7 +70,8 @@ export default {
         allFeatures: Array,
         quarterGeometrySmall: Object,
         quarterGeometryData: Map,
-        crimeTypes: Set
+        crimeTypes: Set,
+        numberOfResidentsPerQuarterMap: Map
     },
     name: "TotalCrimesMap",
     mounted() {
@@ -52,7 +79,8 @@ export default {
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const crimeTypes = this.crimeTypes;
         const quarterGeometryData = this.quarterGeometryData;
-
+        const numberOfResidentsPerQuarterMap = this.numberOfResidentsPerQuarterMap;
+        let showDataRelativePerNumberOfResidents = false;
         const mapSvg = d3
             .select("#totalMapContainer")
             .append("svg")
@@ -86,7 +114,7 @@ export default {
 
         //--------------------- dropdown ----------------------------------------
 
-        const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
+        const allCategories = ["Alle Categorieën"].concat([...crimeTypes]);
 
         // Function to update the map if a new crime category is chosen
         function updateMapWithNewCrimeCategory(selectedGroup) {
@@ -99,12 +127,11 @@ export default {
                 });
             }
 
+            dataInMapFormat = dataToMapDataFormat(features, quarterGeometryData, numberOfResidentsPerQuarterMap);
             // plot the changed map
-            map.data(dataToMapDataFormat(features, quarterGeometryData))
+            map.data(dataInMapFormat)
                 .attr("fill", (d, _) => {
-                    const properties = d["properties"];
-                    const count = properties.count;
-                    const maxCount = properties.max;
+                    const [count, maxCount] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
                     return linearScaleColour(count, maxCount);
                 });
         }
@@ -139,9 +166,7 @@ export default {
         }
 
         function mouseOutHandler(event, data) {
-            const properties = data["properties"];
-            const count = properties.count;
-            const max = properties.max;
+            const [count, max] = getInfoForColouringMap(data, showDataRelativePerNumberOfResidents);
             const selectedColor = linearScaleColour(count, max);
             d3.select(this).attr("fill", selectedColor);
 
@@ -156,8 +181,9 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
+            const numberOfResidents = properties.numberOfResidents;
             tooltip
-                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
+                .html("Regio: " + quarter + "<br>Aantal inwonders: " + numberOfResidents + "<br>Aantal geregistreerde voorvallen: " + count)
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
         }
@@ -170,9 +196,10 @@ export default {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
+        let dataInMapFormat = dataToMapDataFormat(allFeatures, quarterGeometryData, numberOfResidentsPerQuarterMap);
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(allFeatures, quarterGeometryData, crimeTypes))
+            .data(dataInMapFormat)
             .enter()
             .append("path")
             .attr("d", path)
@@ -188,12 +215,30 @@ export default {
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
+
+        // listen to toggle
+        d3.select("#totalCrimesMapToggle").on("change", function (_) {
+            showDataRelativePerNumberOfResidents = d3.select("#totalCrimesMapToggle").property("checked");
+            map.data(dataInMapFormat)
+                .attr("fill", (d, _) => {
+                    const [count, max] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
+                    return linearScaleColour(count, max);
+                });
+        });
     }
 };
 </script>
 
 <template>
     <div id="chartWrapper">
+        <div id="toggleDiv">
+            <!-- Rounded switch -->
+            <label class="switch">
+                <input type="checkbox" id="totalCrimesMapToggle">
+                <span class="slider round"></span>
+            </label>
+            <p id="currentlyShowing">Normaliseer data met aantal inwoners in deze wijk</p>
+        </div>
         <select id="selectButtonTotalCrimes"></select>
         <div id="totalMapContainer"/>
     </div>
@@ -201,4 +246,78 @@ export default {
 
 
 <style scoped>
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+#toggleDiv {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1em;
+    align-items: center;
+}
+
+#currentlyShowing {
+    margin: 0;
+}
 </style>

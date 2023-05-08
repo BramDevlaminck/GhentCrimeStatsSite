@@ -38,6 +38,25 @@ const allData = await Promise.all([
 
 const bikeParkingObject = await getData("bike_parkings_per_quarter.json");
 const bikeParkingMap = new Map(Object.entries(bikeParkingObject));
+const numberOfResidentsPerQuarter = await getData("bevolkingsaantal-per-wijk-per-jaar-gent.geojson").then(
+    res => {
+        return res["features"].map(obj => {
+            const property = obj["properties"];
+            const numberOfResidents = property.valuestring;
+            let quarter = property.wijk;
+            // handle edge the 2 coses where the quarter is written differently in this dataset
+            if (quarter === "Stationsbuurt-Noord") {
+                quarter = "Stationsbuurt Noord";
+            } else if (quarter === "Stationsbuurt-Zuid") {
+                quarter =  "Stationsbuurt Zuid";
+            } else if (quarter === null) { // some data does not belong to a quarter, so we just ignore those entries and remove them later with the filter operation
+                return [];
+            }
+            return [quarter, numberOfResidents];
+        }).filter(entry => entry.length !== 0);
+    }
+);
+const numberOfResidentsPerQuarterMap = new Map(numberOfResidentsPerQuarter);
 
 // make sure we only add each quarter once
 const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
@@ -135,7 +154,8 @@ export default {
             currentShownTab: currentShownTab,
             allFeaturesWithoutUnknown: allData.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
             quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
-            quarterGeometrySmall: quarterGeometrySmall
+            quarterGeometrySmall: quarterGeometrySmall,
+            numberOfResidentsPerQuarterMap: numberOfResidentsPerQuarterMap
         };
     },
     computed: {
@@ -169,15 +189,19 @@ export default {
 
         <div v-if="dataIsAvailable">
             <button type="button" v-on:click="saveFile()">Save AllData json file</button>
-            <OtherGraphs v-show="currentShownTab === 'other'" :combinedData="combinedDataNoGeoInfo" :crime-types="crimeTypes"/>
+            <OtherGraphs v-show="currentShownTab === 'other'"
+                         :combinedData="combinedDataNoGeoInfo"
+                         :crime-types="crimeTypes"/>
             <Maps v-show="currentShownTab === 'maps'"
                   :all-features="combinedDataWithGeoInfo"
                   :begin-date="beginDate"
                   :end-date="endDate"
                   :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"
                   :bike-parking-per-quarter="bikeParkingMaps"
-                  :quarter-geometry-small="quarterGeometrySmall" :all-features-without-unknown="allFeaturesWithoutUnknown"
-                  :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"/>
+                  :quarter-geometry-small="quarterGeometrySmall"
+                  :all-features-without-unknown="allFeaturesWithoutUnknown"
+                  :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
+                  :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
         </div>
         <h4 v-if="!dataIsAvailable">No data available</h4>
     </div>
@@ -185,7 +209,7 @@ export default {
 </template>
 
 <style scoped>
-.wrapper{
+.wrapper {
     padding-bottom: 4rem;
 }
 </style>

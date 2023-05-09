@@ -274,6 +274,7 @@ export default {
 .slider {
     position: absolute;
     cursor: pointer;
+    width: 60px;
     top: 0;
     left: 0;
     right: 0;

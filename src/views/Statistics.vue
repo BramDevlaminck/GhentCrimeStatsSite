@@ -62,8 +62,6 @@ const quarterGeometryDataObject = await getData("quarter_shapes.geojson").then(
     }
 )
 const quarterGeometryData = new Map(quarterGeometryDataObject); // contains quarter as key, and the value is the geometry data
-const quarters = new Set(quarterGeometryData.keys()); // set that will contain all the quarters
-const crimeTypes = new Set(); // set that will contain all the crimeTypes
 
 // start and end of dataset in time-wise
 let smallestDate = null;
@@ -78,7 +76,7 @@ const dates = allData.reduce((acc, curr) => {
 smallestDate = dates.min;
 biggestDate = dates.max;
 
-
+const crimeTypes = new Set(); // set that will contain all the crimeTypes
 allData.forEach(obj => {
     let crime = obj["fact_category"];
     crimeTypes.add(crime);

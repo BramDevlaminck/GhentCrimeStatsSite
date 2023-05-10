@@ -94,7 +94,7 @@ if __name__ == "__main__":
     all_geo_json = get_all_geojson_in_directory(path)
     for filename in all_geo_json:
         with open(f"{path}/{filename}") as input_file:
-            data = json.loads(input_file.read())
+            data = json.load(input_file)
             features = data["features"]
             if is_crime_data_per_year(filename):
                 cleanup_crime_data_per_year(features)

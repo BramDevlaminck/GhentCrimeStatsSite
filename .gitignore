@@ -26,5 +26,5 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-/Datasets
-!/Datasets/.gitkeep
+/public/Datasets
+!/public/Datasets/.gitkeep

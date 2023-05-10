@@ -7,14 +7,14 @@ import OtherGraphs from "@/components/otherGraphs/OtherGraphs.vue";
 
 // function to read the data
 function getData(filename) {
-    return fetch("./Datasets/" + filename)
+    return fetch("/Datasets/" + filename)
         .then(res => res.json())
         .then(res => {
             rewind(res, true); // use rewind to make sure the geojson is clockwise! if this is not the case the map will not be displayed!
             return res;
         })
         .catch(() => {
-            console.error("Something went wrong while trying to read the file ./Datasets/" + filename);
+            console.error("Something went wrong while trying to read the file /Datasets/" + filename);
             return []; // return empty array to make sure the awaited data is iterable
         });
 }

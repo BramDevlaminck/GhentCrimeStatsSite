@@ -19,7 +19,9 @@ npm install
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Deploy to site
+Run this script to generate the static site that expects to be located at the `VITE_BASE_URL`
+specified in the `.env.production` file.
 
 ```sh
 npm run build

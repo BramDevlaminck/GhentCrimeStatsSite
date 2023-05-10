@@ -11,11 +11,11 @@ const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#d36f80";
 
 function filterDataBasedOnDateString(date, data) {
-    return data.filter(entry => entry["properties"]["jaar_maand"] === date);
+    return data.filter(entry => entry["jaar_maand"] === date);
 }
 
 function filterDataBasedOnYearString(year, data) {
-    return data.filter(entry => entry["properties"]["year"] === year);
+    return data.filter(entry => entry["year"] === year);
 }
 
 // transform the data to the format we use for the map
@@ -27,10 +27,9 @@ function dataToMapDataFormat(data, quarterGeometryData) {
     }
 
     data.forEach(obj => {
-        const properties = obj["properties"];
-        const quarter = properties["quarter"];
+        const quarter = obj["quarter"];
         const currentCount = totalCounts.get(quarter);
-        totalCounts.set(quarter, currentCount + properties["total"]);
+        totalCounts.set(quarter, currentCount + obj["total"]);
     });
 
     // get the max this happens per quarter
@@ -56,7 +55,6 @@ export default {
         endDate: Date,
         crimeTypes: Set,
         quarterGeometryData: Map,
-        bikeParkingPerQuarter: Map,
         quarterGeometryDataWithoutUnknown: Map,
         quarterGeometrySmall: Object
     },
@@ -173,7 +171,7 @@ export default {
             // select the data from the chart that we actually want/need
             if (selectedGroup !== allCategories[0]) {
                 features = features.filter(element => {
-                    return element["properties"]["fact_category"] === selectedGroup;
+                    return element["fact_category"] === selectedGroup;
                 });
             }
 

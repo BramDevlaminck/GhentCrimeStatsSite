@@ -10,7 +10,9 @@ function getData(filename) {
     return fetch("Datasets/" + filename)
         .then(res => res.json())
         .then(res => {
-            rewind(res, true); // use rewind to make sure the geojson is clockwise! if this is not the case the map will not be displayed!
+            if (filename.endsWith(".geojson")) {
+                rewind(res, true); // use rewind to make sure the geojson is clockwise! if this is not the case the map will not be displayed!
+            }
             return res;
         })
         .catch(() => {
@@ -21,46 +23,46 @@ function getData(filename) {
 
 // load all the data
 const allData = await Promise.all([
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2018.geojson"),
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2019.geojson"),
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2020.geojson"),
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2021.geojson"),
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2022.geojson"),
-    getData("criminaliteitscijfers-per-wijk-per-maand-gent-2023.geojson")
+    getData("data_2018.json"),
+    getData("data_2019.json"),
+    getData("data_2020.json"),
+    getData("data_2021.json"),
+    getData("data_2022.json"),
+    getData("data_2023.json"),
 ])
     .then(jsonArray => {
         const features = [];
         jsonArray.forEach(dataset => {
-            features.push(...dataset["features"]);
+            features.push(...dataset);
         });
         return features;
     });
 
 const bikeParkingObject = await getData("bike_parkings_per_quarter.json");
 const bikeParkingMap = new Map(Object.entries(bikeParkingObject));
-const numberOfResidentsPerQuarter = await getData("bevolkingsaantal-per-wijk-per-jaar-gent.geojson").then(
+const numberOfResidentsPerQuarter = await getData("residents_per_quarter.json").then(
     res => {
-        return res["features"].map(obj => {
-            const property = obj["properties"];
-            const numberOfResidents = property.valuestring;
-            let quarter = property.wijk;
-            // handle edge the 2 coses where the quarter is written differently in this dataset
-            if (quarter === "Stationsbuurt-Noord") {
-                quarter = "Stationsbuurt Noord";
-            } else if (quarter === "Stationsbuurt-Zuid") {
-                quarter =  "Stationsbuurt Zuid";
-            } else if (quarter === null) { // some data does not belong to a quarter, so we just ignore those entries and remove them later with the filter operation
-                return [];
-            }
+        return res.map(obj => {
+            const quarter = obj["quarter"];
+            const numberOfResidents = obj["number_of_residents"];
             return [quarter, numberOfResidents];
-        }).filter(entry => entry.length !== 0);
+        });
     }
 );
 const numberOfResidentsPerQuarterMap = new Map(numberOfResidentsPerQuarter);
 
 // make sure we only add each quarter once
-const quarterGeometryData = new Map(); // contains quarter as key, and the value is the geometry data
-const quarters = new Set(); // set that will contain all the quarters
+const quarterGeometryDataObject = await getData("quarter_shapes.geojson").then(
+    res => {
+        return res["features"].map(entry => {
+            const geometry_data = entry["geometry"];
+            const quarter = entry["properties"]["quarter"];
+            return [quarter, geometry_data]
+        });
+    }
+)
+const quarterGeometryData = new Map(quarterGeometryDataObject); // contains quarter as key, and the value is the geometry data
+const quarters = new Set(quarterGeometryData.keys()); // set that will contain all the quarters
 const crimeTypes = new Set(); // set that will contain all the crimeTypes
 
 // start and end of dataset in time-wise
@@ -68,7 +70,7 @@ let smallestDate = null;
 let biggestDate = null;
 
 const dates = allData.reduce((acc, curr) => {
-    const currDate = new Date(curr.properties.year);
+    const currDate = new Date(curr.year);
     acc.min = !acc.min || currDate < acc.min ? currDate : acc.min;
     acc.max = !acc.max || currDate > acc.max ? currDate : acc.max;
     return acc;
@@ -78,19 +80,7 @@ biggestDate = dates.max;
 
 
 allData.forEach(obj => {
-    const properties = obj["properties"];
-    const quarter = properties["quarter"];
-    let crime = properties["fact_category"];
-    // we have to hard-code this since the datasets of 2018 and 2019 still have the old entries
-    if (crime === "Verkeerongevallen met lichamelijk letsel") {
-        crime = "Verkeersongevallen met lichamelijk letsel";
-        properties["fact_category"] = crime;
-    }
-    if (!quarters.has(quarter)) {
-        quarterGeometryData.set(quarter, obj["geometry"]);
-        quarters.add(quarter);
-    }
-
+    let crime = obj["fact_category"];
     crimeTypes.add(crime);
 });
 
@@ -110,14 +100,12 @@ const monthMapping = new Map(Object.entries({
 }));
 
 allData.forEach(datum => {
-    const splittedDate = datum.properties.jaar_maand.split("-");
-    datum.properties.formatted_date = monthMapping.get(splittedDate[1]) + " " + splittedDate[2] + " " + splittedDate[0];
+    const splittedDate = datum.jaar_maand.split("-");
+    datum.formatted_date = monthMapping.get(splittedDate[1]) + " " + splittedDate[2] + " " + splittedDate[0];
 });
 
 // get the properties of the geoJson, this is exactly the data we need for the non-map graphs
-const dataWithoutGeoInformation = allData.map(entry => entry.properties);
 let currentShownTab = 'maps';
-
 
 // get the data but without the data that belongs to an unknown quarter
 const quarterGeometryDataWithoutUnknown = new Map();
@@ -144,15 +132,14 @@ export default {
     },
     data() {
         return {
-            combinedDataNoGeoInfo: dataWithoutGeoInformation,
-            combinedDataWithGeoInfo: allData,
+            combinedDataNoGeoInfo: allData,
             beginDate: smallestDate,
             endDate: biggestDate,
             crimeTypes: crimeTypes,
             quarterGeometryData: quarterGeometryData,
             bikeParkingMaps: bikeParkingMap,
             currentShownTab: currentShownTab,
-            allFeaturesWithoutUnknown: allData.filter(entry => entry["properties"]["quarter"] !== "Onbekend"),
+            allFeaturesWithoutUnknown: allData.filter(entry => entry["quarter"] !== "Onbekend"),
             quarterGeometryDataWithoutUnknown: quarterGeometryDataWithoutUnknown,
             quarterGeometrySmall: quarterGeometrySmall,
             numberOfResidentsPerQuarterMap: numberOfResidentsPerQuarterMap
@@ -160,7 +147,7 @@ export default {
     },
     computed: {
         dataIsAvailable: () => {
-            return dataWithoutGeoInformation.length > 0;
+            return allData.length > 0;
         },
     },
     methods: {
@@ -190,7 +177,6 @@ export default {
                          :combinedData="combinedDataNoGeoInfo"
                          :crime-types="crimeTypes"/>
             <Maps v-show="currentShownTab === 'maps'"
-                  :all-features="combinedDataWithGeoInfo"
                   :begin-date="beginDate"
                   :end-date="endDate"
                   :crime-types="crimeTypes" :quarter-geometry-data="quarterGeometryData"

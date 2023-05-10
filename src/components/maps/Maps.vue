@@ -6,7 +6,6 @@ import BikeMap from "@/components/maps/BikeMap.vue";
 export default {
     components: {BikeMap, TotalCrimesMap, InteractiveMap},
     props: {
-        allFeatures: Array,
         beginDate: Date,
         endDate: Date,
         crimeTypes: Set,
@@ -35,7 +34,6 @@ export default {
                         :end-date="endDate"
                         :crime-types="crimeTypes"
                         :quarter-geometry-data="quarterGeometryData"
-                        :bike-parking-per-quarter="bikeParkingPerQuarter"
                         :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
                         :quarter-geometry-small="quarterGeometrySmall"/>
         <h1>

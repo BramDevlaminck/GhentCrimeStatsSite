@@ -1,4 +1,4 @@
-import {createWebHistory, createRouter} from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import Introduction from "@/views/Introduction.vue";
 import About from "@/views/About.vue";
 import Statistics from "@/views/Statistics.vue";
@@ -22,7 +22,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory("/~brdvlami/"),
+    history: createWebHistory(import.meta.env.VITE_BASE_URL),
     routes,
 });
 

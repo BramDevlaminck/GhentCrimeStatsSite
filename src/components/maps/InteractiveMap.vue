@@ -486,7 +486,6 @@ export default {
 
         function updateSlideronClick(e) {
             const handle = d3.select("#slider-handle");
-            // var handlex = handle.attr("x");
             var handlew = +handle.attr("width");
             const root = d3.select(this);
 

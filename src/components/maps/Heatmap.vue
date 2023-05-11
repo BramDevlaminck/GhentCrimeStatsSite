@@ -1,5 +1,42 @@
 <template>
-    <div id="heatmap"></div>
+    <div id="textChartWrapper">
+        <div id="chartWrapper">
+            <div id="heatmap"/>
+        </div>
+        <div>
+            <h5>Zwaktes</h5>
+            <p>
+                De <b>binnenstad</b> scoort over het algemeen slecht.
+                Dit valt te verklaren aan het feit dat er gewoonweg erg veel geregistreerde feiten zijn in deze omgeving.
+                De vele aanwezige <b>toeristen</b> en <b>studenten</b> kunnen hier een verklaring voor zijn.
+                Van de zowat 80 000 studenten die in Gent studeren hebben enkele duizenden hier hun <b>kot</b>, bovendien ligt ook een groot stuk van de <b>campussen</b> in deze regio (14/37 van alle campussen van hoge scholen en universiteiten in gent die we konden vinden liggen hier <span class="source"><a href="https://github.com/BramDevlaminck/DatavisualisationPreprocessing">bron</a>)</span>).
+                Studenten die hier een kot hebben worden echter niet meegeteld in het aantal inwoners.
+                Ook de <b>uitgaansbuurten</b> zoals de Overpoort liggen in deze wijk.
+                Dit allemaal draagt bij tot het hoge aantal geregistreerde feiten ten opzichte van het aantal inwoners <span class="source">(<a href="https://hoeveelin.stad.gent/wijken/binnenstad/">bron</a>)</span>.
+            </p>
+            <p>
+                Bij de Gentse Kanaaldorpen en -zone valt te zien dat er veel <b>verkeersongevallen met lichamelijke letsels</b> zijn vergeleken met het aantal inwoners.
+                Dit valt deels te verklaren door de erg <b>dunne bevolkingsdichtheid</b> in deze regio en het grote oppervlak.
+                Een andere belangrijke reden is de ligging bij de <b>havens</b> (en de bijbehorende industrie).
+                Hierdoor is er erg veel <b>doorgaand vrachtverkeer</b>, met meerdere drukke en onveilige verbindingen/knooppunten<span class="source">(<a href="https://hoeveelin.stad.gent/wijken/kanaaldorpen-en-kanaalzone/">bron</a>)</span>.
+            </p>
+            <p>
+                <i>Watersportbaan - Ekkergem</i> en <i>Elisabethbegijnhof - Prinsenhof - Papegaai - Sint-Michiels</i> vertonen naast de binnenstad een hoog aantal geregistreerde voorvallen in verhouding met het aantal inwoners.
+                Zeker als we dit vergelijken met de andere wijken zien we hier erg veel geel en rood. De <b>eerste regio bevat de Blaarmeersen en watersportbaan</b>.
+                Dit zijn populaire plaatsen in Gent. Zeker in de Blaarmeersen kan het erg druk worden in de zomer <span class="source">(<a href="https://www.vrt.be/vrtnws/nl/2022/06/27/gent-zet-camera-s-in-op-blaarmeersen-om-in-te-grijpen-bij-te-gro/">bron</a>)</span>.
+                Deze <b>tweede wijk ligt vlak bij de binnenstad</b> en bevat campussen zoals deze van LUCA school of arts.
+                Enkele van de meest gekende adresjes in Gent zijn hier ook terug te vinden zoals, De Kastart, Bocca, De Gekroonde Hoofden,…
+                Ook hier is dus een gelijkaardige verklaring als voor het hoge aantal feiten in de binnenstad.
+                De extra drukte van studenten die hier een kot hebben of zijn om te ontspannen heeft een zichtbare invloed<span class="source">(<a href="https://hoeveelin.stad.gent/wijken/elisabethbegijnhof-papegaai/">bron</a>)</span>.
+            </p>
+            <h5>Sterktes</h5>
+            <p>
+                Oostakker,  sint-amandsberg, Moscou-vogelhoek, Zwijnaarde, Mariakerke, Drongen en Wondelgem vertonen in het algemeen een erg lage hoeveelheid geregistreerde feiten ten opzichte van hun aantal inwoners.
+                Deze wijken liggen allemaal wat <b>verder van het stadscentrum</b> .
+                Toerisme is hier niet veelvoorkomend en voor de meeste studenten is dit te ver van hun campussen om hier een kot te zoeken.
+            </p>
+        </div>
+    </div>
 </template>
 
 <script>

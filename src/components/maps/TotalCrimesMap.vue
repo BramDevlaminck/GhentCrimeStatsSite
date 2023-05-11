@@ -240,7 +240,7 @@ export default {
                 Ook hier zien we vooral veel geregistreerde feiten in de <b>binnenstad</b>.
                 Dit valt te verwachten aangezien hier veel studenten en toeristen terug te vinden zijn.
                 Dit zorgt voor een grote drukte en dus ook een grotere kans op mensen die verkeerd parkeren, ongevallen
-                die gebeuren, zakkenrollers,…
+                die gebeuren, zakkenrollers die buit kunnen maken,…
             </p>
             <p>
                 Als we ons focussen op de wijken rond de binnenstad valt vooral wijk <b>Brugse Poort - Rooigem</b> op.

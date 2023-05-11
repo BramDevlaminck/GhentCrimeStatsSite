@@ -25,7 +25,7 @@ export default {
 <template>
     <div>
         <h1>
-            Interactive map
+            Interactive kaart
         </h1>
         <h5>
             Deze kaart geeft een overzicht van het aantal misdrijven van een bepaalde categorie voor een bepaalde maand.

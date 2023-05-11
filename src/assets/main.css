@@ -1,3 +1,7 @@
+body {
+    overflow-y: scroll;
+}
+
 #app{
     min-height: 100vh;
 }
@@ -16,4 +20,8 @@
 
 #text-next-to-slider {
     margin-top: 4rem;
+}
+
+.source {
+    font-size: 80%;
 }

@@ -87,6 +87,7 @@ function constructCountsPerYear(data, quarterGeometryData) {
         currentCountMap.set(quarter, currentMonthCount);
         yearCounts.set(year, currentCountMap);
     });
+    console.log(yearCounts);
     return yearCounts;
 }
 
@@ -111,13 +112,28 @@ function constructAvgsFromCounts(yearCounts) {
         yearAverages.set(year, quarterAvgs);
 
     }
+    console.log(yearAverages);
     return yearAverages;
 }
 
-function getAllYearMax(data, quarterGeometryData) {
+function constructTotalYearAvgs(yearAvgs) {
+    let totalAvgs = new Map();
+    for (const [year, quarters] of yearAvgs) {
+        let totalAvg = 0;
+        for (const [quarter, avg] of quarters) {
+            totalAvg += avg;
+        }
+        totalAvgs.set(year, totalAvg);
+    }
+    console.log(totalAvgs);
+    return totalAvgs;
+
+}
+
+function getAllYearExtrema(yearAvgs) {
     // count how often something happened per quarter
-    const yearCounts = constructCountsPerYear(data, quarterGeometryData);
-    const yearAvgs = constructAvgsFromCounts(yearCounts);
+    // const yearCounts = constructCountsPerYear(data, quarterGeometryData);
+    // const yearAvgs = constructAvgsFromCounts(yearCounts);
 
     const maxAvgPerYear = new Map();
     for (const [year, quarters] of yearAvgs) {
@@ -125,15 +141,15 @@ function getAllYearMax(data, quarterGeometryData) {
         maxAvgPerYear.set(year, maxAvg);
     }
 
-    return Math.max(...maxAvgPerYear.values());
+    return [Math.max(...maxAvgPerYear.values()), Math.min(...maxAvgPerYear.values())];
 }
 
 // ------ Data processing  ------
-function dataToMapDataFormat(data, quarterGeometryData, maxAvg, year = "2018") {
+function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018") {
     // count how often something happened per quarter
-    const yearCounts = constructCountsPerYear(data, quarterGeometryData);
+    // const yearCounts = constructCountsPerYear(data, quarterGeometryData);
 
-    const currentYearAvgs = constructAvgsFromCounts(yearCounts).get(year);
+    const currentYearAvgs = yearAvgs.get(year);
 
     // create the result array in the right format and return it
     const result = [];
@@ -146,6 +162,7 @@ function dataToMapDataFormat(data, quarterGeometryData, maxAvg, year = "2018") {
     }
     return result;
 }
+
 
 export default {
     components: { TotalCrimesMap, BikeMap },
@@ -237,8 +254,10 @@ export default {
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
 
+        let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
         // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
-        let maxAvg = getAllYearMax(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown);
+        let maxAvg = getAllYearExtrema(yearAverages)[0];
+        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
         // VIEW
         const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client 
 
@@ -246,16 +265,16 @@ export default {
         // TODO: fix width references
         const projection = d3.geoMercator()
             .fitExtent([[20, 20], [mapcontainerclient.width - 20, mapcontainerclient.height - 20]], quarterGeometrySmall);
-        const path = d3.geoPath().projection(projection);
+        const mapPath = d3.geoPath().projection(projection);
 
         // --------- MAP:draw graph -----------
         // Draw districts and register event listeners
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(filterDataBasedOnYearString(currentYear, allFeaturesWithoutUnknown), quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
+            .data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
             .enter()
             .append("path")
-            .attr("d", path)
+            .attr("d", mapPath)
             .attr("fill", (d, _) => {
                 const properties = d["properties"];
                 const count = properties.count;
@@ -273,32 +292,6 @@ export default {
         const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
         let currentDataDisplayedBasedOnCategory = allFeaturesWithoutUnknown; // all data of the current category!
         // Function to update the map if a new crime category is chosen
-        function updateMapWithNewCrimeCategory(selectedGroup) {
-            let features = allFeaturesWithoutUnknown;
-
-            // select the data from the chart that we actually want/need
-            if (selectedGroup !== allCategories[0]) {
-                features = features.filter(element => {
-                    return element["properties"]["fact_category"] === selectedGroup;
-                });
-            }
-
-            currentDataDisplayedBasedOnCategory = features;
-            maxAvg = getAllYearMax(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown);
-
-            // filter the data based on YEAR
-            const dataFilteredOnYear = filterDataBasedOnYearString(currentYear, currentDataDisplayedBasedOnCategory);
-
-
-            // plot the changed map
-            map.data(dataToMapDataFormat(dataFilteredOnYear, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
-                .attr("fill", (d, _) => {
-                    const properties = d["properties"];
-                    const count = properties.count;
-                    const maxCount = properties.max;
-                    return linearScaleColour(count, maxCount);
-                });
-        }
 
         // add the options to the button
         d3.select("#selectButton")
@@ -348,9 +341,9 @@ export default {
         const playButton = d3.select("#playButton");
 
         // gives the position on the sliders as an x-value
-        const positionOnSliderObject = d3.scaleTime()
-            .domain([new Date(beginYear), new Date(endYear)])
-            .range([0, maxXPositionOnSlider])
+        const xScale = d3.scaleTime()
+            .domain([new Date(Date.UTC(parseInt(beginYear),0,0,0,0,0)), new Date(endYear)])
+            .range([15, maxXPositionOnSlider])
             .clamp(true)
 
         // create the slider
@@ -361,18 +354,24 @@ export default {
             .attr("height", 90);
         const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
-        //TODO: add background line chart in this group
-        const slider = sliderSvg
-            .append("g")
-            .attr("class", "slider")
-            .attr("transform", "translate(" + (sliderSvg.attr("x") + 5) + "," + (sliderSvg.attr("y") + 5) + ")");
+        //linear value scale for the slider line chart
+        // console.log(xScale(new Date("2019")));
+        // console.log(...totalAverages.map(obj => obj.year));
+        // console.log(xScale(new Date('2023')));
+        // console.log(xScale(Math.max(new Date(...totalAverages.map(obj => obj.year)))));   
 
 
-        const axis = d3.axisBottom(positionOnSliderObject);
+        const yScale = d3.scaleLinear()
+        .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
+        .range([slidercontainerclient.height - 25, 3])
+        .nice()
+        
+        const axis = d3.axisBottom(xScale);
         axis.ticks((+endYear) - (+beginYear) + 1, "%Y");
 
+        
 
-        slider.append("g")
+        sliderSvg.append("g")
             .attr("class", "axis-slider")
             .attr("transform", `translate(0, ${slidercontainerclient.height - 25})`)
             .call(axis);
@@ -397,7 +396,7 @@ export default {
             let handlew = +handle.attr("width");
             let handlemidx = handlex + (handlew / 2);
 
-            let xYear = positionOnSliderObject.invert(handlemidx);
+            let xYear = xScale.invert(handlemidx);
             let snappedx = roundtoYear(xYear);
 
             updateSlider(snappedx);
@@ -407,9 +406,9 @@ export default {
             .on("drag", dragmove)
             .on("end", dragend);
 
-        const handle = slider.append('rect')
+        const handle = sliderSvg.append('rect')
             .attr("id", "slider-handle")
-            .attr("x", 0)
+            .attr("x", 7.5)
             .attr("y", 0)
             .attr("width", 12)
             .attr("height", function () {
@@ -418,6 +417,72 @@ export default {
             .style("fill", 'cornflowerblue')
             .style("opacity", 0.5)
             .call(drag);
+
+        function updateSliderLineChart(data){
+            console.log(data);
+            const dataWithoutZeroes = data.filter(obj => obj.value > 0)
+            yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
+            // console.log(yScale.domain());
+            
+            var slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function(d) { return d.year});
+
+            slider
+                .enter()
+                .append("path")
+                .attr("class","slider-linechart")
+                .merge(slider)
+                .transition()
+                .ease(d3.easePolyInOut)
+                .duration(1000)
+                .attr("d", d3.line()
+                    .curve(d3.curveCardinal)
+                    .x(function(d) { 
+                        return xScale(new Date(d.year)); 
+                    })
+                    .y(function(d) {
+                        return yScale(d.value);
+                    })
+                    .defined(function (d){
+                        return d.value>0;
+                    }))
+                .attr("fill", "none")
+                .attr("stroke", "#3271e7")
+                .attr("stroke-width", 1.5);
+        }
+
+        updateSliderLineChart(totalAverages);
+
+        function updateMapWithNewCrimeCategory(selectedGroup) {
+            let features = allFeaturesWithoutUnknown;
+
+            // select the data from the chart that we actually want/need
+            if (selectedGroup !== allCategories[0]) {
+                features = features.filter(element => {
+                    return element["properties"]["fact_category"] === selectedGroup;
+                });
+            }
+
+            currentDataDisplayedBasedOnCategory = features;
+            yearAverages = constructAvgsFromCounts(constructCountsPerYear(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown))
+            maxAvg = getAllYearExtrema(yearAverages)[0];
+            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
+
+            // const totalAveragesArray = Array.from(totalAverages, ([year, value]) => ({ year, value }));
+            console.log(totalAverages);
+
+            // filter the data based on YEAR
+            // const dataFilteredOnYear = filterDataBasedOnYearString(currentYear, currentDataDisplayedBasedOnCategory);
+            updateSliderLineChart(totalAverages);
+
+            // plot the changed map
+            map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
+                .attr("fill", (d, _) => {
+                    const properties = d["properties"];
+                    const count = properties.count;
+                    const maxCount = properties.max;
+                    return linearScaleColour(count, maxCount);
+                });
+        }
 
 
         function updateSlideronClick(e) {
@@ -433,7 +498,7 @@ export default {
 
             var computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x - rootclient.x));
 
-            let xYear = positionOnSliderObject.invert(computedx);
+            let xYear = xScale.invert(computedx);
 
             let snappedx = roundtoYear(xYear);
             updateSlider(snappedx);
@@ -446,7 +511,7 @@ export default {
             // let handle = d3.select("slider-handle");
             let handlew = +handle.attr("width");
 
-            let datex = positionOnSliderObject(date);
+            let datex = xScale(date);
 
             handle.transition().attr("x", datex - handlew / 2);
 
@@ -472,17 +537,17 @@ export default {
         // execute 1 step on the slider
         function stepOnSlider() {
 
-            const currentdate = positionOnSliderObject.invert(xPositionOnSlider);
+            const currentdate = xScale.invert(xPositionOnSlider);
             const nextDate = toNextRoundYear(currentdate);
-            if (nextDate < positionOnSliderObject.domain()[1]) {
+            if (nextDate < xScale.domain()[1]) {
                 updateSlider(nextDate);
-                xPositionOnSlider = positionOnSliderObject(nextDate);
+                xPositionOnSlider = xScale(nextDate);
             }
             // stop the play button 
             else {
                 sliderIsMoving = false;
                 xPositionOnSlider = 0;
-                updateSlider(positionOnSliderObject.invert(0));
+                updateSlider(xScale.invert(0));
                 clearInterval(timer);
                 playButton.text("Play");
             }
@@ -496,14 +561,14 @@ export default {
             updatesliderposition(date);
 
             const year = date.getFullYear();
-            const month = date.getUTCMonth() + 1; // +1 since months start at 0 in the date object
+            // const month = date.getUTCMonth() + 1; // +1 since months start at 0 in the date object
 
-            const format_month = (month) => {
-                if (month < 10) {
-                    return "0" + month.toString();
-                }
-                return month.toString();
-            };
+            // const format_month = (month) => {
+            //     if (month < 10) {
+            //         return "0" + month.toString();
+            //     }
+            //     return month.toString();
+            // };
 
             // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
             // currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
@@ -511,8 +576,8 @@ export default {
 
 
 
-            const dataToShow = filterDataBasedOnYearString(year.toString(), currentDataDisplayedBasedOnCategory);
-            map.data(dataToMapDataFormat(dataToShow, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
+            // const dataToShow = filterDataBasedOnYearString(year.toString(), currentDataDisplayedBasedOnCategory);
+            map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
@@ -557,12 +622,12 @@ export default {
     background-color: #696969;
 }
 
-#sliderDiv {
+/* #sliderDiv {
     width: 50vw;
-}
+} */
 
 /*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
-#sliderDiv:deep(.ticks) {
+/* #sliderDiv:deep(.ticks) {
     font-size: 10px;
 }
 
@@ -595,5 +660,5 @@ export default {
     stroke: #000;
     stroke-opacity: 0.5;
     stroke-width: 1px;
-}
+} */
 </style>

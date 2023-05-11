@@ -490,7 +490,6 @@ export default {
             const root = d3.select(this);
 
             const rootclient = root.node().getBoundingClientRect();
-            // var rootx = +root.attr("x");
             var rootw = +root.attr("width");
 
 

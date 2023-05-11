@@ -379,7 +379,6 @@ export default {
         // drag behavior functions
         function dragmove(e) {
             var handle = d3.select(this);
-            // var handlex = handle.attr("x");
             var handlew = +handle.attr("width");
 
             var rootx = +sliderSvg.attr("x");

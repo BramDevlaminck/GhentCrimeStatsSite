@@ -251,8 +251,8 @@ export default {
             </p>
             <p>
                 Zelfs van binnen de wijk geeft <b>50% van de inwoners aan dat ze vaak buurthinder ondervinden</b>.
-                Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen (<a
-                    href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>).
+                Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen <span class="source">(<a
+                href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>)</span>.
             </p>
             <ul>
                 <li>1/5 geeft aan bewust plekken in hun buurt te vermijden</li>

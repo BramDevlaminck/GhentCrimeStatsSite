@@ -180,13 +180,15 @@ export default {
         // set the dimensions and margins of the graph
         const margin = {top: 350, right: 25, bottom: 25, left: 250},
             width = WIDTH - margin.left - margin.right,
-            height = WIDTH - 0.05*WIDTH - margin.top - margin.bottom;
+            height = WIDTH - margin.top - margin.bottom;
+
+        const graphBandSize = Math.min(width, height)
 
         // append the svg object to the body of the page
         const svg = d3.select("#heatmap")
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("width", graphBandSize + margin.left + margin.right)
+            .attr("height", graphBandSize * 0.66 + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -201,7 +203,7 @@ export default {
 
         // Build X scales and axis:
         const x = d3.scaleBand()
-            .range([0, width])
+            .range([0, graphBandSize])
             .domain(quarters)
             .padding(0.05);
         svg.append("g")
@@ -217,7 +219,7 @@ export default {
 
         // Build Y scales and axis:
         const y = d3.scaleBand()
-            .range([height, 0])
+            .range([graphBandSize * 0.66, 0])
             .domain(crimes)
             .padding(0.05);
         svg.append("g")

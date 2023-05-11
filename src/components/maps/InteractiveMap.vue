@@ -87,7 +87,6 @@ function constructCountsPerYear(data, quarterGeometryData) {
         currentCountMap.set(quarter, currentMonthCount);
         yearCounts.set(year, currentCountMap);
     });
-    console.log(yearCounts);
     return yearCounts;
 }
 
@@ -112,7 +111,6 @@ function constructAvgsFromCounts(yearCounts) {
         yearAverages.set(year, quarterAvgs);
 
     }
-    console.log(yearAverages);
     return yearAverages;
 }
 
@@ -125,15 +123,12 @@ function constructTotalYearAvgs(yearAvgs) {
         }
         totalAvgs.set(year, totalAvg);
     }
-    console.log(totalAvgs);
     return totalAvgs;
 
 }
 
 function getAllYearExtrema(yearAvgs) {
     // count how often something happened per quarter
-    // const yearCounts = constructCountsPerYear(data, quarterGeometryData);
-    // const yearAvgs = constructAvgsFromCounts(yearCounts);
 
     const maxAvgPerYear = new Map();
     for (const [year, quarters] of yearAvgs) {
@@ -147,8 +142,6 @@ function getAllYearExtrema(yearAvgs) {
 // ------ Data processing  ------
 function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018") {
     // count how often something happened per quarter
-    // const yearCounts = constructCountsPerYear(data, quarterGeometryData);
-
     const currentYearAvgs = yearAvgs.get(year);
 
     // create the result array in the right format and return it
@@ -247,7 +240,6 @@ export default {
         const endYear = dateToYearString(endDate);
 
         let currentYear = beginYear;
-        // let currentDateString = dateObjectToYearMonthDay(beginDate);
 
         // DATA
         const allFeaturesWithoutUnknown = this.allFeatures;
@@ -354,13 +346,7 @@ export default {
             .attr("height", 90);
         const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
-        //linear value scale for the slider line chart
-        // console.log(xScale(new Date("2019")));
-        // console.log(...totalAverages.map(obj => obj.year));
-        // console.log(xScale(new Date('2023')));
-        // console.log(xScale(Math.max(new Date(...totalAverages.map(obj => obj.year)))));   
-
-
+        //linear value scale for the slider line chart   
         const yScale = d3.scaleLinear()
         .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
         .range([slidercontainerclient.height - 25, 3])
@@ -418,10 +404,8 @@ export default {
             .call(drag);
 
         function updateSliderLineChart(data){
-            console.log(data);
             const dataWithoutZeroes = data.filter(obj => obj.value > 0)
             yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
-            // console.log(yScale.domain());
             
             var slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function(d) { return d.year});
 
@@ -466,11 +450,8 @@ export default {
             maxAvg = getAllYearExtrema(yearAverages)[0];
             totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
 
-            // const totalAveragesArray = Array.from(totalAverages, ([year, value]) => ({ year, value }));
-            console.log(totalAverages);
 
             // filter the data based on YEAR
-            // const dataFilteredOnYear = filterDataBasedOnYearString(currentYear, currentDataDisplayedBasedOnCategory);
             updateSliderLineChart(totalAverages);
 
             // plot the changed map
@@ -557,21 +538,9 @@ export default {
             updatesliderposition(date);
 
             const year = date.getFullYear();
-            // const month = date.getUTCMonth() + 1; // +1 since months start at 0 in the date object
-
-            // const format_month = (month) => {
-            //     if (month < 10) {
-            //         return "0" + month.toString();
-            //     }
-            //     return month.toString();
-            // };
-
-            // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
+            // TODO: only replace year if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
             currentYear = year.toString();
 
-
-
-            // const dataToShow = filterDataBasedOnYearString(year.toString(), currentDataDisplayedBasedOnCategory);
             map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];

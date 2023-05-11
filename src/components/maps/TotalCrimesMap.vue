@@ -250,7 +250,7 @@ export default {
                 Bovendien is het een cultureel multi-diverse wijk waar mensen vaak slechts enkele jaren wonen.
             </p>
             <p>
-                Zelfs van binnen de wijk geeft <b>50% van de inwoners aan dat ze vaak buurthinder ondervinden</b>.
+                <b>50% van de inwoners in deze wijk geeft aan dat ze vaak buurthinder ondervinden</b>.
                 Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen <span class="source">(<a
                 href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>)</span>.
             </p>

@@ -1,10 +1,12 @@
 <template>
     <div class="container-lg">
         <h1>Introductie</h1>
+        <h5>Wat?</h5>
         <p>
             Als project voor het vak <b>Datavisualisatie</b> aan UGent (gegeven door prof. dr. Bart Mesuere) is het de bedoeling om een dataset te toegankelijker/interpreteerbaarder te maken aan de hand van visualisaties.
             Een eerste stap was het zoeken van een geschikte dataset die ons interesseerde.
         </p>
+        <h5>Zoektocht naar een dataset</h5>
         <p>
             Onze bedoeling was om te werken met data die geen ver-van-mijn-bedshow is voor de meeste mensen.
             Aangezien stad <b>Gent</b> heel veel data beschikbaar maakt voor iedereen leek ons dit een goeie plaats om een interessant onderwerp te vinden.
@@ -13,6 +15,7 @@
             Uiteindelijk viel 1 categorie van datasets viel ons op.
             Dit waren datasets ter beschikking gesteld door de <b>politie</b> en deze bevatten een overzicht per maand van geregistreerde feiten per wijk.
         </p>
+        <h5>Wat bestaat al?</h5>
         <p>
             De site van het dataportaal maakt de bestaande datasets beschikbaar in vele formaten:
         </p>
@@ -23,12 +26,14 @@
             <li>Als kaart</li>
             <li>Via een interactieve en aanpasbare visualisatie</li>
         </ul>
+        <h5>Huidige tekortkomingen</h5>
         <p>
             Deze laatste 2 zijn kunnen erg interessant zijn om de data <b>toegankelijk</b> te maken naar het brede publiek.
             Ons viel echter al snel op dat deze opties best ingewikkeld zijn om mee te werken en niet in 1 oog opzicht de data kunnen voorstellen.
             Bovendien is het rechtuit niet mogelijk om meerdere datasets samen te visualiseren.
             Iets wat ons heel erg interesseerde omdat het ons toe zou laten te zien hoe het aantal geregistreerde feiten <b>evolueert doorheen de tijd</b>.
         </p>
+        <h5>Onderzoek</h5>
         <p>
             Enkele vragen die direct bij ons opkwamen toen we de dataset aan het verkennen waren (en die we hopen te beantwoorden zijn):
         </p>
@@ -36,8 +41,6 @@
             <li>Hoeveel fietsdiefstallen zijn er effectief en in welke regio's is dit vooral?</li>
             <li>Welke wijken hebben een verhoogd aantal geregistreerde feiten vergeleken met de rest van Gent?</li>
             <li>Wat is de invloed van corona en de Gentse feesten op de data?</li>
-            <li>Als kaart</li>
-            <li>Via een interactieve en aanpasbare visualisatie</li>
         </ul>
 
         <p>

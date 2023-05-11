@@ -5,6 +5,7 @@ import BikeMap from "@/components/maps/BikeMap.vue";
 import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
 import { max } from "d3";
 import colourScales from '../ColourScales'
+// import '../../assets/patterns.css'
 const { linearScaleColour } = colourScales();
 
 // TODO: change this if needed? not really clean this way
@@ -172,6 +173,25 @@ export default {
     name: "InteractiveMap",
     mounted() {
 
+        // -------- global variable definition ---------
+        // DATES
+        const beginDate = new Date(this.beginDate);
+        const endDate = new Date(this.endDate);
+        const beginYear = dateToYearString(beginDate);
+        const endYear = dateToYearString(endDate);
+
+        let currentYear = beginYear;
+
+        // DATA
+        const allFeaturesWithoutUnknown = this.allFeatures;
+        const quarterGeometrySmall = this.quarterGeometrySmall;
+        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
+
+        let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
+        // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
+        let maxAvg = getAllYearExtrema(yearAverages)[0];
+        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
+
         //------ MAP  ------
         //create an SVG in the map container, and keep a reference to it
         const mapSvg = d3
@@ -179,6 +199,10 @@ export default {
             .append("svg")
             .attr("width", "50vw")
             .attr("height", "50vh");
+
+        // VIEW
+        const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client 
+
 
         // create a group of SVG elements inside mapSVG
         const g = mapSvg.append("g");
@@ -212,8 +236,15 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const maxCount = properties.max;
-            const selectedColor = linearScaleColour(count, maxCount);
-            d3.select(this).attr("fill", selectedColor);
+            const totalAvginYear = totalAverages[currentYear-2018];
+
+            if( totalAvginYear.value > 0 ){
+                const selectedColor = linearScaleColour(count, maxCount);
+                d3.select(this).attr("fill", selectedColor);
+            } else {
+                const selectedColor = "#778899";
+                d3.select(this).attr("fill", selectedColor );
+            }
 
             tooltip.style("opacity", 0);
         }
@@ -226,33 +257,22 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
-            tooltip
+            const totalAvginYear = totalAverages[currentYear-beginYear];
+
+            if( totalAvginYear.value > 0){
+                tooltip
                 .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
+            } else {
+                tooltip
+                .html("Regio: " + quarter + "<br>Geen data voor het jaar " + currentYear)
+                .style("left", ((event.pageX) + 20) + "px")
+                .style("top", (event.pageY) + "px");
+            }
         }
 
-        // -------- global variable definition ---------
-        // DATES
-        const beginDate = new Date(this.beginDate);
-        const endDate = new Date(this.endDate);
-        const beginYear = dateToYearString(beginDate);
-        const endYear = dateToYearString(endDate);
-
-        let currentYear = beginYear;
-
-        // DATA
-        const allFeaturesWithoutUnknown = this.allFeatures;
-        const quarterGeometrySmall = this.quarterGeometrySmall;
-        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
-
-        let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
-        // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
-        let maxAvg = getAllYearExtrema(yearAverages)[0];
-        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
-        // VIEW
-        const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client 
-
+        
         // ------- MAP:projection and path ---------
         // TODO: fix width references
         const projection = d3.geoMercator()
@@ -460,7 +480,16 @@ export default {
                     const properties = d["properties"];
                     const count = properties.count;
                     const maxCount = properties.max;
-                    return linearScaleColour(count, maxCount);
+
+                    const totalAvginYear = totalAverages[currentYear-beginYear];
+                    let selectedColor;
+
+                    if( totalAvginYear.value > 0 ){
+                        selectedColor = linearScaleColour(count, maxCount);
+                    } else {
+                        selectedColor = "#778899"
+                    }
+                    return selectedColor; 
                 });
         }
 
@@ -546,7 +575,17 @@ export default {
                     const properties = d["properties"];
                     const count = properties.count;
                     const maxCount = properties.max;
-                    return linearScaleColour(count, maxCount);
+
+                    const totalAvginYear = totalAverages[currentYear-beginYear];
+
+                    let selectedColor;
+
+                    if( totalAvginYear.value > 0 ){
+                        selectedColor = linearScaleColour(count, maxCount);
+                    } else {
+                        selectedColor = "#778899"
+                    }
+                    return selectedColor; 
                 });
         }
 

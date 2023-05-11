@@ -585,44 +585,4 @@ export default {
 #playButton:hover {
     background-color: #696969;
 }
-
-/* #sliderDiv {
-    width: 50vw;
-} */
-
-/*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
-/* #sliderDiv:deep(.ticks) {
-    font-size: 10px;
-}
-
-#sliderDiv:deep(.track,
-    .track-inset,
-    .track-overlay) {
-    stroke-linecap: round;
-}
-
-#sliderDiv:deep(.track) {
-    stroke: #000;
-    stroke-opacity: 0.3;
-    stroke-width: 10px;
-}
-
-#sliderDiv:deep(.track-inset) {
-    stroke: #dcdcdc;
-    stroke-width: 8px;
-}
-
-#sliderDiv:deep(.track-overlay) {
-    pointer-events: stroke;
-    stroke-width: 50px;
-    stroke: transparent;
-    cursor: grab;
-}
-
-#sliderDiv:deep(.handle) {
-    fill: #fff;
-    stroke: #000;
-    stroke-opacity: 0.5;
-    stroke-width: 1px;
-} */
 </style>

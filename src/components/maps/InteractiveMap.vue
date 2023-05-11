@@ -1,8 +1,8 @@
 <script>
+//TODO:!https://fonts.googleapis.com/css?family=Special+Elite apply this font in some places?
 import * as d3 from "d3";
-import BikeMap from "@/components/maps/BikeMap.vue";
-import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
-import colourScales  from '../ColourScales'
+import colourScales from '../ColourScales';
+// import '../../assets/patterns.css'
 const {linearScaleColour} = colourScales();
 
 // TODO: change this if needed? not really clean this way
@@ -10,36 +10,131 @@ const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#d36f80";
 
-function filterDataBasedOnDateString(date, data) {
-    return data.filter(entry => entry["jaar_maand"] === date);
-}
 
-function filterDataBasedOnYearString(year, data) {
-    return data.filter(entry => entry["year"] === year);
-}
-
-// transform the data to the format we use for the map
-function dataToMapDataFormat(data, quarterGeometryData) {
-    // count how often something happened per quarter
-    const totalCounts = new Map();
-    for (const quarter of quarterGeometryData.keys()) {
-        totalCounts.set(quarter, 0);
+// ------ Year functions  ------
+function roundtoYear(x) {
+    const xYear = x.getFullYear();
+    let yearms = 1000 * 60 * 60 * 24;
+    // leapyear
+    if (xYear % 4 === 0 && xYear % 100 !== 0) {
+        yearms *= 366;
+    } else {
+        yearms *= 365;
     }
+    const halfyearms = yearms / 2;
+
+    return new Date(new Date(x.valueOf() + halfyearms).getUTCFullYear(), 0, 1);
+}
+
+function toNextRoundYear(x) {
+    const nextYear = x.getFullYear() + 1;
+
+    return new Date(nextYear, 0, 1);
+}
+
+function getUniqueYears(data) {
+    let years = data.map(obj => obj.year);
+    let uniqueYears = years.filter((year, index, self) => self.indexOf(year) === index);
+    return uniqueYears;
+}
+
+function constructCountsPerYear(data, quarterGeometryData) {
+    // count how often something happened per quarter
+    const yearCounts = new Map();
+
+    const years = getUniqueYears(data);
+    for (const year of years) {
+        const quarterCounts = new Map();
+
+        for (const quarter of quarterGeometryData.keys()) {
+            quarterCounts.set(quarter, new Map());
+            yearCounts.set(year, quarterCounts);
+        }
+    }
+
+    // yearCounts should have the following structure:
+    /* Map (year, Map(quarter, Map(month, total)))
+     */
 
     data.forEach(obj => {
         const quarter = obj["quarter"];
-        const currentCount = totalCounts.get(quarter);
-        totalCounts.set(quarter, currentCount + obj["total"]);
-    });
+        const month = obj["month"];
+        const year = obj["year"];
 
-    // get the max this happens per quarter
-    const maxCount = Math.max(...totalCounts.values());
+        const currentCountMap = yearCounts.get(year);
+
+
+        const currentMonthCount = currentCountMap.get(quarter);
+        if (currentMonthCount.has(month)) {
+            currentMonthCount.set(month, currentMonthCount.get(month) + obj["total"]);
+        } else {
+            currentMonthCount.set(month, obj['total']);
+        }
+        currentCountMap.set(quarter, currentMonthCount);
+        yearCounts.set(year, currentCountMap);
+    });
+    return yearCounts;
+}
+
+function constructAvgsFromCounts(yearCounts) {
+    const yearAverages = new Map();
+
+    for (const [year, quarters] of yearCounts) {
+        yearAverages.set(year, new Map());
+        const quarterAvgs = yearAverages.get(year);
+        // Iterate over each month's count for the current neighborhood
+        for (const [quarter, months] of quarters) {
+            let total = 0;
+            for (const [_, count] of months) {
+                total += count;
+            }
+            // Calculate the monthly average for the current neighborhood
+            const average = total / months.size;
+
+            // Add the average to the new Map
+            quarterAvgs.set(quarter, average);
+        }
+        yearAverages.set(year, quarterAvgs);
+
+    }
+    return yearAverages;
+}
+
+function constructTotalYearAvgs(yearAvgs) {
+    let totalAvgs = new Map();
+    for (const [year, quarters] of yearAvgs) {
+        let totalAvg = 0;
+        for (const [_, avg] of quarters) {
+            totalAvg += avg;
+        }
+        totalAvgs.set(year, totalAvg);
+    }
+    return totalAvgs;
+
+}
+
+function getAllYearExtrema(yearAvgs) {
+    // count how often something happened per quarter
+
+    const maxAvgPerYear = new Map();
+    for (const [year, quarters] of yearAvgs) {
+        const maxAvg = Math.max(...quarters.values());
+        maxAvgPerYear.set(year, maxAvg);
+    }
+
+    return [Math.max(...maxAvgPerYear.values()), Math.min(...maxAvgPerYear.values())];
+}
+
+// ------ Data processing  ------
+function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018") {
+    // count how often something happened per quarter
+    const currentYearAvgs = yearAvgs.get(year);
 
     // create the result array in the right format and return it
     const result = [];
-    for (const [quarter, total] of totalCounts) {
+    for (const [quarter, avg] of currentYearAvgs) {
         result.push({
-            properties: {"quarter": quarter, "count": total, "max": maxCount},
+            properties: {"quarter": quarter, "count": avg, "max": maxAvg},
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -47,8 +142,8 @@ function dataToMapDataFormat(data, quarterGeometryData) {
     return result;
 }
 
+
 export default {
-    components: {TotalCrimesMap, BikeMap},
     props: {
         allFeatures: Array,
         beginDate: Date,
@@ -60,24 +155,43 @@ export default {
     },
     name: "InteractiveMap",
     mounted() {
+
+        // -------- global variable definition ---------
+        // DATES
+        const beginDate = new Date(this.beginDate);
+        const endDate = new Date(this.endDate);
+        const beginYear = dateToYearString(beginDate);
+        const endYear = dateToYearString(endDate);
+
+        let currentYear = beginYear;
+
+        // DATA
+        const allFeaturesWithoutUnknown = this.allFeatures;
+        const quarterGeometrySmall = this.quarterGeometrySmall;
+        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
+
+        let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
+        // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
+        let maxAvg = getAllYearExtrema(yearAverages)[0];
+        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
+
+        //------ MAP  ------
+        //create an SVG in the map container, and keep a reference to it
         const mapSvg = d3
             .select("#mapContainer")
             .append("svg")
             .attr("width", "50vw")
             .attr("height", "50vh");
 
-        const g = mapSvg.append("g");
-        g.append("rect")
-            .attr("width", WIDTH)
-            .attr("height", HEIGHT)
-            .attr(
-                "transform",
-                `translate(-${WIDTH},-${HEIGHT})`
-            )
-            .style("fill", "none")
-            .style("pointer-events", "all");
+        // VIEW
+        const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client
 
-        // --------------------------  create a tooltip --------------------
+
+        // create a group of SVG elements inside mapSVG
+        const g = mapSvg.append("g");
+
+        // ------  Tooltip -------
+        // tooltip is a little box that will contain information on a part of the map
         const tooltip = d3.select("#mapContainer")
             .append("div")
             .style("opacity", 0)
@@ -91,7 +205,7 @@ export default {
             .style("position", "absolute");
 
 
-        // -------------------------- effect handlers for the map tooltip -----------------
+        // -------- effect handlers for the map tooltip ---------
         function mouseOverHandler(event, _) {
             d3.select(this).attr("fill", HOVER_COLOR);
             tooltip.style("opacity", 1);
@@ -105,8 +219,15 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const maxCount = properties.max;
-            const selectedColor = linearScaleColour(count, maxCount);
-            d3.select(this).attr("fill", selectedColor);
+            const totalAvginYear = totalAverages[currentYear - 2018];
+
+            if (totalAvginYear.value > 0) {
+                const selectedColor = linearScaleColour(count, maxCount);
+                d3.select(this).attr("fill", selectedColor);
+            } else {
+                const selectedColor = "#778899";
+                d3.select(this).attr("fill", selectedColor);
+            }
 
             tooltip.style("opacity", 0);
         }
@@ -119,34 +240,36 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
-            tooltip
-                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px");
+            const totalAvginYear = totalAverages[currentYear - beginYear];
+
+            if (totalAvginYear.value > 0) {
+                tooltip
+                    .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
+            } else {
+                tooltip
+                    .html("Regio: " + quarter + "<br>Geen data voor het jaar " + currentYear)
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
+            }
         }
 
-        const beginDate = new Date(this.beginDate);
-        const endDate = new Date(this.endDate);
-        const allFeaturesWithoutUnknown = this.allFeatures;
-        const quarterGeometrySmall = this.quarterGeometrySmall;
-        const quarterGeometryDataWithoutUnknown = this.quarterGeometryDataWithoutUnknown;
 
-        // --------------------- projection and path ----------------------------
+        // ------- MAP:projection and path ---------
+        // TODO: fix width references
         const projection = d3.geoMercator()
-            .fitExtent([[20, 20], [WIDTH - 20, HEIGHT - 20]], quarterGeometrySmall);
-        const path = d3.geoPath().projection(projection);
+            .fitExtent([[20, 20], [mapcontainerclient.width - 20, mapcontainerclient.height - 20]], quarterGeometrySmall);
+        const mapPath = d3.geoPath().projection(projection);
 
-
-        let currentDateString = dateObjectToYearMonthDay(beginDate);
-
-        // ---------------------------------- draw graph ------------------------------------
+        // --------- MAP:draw graph -----------
         // Draw districts and register event listeners
         const map = g.append("g")
             .selectAll("path")
-            .data(dataToMapDataFormat(filterDataBasedOnDateString(currentDateString, allFeaturesWithoutUnknown), quarterGeometryDataWithoutUnknown))
+            .data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
             .enter()
             .append("path")
-            .attr("d", path)
+            .attr("d", mapPath)
             .attr("fill", (d, _) => {
                 const properties = d["properties"];
                 const count = properties.count;
@@ -160,35 +283,10 @@ export default {
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
 
-        //--------------------- dropdown ----------------------------------------
-
+        //----------- dropdown --------------
         const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
         let currentDataDisplayedBasedOnCategory = allFeaturesWithoutUnknown; // all data of the current category!
         // Function to update the map if a new crime category is chosen
-        function updateMapWithNewCrimeCategory(selectedGroup) {
-            let features = allFeaturesWithoutUnknown;
-
-            // select the data from the chart that we actually want/need
-            if (selectedGroup !== allCategories[0]) {
-                features = features.filter(element => {
-                    return element["fact_category"] === selectedGroup;
-                });
-            }
-
-            currentDataDisplayedBasedOnCategory = features;
-
-            // filter the data based on date
-            const dataFilteredOnDate = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
-
-            // plot the changed map
-            map.data(dataToMapDataFormat(dataFilteredOnDate, quarterGeometryDataWithoutUnknown))
-                .attr("fill", (d, _) => {
-                    const properties = d["properties"];
-                    const count = properties.count;
-                    const maxCount = properties.max;
-                    return linearScaleColour(count, maxCount);
-                });
-        }
 
         // add the options to the button
         d3.select("#selectButton")
@@ -209,79 +307,194 @@ export default {
         });
 
         // ----------------------------- slider ------------------------------
-
-        // translate date object to YYYY-MM-DD string
-        function dateObjectToYearMonthDay(date) {
-            return date.toISOString().split('T')[0];
+        //translate date obj to Year string (e.g: "2018")
+        function dateToYearString(date) {
+            return date.getFullYear().toString();
         }
 
-        // function to format data in d3
-        const formatDateIntoYear = d3.timeFormat("%Y");
-        const formatDate = d3.timeFormat("%b %Y");
-
+        // TODO
         const margin = {top: 50, right: 50, bottom: 0, left: 50};
         const width = WIDTH - margin.left - margin.right;
         const height = HEIGHT - margin.top - margin.bottom;
 
+        const heightSlider = 300;
+
         let sliderIsMoving = false;
         let xPositionOnSlider = 0;
-        const maxXPositionOnSlider = width;
+        const maxXPositionOnSlider = mapcontainerclient.width;
 
         const playButton = d3.select("#playButton");
 
         // gives the position on the sliders as an x-value
-        const positionOnSliderObject = d3.scaleTime()
-            .domain([beginDate, endDate])
-            .range([0, maxXPositionOnSlider])
+        const xScale = d3.scaleTime()
+            .domain([new Date(Date.UTC(parseInt(beginYear), 0, 0, 0, 0, 0)), new Date(endYear)])
+            .range([15, maxXPositionOnSlider])
             .clamp(true);
 
         // create the slider
         const sliderSvg = d3.select("#sliderDiv")
             .append("svg")
-            .attr("width", "100%")
-            .attr("height", "100%");
+            .attr("id", "slider-svg")
+            .attr("width", mapcontainerclient.width + 20)
+            .attr("height", 90);
+        const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
-        const slider = sliderSvg
-            .append("g")
-            .attr("class", "slider")
-            .attr("transform", "translate(" + margin.left + "," + height / 10 + ")");
+        //linear value scale for the slider line chart
+        const yScale = d3.scaleLinear()
+            .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
+            .range([slidercontainerclient.height - 25, 3])
+            .nice();
 
-        // add all the features to the slider
-        slider.append("line")
-            .attr("class", "track")
-            .attr("x1", positionOnSliderObject.range()[0])
-            .attr("x2", positionOnSliderObject.range()[1])
-            .select(function () {
-                return this.parentNode.appendChild(this.cloneNode(true));
+        const axis = d3.axisBottom(xScale);
+        axis.ticks((+endYear) - (+beginYear) + 1, "%Y");
+
+
+        sliderSvg.append("g")
+            .attr("class", "axis-slider")
+            .attr("transform", `translate(0, ${slidercontainerclient.height - 25})`)
+            .call(axis);
+
+        // drag behavior functions
+        function dragmove(e) {
+            const handle = d3.select(this);
+            const handlew = +handle.attr("width");
+
+            const rootx = +sliderSvg.attr("x");
+            const rootw = +sliderSvg.attr("width");
+
+            const computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x));
+
+            handle.attr("x", computedx);
+        }
+
+        function dragend(e) {
+            let handle = d3.select(this);
+            let handlex = +handle.attr("x");
+            let handlew = +handle.attr("width");
+            let handlemidx = handlex + (handlew / 2);
+
+            let xYear = xScale.invert(handlemidx);
+            let snappedx = roundtoYear(xYear);
+
+            updateSlider(snappedx);
+        }
+
+        const drag = d3.drag()
+            .on("drag", dragmove)
+            .on("end", dragend);
+
+        const handle = sliderSvg.append('rect')
+            .attr("id", "slider-handle")
+            .attr("x", 7.5)
+            .attr("y", 0)
+            .attr("width", 12)
+            .attr("height", function () {
+                return sliderSvg.attr("height") - 25;
             })
-            .attr("class", "track-inset")
-            .select(function () {
-                return this.parentNode.appendChild(this.cloneNode(true));
-            })
-            .attr("class", "track-overlay")
-            .call(d3.drag()
-                .on("start.interrupt", (_) => {
-                    slider.interrupt();
-                })
-                .on("start drag", (event) => {
-                    xPositionOnSlider = event.x;
-                    updateSlider(positionOnSliderObject.invert(xPositionOnSlider));
-                })
-            );
+            .style("fill", 'cornflowerblue')
+            .style("opacity", 0.5)
+            .call(drag);
 
-        slider.insert("g", ".track-overlay")
-            .attr("class", "ticks")
-            .attr("transform", "translate(0," + 18 + ")")
-            .selectAll("text")
-            .data(positionOnSliderObject.ticks(10))
-            .enter()
-            .append("text")
-            .attr("x", positionOnSliderObject)
-            .attr("y", 10)
-            .attr("text-anchor", "middle")
-            .text(function (d) {
-                return formatDateIntoYear(d);
+        function updateSliderLineChart(data) {
+            const dataWithoutZeroes = data.filter(obj => obj.value > 0);
+            yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
+
+            const slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function (d) {
+                return d.year;
             });
+
+            slider
+                .enter()
+                .append("path")
+                .attr("class", "slider-linechart")
+                .merge(slider)
+                .transition()
+                .ease(d3.easePolyInOut)
+                .duration(1000)
+                .attr("d", d3.line()
+                    .curve(d3.curveCardinal)
+                    .x(function (d) {
+                        return xScale(new Date(d.year));
+                    })
+                    .y(function (d) {
+                        return yScale(d.value);
+                    })
+                    .defined(function (d) {
+                        return d.value > 0;
+                    }))
+                .attr("fill", "none")
+                .attr("stroke", "#3271e7")
+                .attr("stroke-width", 1.5);
+        }
+
+        updateSliderLineChart(totalAverages);
+
+        function updateMapWithNewCrimeCategory(selectedGroup) {
+            let features = allFeaturesWithoutUnknown;
+
+            // select the data from the chart that we actually want/need
+            if (selectedGroup !== allCategories[0]) {
+                features = features.filter(element => {
+                    return element["fact_category"] === selectedGroup;
+                });
+            }
+
+            currentDataDisplayedBasedOnCategory = features;
+            yearAverages = constructAvgsFromCounts(constructCountsPerYear(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown));
+            maxAvg = getAllYearExtrema(yearAverages)[0];
+            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
+
+
+            // filter the data based on YEAR
+            updateSliderLineChart(totalAverages);
+
+            // plot the changed map
+            map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
+                .attr("fill", (d, _) => {
+                    const properties = d["properties"];
+                    const count = properties.count;
+                    const maxCount = properties.max;
+
+                    const totalAvginYear = totalAverages[currentYear - beginYear];
+                    let selectedColor;
+
+                    if (totalAvginYear.value > 0) {
+                        selectedColor = linearScaleColour(count, maxCount);
+                    } else {
+                        selectedColor = "#778899";
+                    }
+                    return selectedColor;
+                });
+        }
+
+
+        function updateSlideronClick(e) {
+            const handle = d3.select("#slider-handle");
+            const handlew = +handle.attr("width");
+            const root = d3.select(this);
+
+            const rootclient = root.node().getBoundingClientRect();
+            const rootw = +root.attr("width");
+
+
+            const computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x - rootclient.x));
+
+            let xYear = xScale.invert(computedx);
+
+            let snappedx = roundtoYear(xYear);
+            updateSlider(snappedx);
+        }
+
+        d3.select("#slider-svg").on("click", updateSlideronClick);
+
+        // ----- Helper function to update the slider's position -----
+        function updatesliderposition(date) {
+            let handlew = +handle.attr("width");
+
+            let datex = xScale(date);
+
+            handle.transition().attr("x", datex - handlew / 2);
+        }
 
         let timer; // timer we will use to check if slider already needs to move or not
         playButton
@@ -294,63 +507,57 @@ export default {
                 } else {
                     sliderIsMoving = true;
                     // wait 1/4 sec before going to the next step
-                    timer = setInterval(stepOnSlider, 250);
+                    timer = setInterval(stepOnSlider, 3000);
                     button.text("Pause");
                 }
             });
 
         // execute 1 step on the slider
         function stepOnSlider() {
-            // invert creates the date from the current x position on the slider
-            updateSlider(positionOnSliderObject.invert(xPositionOnSlider));
-            xPositionOnSlider = xPositionOnSlider + (maxXPositionOnSlider / 151);
-            if (xPositionOnSlider > maxXPositionOnSlider) {
+
+            const currentdate = xScale.invert(xPositionOnSlider);
+            const nextDate = toNextRoundYear(currentdate);
+            if (nextDate < xScale.domain()[1]) {
+                updateSlider(nextDate);
+                xPositionOnSlider = xScale(nextDate);
+            }
+            // stop the play button
+            else {
                 sliderIsMoving = false;
                 xPositionOnSlider = 0;
+                updateSlider(xScale.invert(0));
                 clearInterval(timer);
                 playButton.text("Play");
             }
+
         }
-
-        const sliderHandle = slider.insert("circle", ".track-overlay")
-            .attr("class", "handle")
-            .attr("r", 9);
-
-        const sliderLabel = slider.append("text")
-            .attr("class", "label")
-            .attr("text-anchor", "middle")
-            .text(formatDate(beginDate))
-            .attr("transform", "translate(0," + (-25) + ")");
 
         // this function is called every time the position of the slider changes, here we update the data
         function updateSlider(date) {
             // TODO: if the tooltip is shown, this should also be updated when we have a change here
             // update position and text of label according to slider scale
-            sliderHandle.attr("cx", positionOnSliderObject(date));
-            sliderLabel
-                .attr("x", positionOnSliderObject(date))
-                .text(formatDate(date));
+            updatesliderposition(date);
 
-            const year = date.getUTCFullYear();
-            const month = date.getUTCMonth() + 1; // +1 since months start at 0 in the date object
+            const year = date.getFullYear();
+            // TODO: only replace year if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
+            currentYear = year.toString();
 
-            const format_month = (month) => {
-                if (month < 10) {
-                    return "0" + month.toString();
-                }
-                return month.toString();
-            };
-
-            // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
-            currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
-            const dataToShow = filterDataBasedOnDateString(currentDateString, currentDataDisplayedBasedOnCategory);
-
-            map.data(dataToMapDataFormat(dataToShow, quarterGeometryDataWithoutUnknown))
+            map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))
                 .attr("fill", (d, _) => {
                     const properties = d["properties"];
                     const count = properties.count;
                     const maxCount = properties.max;
-                    return linearScaleColour(count, maxCount);
+
+                    const totalAvginYear = totalAverages[currentYear - beginYear];
+
+                    let selectedColor;
+
+                    if (totalAvginYear.value > 0) {
+                        selectedColor = linearScaleColour(count, maxCount);
+                    } else {
+                        selectedColor = "#778899";
+                    }
+                    return selectedColor;
                 });
         }
 
@@ -372,7 +579,6 @@ export default {
 </template>
 
 <style scoped>
-
 #playButton {
     top: 140px;
     left: 50px;
@@ -389,45 +595,5 @@ export default {
 
 #playButton:hover {
     background-color: #696969;
-}
-
-#sliderDiv {
-    width: 50vw;
-}
-
-/*use deep selector to select things dynamically added by d3 in this component, see discussion here: https://github.com/vuejs/vue-loader/issues/559*/
-#sliderDiv:deep(.ticks) {
-    font-size: 10px;
-}
-
-#sliderDiv:deep(.track,
-.track-inset,
-.track-overlay) {
-    stroke-linecap: round;
-}
-
-#sliderDiv:deep(.track) {
-    stroke: #000;
-    stroke-opacity: 0.3;
-    stroke-width: 10px;
-}
-
-#sliderDiv:deep(.track-inset) {
-    stroke: #dcdcdc;
-    stroke-width: 8px;
-}
-
-#sliderDiv:deep(.track-overlay) {
-    pointer-events: stroke;
-    stroke-width: 50px;
-    stroke: transparent;
-    cursor: grab;
-}
-
-#sliderDiv:deep(.handle) {
-    fill: #fff;
-    stroke: #000;
-    stroke-opacity: 0.5;
-    stroke-width: 1px;
 }
 </style>

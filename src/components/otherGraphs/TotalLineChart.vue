@@ -209,6 +209,21 @@ export default {
                 .attr("r", 3)
                 .style("fill", d => color(d.date.getFullYear()))
                 .attr("class", d => "year" + d.date.getFullYear());
+
+            if (selectedGroup === "Verkeersongevallen met lichamelijk letsel") {
+                // run this in promise to not block everything and first let the transition go to 0, and then hide the values
+                new Promise(() => {
+                    setTimeout(function () {
+                        d3.selectAll(".year2018").style("opacity", 0);
+                        d3.selectAll(".year2019").style("opacity", 0);
+                    }, 1000);
+                });
+            } else {
+                if (d3.selectAll(".year2018").style("opacity") === "0") {
+                    d3.selectAll(".year2018").style("opacity", 1);
+                    d3.selectAll(".year2019").style("opacity", 1);
+                }
+            }
         }
 
         // add the options to the button
@@ -254,9 +269,10 @@ export default {
                 const selector = ".year" + data;
                 // is the element currently visible ?
                 const currentOpacity = d3.selectAll(selector).style("opacity");
-                // Change the opacity: from 0.2 to 1 or from 1 to 0.2
-                d3.selectAll(selector).transition().style("opacity", currentOpacity === "1" ? 0.2 : 1);
-
+                if (currentOpacity !== "0") { // ignore if the opacity is set to 0, if that is the case we want to hide the graph!
+                    // Change the opacity: from 0.2 to 1 or from 1 to 0.2
+                    d3.selectAll(selector).transition().style("opacity", currentOpacity === "1" ? 0.2 : 1);
+                }
             });
 
 

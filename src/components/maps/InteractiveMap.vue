@@ -227,7 +227,7 @@ export default {
             const count = properties.count;
             const quarter = properties.quarter;
             tooltip
-                .html("Regio: " + quarter + "<br>Aantal geregistreerde voorvallen: " + count)
+                .html("Regio: " + quarter + "<br>Maandelijkse gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
         }
@@ -506,7 +506,7 @@ export default {
                 } else {
                     sliderIsMoving = true;
                     // wait 1/4 sec before going to the next step
-                    timer = setInterval(stepOnSlider, 1000);
+                    timer = setInterval(stepOnSlider, 3000);
                     button.text("Pause");
                 }
             });

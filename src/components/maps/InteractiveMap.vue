@@ -227,7 +227,7 @@ export default {
             const count = properties.count;
             const quarter = properties.quarter;
             tooltip
-                .html("Regio: " + quarter + "<br>Maandelijkse gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
+                .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
         }

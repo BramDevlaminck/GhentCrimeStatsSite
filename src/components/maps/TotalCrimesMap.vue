@@ -243,7 +243,7 @@ export default {
                 die gebeuren, zakkenrollers die buit kunnen maken,…
             </p>
             <p>
-                Als we ons focussen op de wijken rond de binnenstad valt vooral wijk <b>Brugse Poort - Rooigem</b> op.
+                Als we ons focussen op de wijken rond de binnenstad valt vooral de wijk <b>Brugse Poort - Rooigem</b> op.
                 Deze heeft duidelijk meer <b>geregistreerde feiten te hebben dan de omliggende wijken</b>.
                 Dit blijkt een erg <b>dicht bebouwde</b> wijk te zijn (bebouwingsgraad van 26.5% terwijl het gemiddelde
                 in Gent 13.3% is).

@@ -18,6 +18,9 @@
             <p>
                 Tot slot willen we graag de dienst van het <a href="https://data.stad.gent/explore/?disjunctive.keyword&disjunctive.theme&sort=modified">Open Data Portaal</a> van stad Gent bedanken.
                 Tijdens het maken van dit project waren ze een grote hulp bij het oplossen van problemen in datasets die we gebruikten.
+                Zo hebben we relatief vroeg in het proces al ontdekt dat de data ontbrak voor het aantal <i>Verkeersongevallen met lichamelijke letsels</i> over alle jaren heen.
+                Alsook waren er voor 2021 en 2023 dubbele entries in de datasets.
+                Dankzij hun hulp is het grootste deel van deze problemen ondertussen opgelost waardoor de visualisaties toch deze data konden bevatten.
             </p>
             <p>
                 Auteurs: Isis Garayalde Vandendriessche, Thomas Van Mullem & Bram Devlaminck.

@@ -571,7 +571,6 @@ export default {
             // };
 
             // TODO: only replace currentDateString if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
-            // currentDateString = year + "-" + format_month(month) + "-01"; // this is the format of the "jaar_maand"-field in the dataset
             currentYear = year.toString();
 
 

@@ -505,7 +505,6 @@ export default {
 
         // ----- Helper function to update the slider's position -----
         function updatesliderposition(date) {
-            // let handle = d3.select("slider-handle");
             let handlew = +handle.attr("width");
 
             let datex = xScale(date);

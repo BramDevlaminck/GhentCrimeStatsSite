@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "buildtest": "vite build --mode prodtest"
+    "testbuild": "vite build --mode testproduction"
   },
   "dependencies": {
     "@mapbox/geojson-rewind": "^0.5.2",

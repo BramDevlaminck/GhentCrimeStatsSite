@@ -66,6 +66,9 @@ import colourScales from '../ColourScales';
 
 const {differentialColour} = colourScales();
 
+const WIDTH = window.innerWidth / 2.5;
+
+
 function transformToHeatmapData(data, crimes, quarters, populationPerQuarter) {
     // initialise a map with as key a quarter, and a value a map that has as key a crime and as value an array of all the totals for that crime in that quarter
     const totalsPerQuarterPerCrime = new Map();
@@ -174,11 +177,10 @@ export default {
     mounted() {
         const quarters = [...this.residentsPerQuarter.keys()];
         const crimes = [...this.crimeTypes];
-
         // set the dimensions and margins of the graph
         const margin = {top: 350, right: 25, bottom: 25, left: 250},
-            width = 900 - margin.left - margin.right,
-            height = 800 - margin.top - margin.bottom;
+            width = WIDTH - margin.left - margin.right,
+            height = WIDTH - 0.05*WIDTH - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
         const svg = d3.select("#heatmap")

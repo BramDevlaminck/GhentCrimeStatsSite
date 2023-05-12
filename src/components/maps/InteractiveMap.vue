@@ -352,7 +352,7 @@ export default {
         const sliderTopPadding = 7.5;
         const sliderBottomPadding = 25;
 
-        const heightSlider = 300
+        const heightSlider = 90;
 
         let sliderIsMoving = false;
 
@@ -372,8 +372,8 @@ export default {
         const sliderSvg = d3.select("#sliderDiv")
             .append("svg")
             .attr("id", "slider-svg")
-            .attr("width", mapcontainerclient.width + 40)
-            .attr("height", 90);
+            .attr("width", mapcontainerclient.width + sliderLeftPadding)
+            .attr("height", heightSlider);
         const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
         //linear value scale for the slider line chart   

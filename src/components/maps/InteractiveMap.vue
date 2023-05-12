@@ -373,15 +373,14 @@ export default {
             .append("svg")
             .attr("id", "slider-svg")
             .attr("width", mapcontainerclient.width + 40)
-            .attr("height", 90)
-            .style("cursor", "alias");
+            .attr("height", 90);
         const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
         //linear value scale for the slider line chart   
         const yScale = d3.scaleLinear()
             .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
             .range([slidercontainerclient.height - sliderBottomPadding, sliderTopPadding])
-            .nice()
+            .nice();
 
         const xAxis = d3.axisBottom(xScale);
         xAxis.ticks((+endYear) - (+beginYear) + 1, "%Y");
@@ -394,10 +393,15 @@ export default {
             .attr("transform", `translate(0, ${slidercontainerclient.height - 25})`)
             .call(xAxis);
 
-        sliderSvg.append("g")
+        const yAxisg = sliderSvg.append("g")
             .attr("class", "yAxis-slider")
             .attr("transform", `translate(${sliderLeftPadding}, 0)`)
             .call(yAxis);
+
+        yAxisg
+            .style('cursor', 'alias')
+            .append('title')
+            .text("Totaal Maandelijkse Gemiddelde\n(som van de gemiddelden over heel gent)");
 
         // drag behavior functions
         function dragmove(e) {

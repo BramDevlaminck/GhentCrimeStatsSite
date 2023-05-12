@@ -362,12 +362,12 @@ export default {
             <div id="lineChart"/>
         </div>
         <div>
-            <h5>Gentse feesten</h5>
+            <h5>Gentse Feesten</h5>
             <p>
                 In <b>juli</b> 2018, 2019 en 2022 valt duidelijk een piek te zien bij het aantal aangiftes van <b>zakkenrollerij</b>, maar in 2020 en 2021 is dit niet zo.
-                Dit komt net overeen met de periode van de Gentse feesten, met uitzondering van in 2020 en 2021 wanneer deze niet konden door gaan wegens corona.
+                Dit komt net overeen met de periode van de Gentse Feesten, met uitzondering van in 2020 en 2021 wanneer deze niet konden door gaan wegens corona.
                 Ook bij het aantal meldingen van <b>geluidsoverlast</b> valt in juli een piek te zien.
-                Enkel met het verschil dat deze piek ook aanwezig is tijdens de jaren dat er geen Gentse feesten waren door corona.
+                Enkel met het verschil dat deze piek ook aanwezig is tijdens de jaren dat er geen Gentse Feesten waren door corona.
                 Vermoedelijk komt dit doordat dit net de periode was na de eerste grote corona-golf <span class="source">(<a href="https://www.belgium.be/nl/node/13178">bron1</a> <a href="https://www.coronaviruscovid19.be/coronavirus-cijfers">bron2</a> <a href="https://www.ad.nl/nlthuis/meer-mensen-blijven-thuis-en-dat-is-hoorbaar-nog-nooit-zoveel-meldingen-van-geluidsoverlast~adcddd1d6/">bron3</a>)</span>.
             </p>
 
@@ -387,7 +387,9 @@ export default {
                 Dit valt mogelijk te verklaren aan de hand van het weer dat beter wordt in de lente en zomer.
             </p>
             <p>
-                Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral door de daling van parkeerovertredingen die maand. (TODO: waarom?, studenten lijkt niet logisch aangezien deze normaal niet met de auto komen?)
+                Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral door de daling van parkeerovertredingen die maand.
+                Er is hiervoor niet meteen een erg duidelijke verklaring.
+                We vermoeden dat dit het effect is van de vakantie, maar dat dit niet zichtbaar is in juli door de Gentse Feesten die de data erg beïnvloeden.
             </p>
         </div>
     </div>

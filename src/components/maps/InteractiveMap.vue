@@ -361,6 +361,7 @@ export default {
         const playButton = d3.select("#playButton");
 
         // gives the position on the sliders as an x-value
+        // domain starts a little bit before 2018, to let the 2018 tick appear on the axis
         const xScale = d3.scaleTime()
             .domain([new Date(Date.UTC(parseInt(beginYear), 0, 0, 0, 0, 0)), new Date(endYear)])
             .range([sliderLeftPadding, maxXPositionOnSlider])
@@ -407,13 +408,13 @@ export default {
         function dragmove(e) {
             var handle = d3.select(this);
             handle.style("cursor", "grabbing")
-                .style("fill", "#3c73d7");
+                  .style("fill", "#3c73d7");
             var handlew = +handle.attr("width");
 
             var rootx = +sliderSvg.attr("x");
             var rootw = +sliderSvg.attr("width");
 
-            var computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x))
+            var computedx = Math.max(sliderLeftPadding-handlew/2, Math.min(maxXPositionOnSlider-handlew/2, e.x))
 
             handle.attr("x", computedx);
         }
@@ -548,6 +549,10 @@ export default {
         }
 
         d3.select("#slider-svg").on("click", updateSlideronClick);
+
+        //little interaction helper 
+        sliderSvg.append('title')
+            .text('click anywhere on the line chart\nor drag the highlighted area\nto update the represented year!')
 
         // ----- Helper function to update the slider's position -----
         function updatesliderposition(date) {

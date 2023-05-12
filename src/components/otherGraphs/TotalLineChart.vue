@@ -388,8 +388,8 @@ export default {
             </p>
             <p>
                 Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral door de daling van parkeerovertredingen die maand.
-                Er is hiervoor niet meteen een erg duidelijke verklaring.
-                We vermoeden dat dit het effect is van de vakantie, maar dat dit niet zichtbaar is in juli door de Gentse Feesten die de data erg beïnvloeden.
+                We vermoeden dat dit het effect is van de vakantie. In juli is dit ook zichtbaar sinds 2020, voordien was dit net eerder een piek.
+                Mogelijks zitten de Gentse Feesten hier voor iets tussen, maar dit valt moeilijk in te schatten.
             </p>
         </div>
     </div>

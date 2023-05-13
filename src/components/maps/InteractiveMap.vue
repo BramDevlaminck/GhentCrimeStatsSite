@@ -11,7 +11,8 @@ const { linearScaleColour } = colourScales();
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
-const HOVER_COLOR = "#d36f80";
+const HOVER_COLOR = "#db5252";
+const NO_DATA_COLOR = "#f08080"
 
 function filterDataBasedOnDateString(date, data) {
     return data.filter(entry => entry["properties"]["jaar_maand"] === date);
@@ -33,7 +34,7 @@ function roundtoYear(x) {
 }
 
 function toNextRoundYear(x) {
-    const nextYear = x.getFullYear() + 1;
+    const nextYear = (+x) + 1;
 
     return new Date(nextYear, 0, 1);
 }
@@ -236,14 +237,14 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const maxCount = properties.max;
-            const totalAvginYear = totalAverages[currentYear-2018];
+            const totalAvginYear = totalAverages[currentYear - 2018];
 
-            if( totalAvginYear.value > 0 ){
+            if (totalAvginYear.value > 0) {
                 const selectedColor = linearScaleColour(count, maxCount);
                 d3.select(this).attr("fill", selectedColor);
             } else {
-                const selectedColor = "#778899";
-                d3.select(this).attr("fill", selectedColor );
+                const selectedColor = NO_DATA_COLOR;
+                d3.select(this).attr("fill", selectedColor);
             }
 
             tooltip.style("opacity", 0);
@@ -257,22 +258,22 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
-            const totalAvginYear = totalAverages[currentYear-beginYear];
+            const totalAvginYear = totalAverages[currentYear - beginYear];
 
-            if( totalAvginYear.value > 0){
+            if (totalAvginYear.value > 0) {
                 tooltip
-                .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px");
+                    .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
             } else {
                 tooltip
-                .html("Regio: " + quarter + "<br>Geen data voor het jaar " + currentYear)
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px");
+                    .html("Regio: " + quarter + "<br>Geen data voor het jaar " + currentYear)
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
             }
         }
 
-        
+
         // ------- MAP:projection and path ---------
         // TODO: fix width references
         const projection = d3.geoMercator()
@@ -344,59 +345,83 @@ export default {
         const width = WIDTH - margin.left - margin.right;
         const height = HEIGHT - margin.top - margin.bottom;
 
-        const heightSlider = 300
+        // const sliderWidth = 
+        const sliderHandleWidth = 12;
+        const sliderLeftPadding = 40;
+        const sliderTopPadding = 7.5;
+        const sliderBottomPadding = 25;
+
+        const heightSlider = 90;
 
         let sliderIsMoving = false;
-        let xPositionOnSlider = 0;
+
         const maxXPositionOnSlider = mapcontainerclient.width;
 
         const playButton = d3.select("#playButton");
 
         // gives the position on the sliders as an x-value
+        // domain starts a little bit before 2018, to let the 2018 tick appear on the axis
         const xScale = d3.scaleTime()
-            .domain([new Date(Date.UTC(parseInt(beginYear),0,0,0,0,0)), new Date(endYear)])
-            .range([15, maxXPositionOnSlider])
+            .domain([new Date(Date.UTC(parseInt(beginYear), 0, 0, 0, 0, 0)), new Date(endYear)])
+            .range([sliderLeftPadding, maxXPositionOnSlider])
             .clamp(true)
+
+        let xPositionOnSlider = xScale(roundtoYear(xScale.invert(0)));
 
         // create the slider
         const sliderSvg = d3.select("#sliderDiv")
             .append("svg")
             .attr("id", "slider-svg")
-            .attr("width", mapcontainerclient.width + 20)
-            .attr("height", 90);
+            .attr("width", mapcontainerclient.width + sliderLeftPadding)
+            .attr("height", heightSlider);
         const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
 
         //linear value scale for the slider line chart   
         const yScale = d3.scaleLinear()
-        .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
-        .range([slidercontainerclient.height - 25, 3])
-        .nice()
-        
-        const axis = d3.axisBottom(xScale);
-        axis.ticks((+endYear) - (+beginYear) + 1, "%Y");
+            .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
+            .range([slidercontainerclient.height - sliderBottomPadding, sliderTopPadding])
+            .nice();
 
-        
+        const xAxis = d3.axisBottom(xScale);
+        xAxis.ticks((+endYear) - (+beginYear) + 1, "%Y");
+
+        const yAxis = d3.axisLeft(yScale);
+        yAxis.ticks(3);
 
         sliderSvg.append("g")
-            .attr("class", "axis-slider")
+            .attr("class", "xAxis-slider")
             .attr("transform", `translate(0, ${slidercontainerclient.height - 25})`)
-            .call(axis);
+            .call(xAxis);
+
+        const yAxisg = sliderSvg.append("g")
+            .attr("class", "yAxis-slider")
+            .attr("transform", `translate(${sliderLeftPadding}, 0)`)
+            .call(yAxis);
+
+        yAxisg
+            .style('cursor', 'alias')
+            .append('title')
+            .text("Totaal Maandelijkse Gemiddelde\n(som van de gemiddelden over heel gent)");
 
         // drag behavior functions
         function dragmove(e) {
             var handle = d3.select(this);
+            handle.style("cursor", "grabbing")
+                  .style("fill", "#3c73d7");
             var handlew = +handle.attr("width");
 
             var rootx = +sliderSvg.attr("x");
             var rootw = +sliderSvg.attr("width");
 
-            var computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x))
+            var computedx = Math.max(sliderLeftPadding-handlew/2, Math.min(maxXPositionOnSlider-handlew/2, e.x))
 
             handle.attr("x", computedx);
         }
 
         function dragend(e) {
             let handle = d3.select(this);
+            handle.style("cursor", "grab")
+                .style("fill", "cornflowerblue");
             let handlex = +handle.attr("x");
             let handlew = +handle.attr("width");
             let handlemidx = handlex + (handlew / 2);
@@ -413,40 +438,51 @@ export default {
 
         const handle = sliderSvg.append('rect')
             .attr("id", "slider-handle")
-            .attr("x", 7.5)
+            .attr("x", xPositionOnSlider - sliderHandleWidth / 2)
             .attr("y", 0)
-            .attr("width", 12)
+            .attr("width", sliderHandleWidth)
             .attr("height", function () {
                 return sliderSvg.attr("height") - 25;
             })
             .style("fill", 'cornflowerblue')
+            .style("cursor", "grab")
             .style("opacity", 0.5)
+            .on("mousedown", function(d){
+                d3.select(this).style("cursor", "grabbing")
+            })
+            .on("mouseup", function(d){
+                d3.select(this).style("cursor", "grab")
+            })
             .call(drag);
 
-        function updateSliderLineChart(data){
+        function updateSliderLineChart(data) {
             const dataWithoutZeroes = data.filter(obj => obj.value > 0)
             yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
-            
-            var slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function(d) { return d.year});
+
+            sliderSvg.select('.yAxis-slider')
+                .transition()
+                .call(yAxis);
+
+            var slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function (d) { return d.year });
 
             slider
                 .enter()
                 .append("path")
-                .attr("class","slider-linechart")
+                .attr("class", "slider-linechart")
                 .merge(slider)
                 .transition()
                 .ease(d3.easePolyInOut)
                 .duration(1000)
                 .attr("d", d3.line()
                     .curve(d3.curveCardinal)
-                    .x(function(d) { 
-                        return xScale(new Date(d.year)); 
+                    .x(function (d) {
+                        return xScale(new Date(d.year));
                     })
-                    .y(function(d) {
+                    .y(function (d) {
                         return yScale(d.value);
                     })
-                    .defined(function (d){
-                        return d.value>0;
+                    .defined(function (d) {
+                        return d.value > 0;
                     }))
                 .attr("fill", "none")
                 .attr("stroke", "#3271e7")
@@ -481,15 +517,15 @@ export default {
                     const count = properties.count;
                     const maxCount = properties.max;
 
-                    const totalAvginYear = totalAverages[currentYear-beginYear];
+                    const totalAvginYear = totalAverages[currentYear - beginYear];
                     let selectedColor;
 
-                    if( totalAvginYear.value > 0 ){
+                    if (totalAvginYear.value > 0) {
                         selectedColor = linearScaleColour(count, maxCount);
                     } else {
-                        selectedColor = "#778899"
+                        selectedColor = NO_DATA_COLOR
                     }
-                    return selectedColor; 
+                    return selectedColor;
                 });
         }
 
@@ -513,6 +549,10 @@ export default {
 
         d3.select("#slider-svg").on("click", updateSlideronClick);
 
+        //little interaction helper 
+        sliderSvg.append('title')
+            .text('click anywhere on the line chart\nor drag the highlighted area\nto update the represented year!')
+
         // ----- Helper function to update the slider's position -----
         function updatesliderposition(date) {
             let handlew = +handle.attr("width");
@@ -528,34 +568,38 @@ export default {
         playButton
             .on("click", function () {
                 const button = d3.select(this);
-                if (button.text() === "Pause") {  // TODO: maybe don't use the "pause" text to check which state we are in, use some class?
+                if (button.attr("class") === "playing") {
                     sliderIsMoving = false;
                     clearInterval(timer);
-                    button.text("Play");
+                    button.classed('paused', true);
+                    button.classed('playing', false);
+                    button.select("i").attr('class', 'bi bi-play');
                 } else {
                     sliderIsMoving = true;
                     // wait 1/4 sec before going to the next step
-                    timer = setInterval(stepOnSlider, 3000);
-                    button.text("Pause");
+                    timer = setInterval(stepOnSlider, 2000);
+                    button.classed('playing', true);
+                    button.classed('paused', false);
+                    button.select("i").attr('class', 'bi bi-pause');
                 }
             });
 
         // execute 1 step on the slider
         function stepOnSlider() {
 
-            const currentdate = xScale.invert(xPositionOnSlider);
-            const nextDate = toNextRoundYear(currentdate);
+            const nextDate = toNextRoundYear(currentYear);
             if (nextDate < xScale.domain()[1]) {
                 updateSlider(nextDate);
-                xPositionOnSlider = xScale(nextDate);
             }
             // stop the play button 
             else {
                 sliderIsMoving = false;
-                xPositionOnSlider = 0;
-                updateSlider(xScale.invert(0));
+                updateSlider(roundtoYear(xScale.invert(0)));
                 clearInterval(timer);
-                playButton.text("Play");
+                playButton.classed("paused", true);
+                playButton.classed("playing", false);
+                playButton.select("i").attr('class', 'bi bi-play');
+
             }
 
         }
@@ -576,16 +620,16 @@ export default {
                     const count = properties.count;
                     const maxCount = properties.max;
 
-                    const totalAvginYear = totalAverages[currentYear-beginYear];
+                    const totalAvginYear = totalAverages[currentYear - beginYear];
 
                     let selectedColor;
 
-                    if( totalAvginYear.value > 0 ){
+                    if (totalAvginYear.value > 0) {
                         selectedColor = linearScaleColour(count, maxCount);
                     } else {
-                        selectedColor = "#778899"
+                        selectedColor = NO_DATA_COLOR
                     }
-                    return selectedColor; 
+                    return selectedColor;
                 });
         }
 
@@ -594,34 +638,40 @@ export default {
 </script>
 
 <template>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <div id="chartWrapper">
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
         <div id="mapContainer" />
-        <!-- div where we will place the slider -->
-        <div id="sliderDiv" />
-        <!-- button to play/pause the slider -->
-        <button id="playButton">Play</button>
+        <div id="sliderContainer">
+            <!-- button to play/pause the slider -->
+            <button id="playButton" class="paused"><i class="bi bi-play"></i></button>
+            <!-- div where we will place the slider -->
+            <div id="sliderDiv" />
+        </div>
     </div>
 </template>
 
 <style scoped>
 #playButton {
-    top: 140px;
-    left: 50px;
     background: #f08080;
     border-radius: 3px;
     border: none;
     color: white;
     margin: 0;
     padding: 0 12px;
-    width: 60px;
+    width: 40px;
     cursor: pointer;
-    height: 30px;
+    height: 65px;
 }
 
 #playButton:hover {
-    background-color: #696969;
+    background-color: #db5252;
+}
+
+#sliderContainer {
+    display: flex;
+    flex-wrap: nowrap;
 }
 </style>

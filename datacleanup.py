@@ -55,7 +55,7 @@ def cleanup_crime_data_per_year(features: Any):
                 quarter = "Stationsbuurt-Zuid"
         properties["quarter"] = quarter
 
-        # cleanup crime type, the dataset from 2019 and 2019 have this different fact_category from the other datasets
+        # cleanup crime type, the dataset from 2018 and 2019 have this different fact_category from the other datasets
         if properties["fact_category"] == "Verkeerongevallen met lichamelijk letsel":
             properties["fact_category"] = "Verkeersongevallen met lichamelijk letsel"
 

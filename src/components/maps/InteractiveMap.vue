@@ -581,7 +581,6 @@ export default {
                     button.classed('playing', true);
                     button.classed('paused', false);
                     button.select("i").attr('class', 'bi bi-pause');
-                    // button.text("Pause");
                 }
             });
 

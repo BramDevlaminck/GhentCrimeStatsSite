@@ -611,7 +611,6 @@ export default {
             // TODO: if the tooltip is shown, this should also be updated when we have a change here
             // update position and text of label according to slider scale
             updatesliderposition(date);
-            // xPositionOnSlider = xScale(date);
 
             const year = date.getFullYear();
             // TODO: only replace year if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)

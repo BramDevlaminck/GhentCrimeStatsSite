@@ -568,7 +568,7 @@ export default {
         playButton
             .on("click", function () {
                 const button = d3.select(this);
-                if (button.attr("class") === "playing") {  // TODO: maybe don't use the "pause" text to check which state we are in, use some class?
+                if (button.attr("class") === "playing") {
                     sliderIsMoving = false;
                     clearInterval(timer);
                     button.classed('paused', true);

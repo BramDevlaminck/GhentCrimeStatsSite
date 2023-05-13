@@ -68,7 +68,7 @@ export default {
         </h1>
         <h5>
             Deze heatmap geeft een overzicht van het aantal misdrijven van een bepaalde categorie per regio.
-            De kleuren zijn genormaliseerd per aantal inwoners. Dit geeft het effect dat een regio met veel inwoner meer registraties van een bepaald feit mag hebben voordat dit als slechter gezien wordt.
+            De kleuren zijn genormaliseerd per aantal inwoners. Dit geeft het effect dat een regio met veel inwoners meer registraties van een bepaald feit mag hebben voordat dit als slechter gezien wordt.
             Dit laat ons toe te zien welke regio's een uitzonderlijk hoog of laag aantal registraties hebben in verhouding met het aantal inwoners.
         </h5>
         <Heatmap :crime-types="crimeTypes" :all-features="allFeaturesWithoutUnknown" :residents-per-quarter="numberOfResidentsPerQuarterMap" />

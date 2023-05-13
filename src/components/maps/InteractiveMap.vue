@@ -1,34 +1,28 @@
 <script>
 //TODO:!https://fonts.googleapis.com/css?family=Special+Elite apply this font in some places?
 import * as d3 from "d3";
-import BikeMap from "@/components/maps/BikeMap.vue";
-import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
-import { max } from "d3";
-import colourScales from '../ColourScales'
-// import '../../assets/patterns.css'
-const { linearScaleColour } = colourScales();
+import colourScales from '../ColourScales';
+
+const {linearScaleColour} = colourScales();
 
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
 const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#db5252";
-const NO_DATA_COLOR = "#f08080"
+const NO_DATA_COLOR = "#f08080";
 
-function filterDataBasedOnDateString(date, data) {
-    return data.filter(entry => entry["properties"]["jaar_maand"] === date);
-}
 
 // ------ Year functions  ------
 function roundtoYear(x) {
     const xYear = x.getFullYear();
     let yearms = 1000 * 60 * 60 * 24;
-    //leapyear
+    // leapyear
     if (xYear % 4 === 0 && xYear % 100 !== 0) {
         yearms *= 366;
     } else {
         yearms *= 365;
     }
-    const halfyearms = yearms / 2
+    const halfyearms = yearms / 2;
 
     return new Date(new Date(x.valueOf() + halfyearms).getUTCFullYear(), 0, 1);
 }
@@ -39,18 +33,9 @@ function toNextRoundYear(x) {
     return new Date(nextYear, 0, 1);
 }
 
-function filterDataBasedOnYearString(year, data) {
-    return data.filter(entry => entry["properties"]["year"] === year);
-}
-
 function getUniqueYears(data) {
-    let years = data.map(obj => obj.properties.year);
-    let uniqueYears = years.filter((year, index, self) => self.indexOf(year) === index);
-    return uniqueYears;
-}
-
-function yearArrayToDateArray(years) {
-    return years.map(year => new Date(year));
+    let years = data.map(obj => obj.year);
+    return years.filter((year, index, self) => self.indexOf(year) === index);
 }
 
 function constructCountsPerYear(data, quarterGeometryData) {
@@ -72,19 +57,18 @@ function constructCountsPerYear(data, quarterGeometryData) {
      */
 
     data.forEach(obj => {
-        const properties = obj["properties"];
-        const quarter = properties["quarter"];
-        const month = properties["month"];
-        const year = properties["year"];
+        const quarter = obj["quarter"];
+        const month = obj["month"];
+        const year = obj["year"];
 
         const currentCountMap = yearCounts.get(year);
 
 
         const currentMonthCount = currentCountMap.get(quarter);
         if (currentMonthCount.has(month)) {
-            currentMonthCount.set(month, currentMonthCount.get(month) + properties["total"]);
+            currentMonthCount.set(month, currentMonthCount.get(month) + obj["total"]);
         } else {
-            currentMonthCount.set(month, properties['total']);
+            currentMonthCount.set(month, obj['total']);
         }
         currentCountMap.set(quarter, currentMonthCount);
         yearCounts.set(year, currentCountMap);
@@ -101,7 +85,7 @@ function constructAvgsFromCounts(yearCounts) {
         // Iterate over each month's count for the current neighborhood
         for (const [quarter, months] of quarters) {
             let total = 0;
-            for (const [month, count] of months) {
+            for (const [_, count] of months) {
                 total += count;
             }
             // Calculate the monthly average for the current neighborhood
@@ -120,7 +104,7 @@ function constructTotalYearAvgs(yearAvgs) {
     let totalAvgs = new Map();
     for (const [year, quarters] of yearAvgs) {
         let totalAvg = 0;
-        for (const [quarter, avg] of quarters) {
+        for (const [_, avg] of quarters) {
             totalAvg += avg;
         }
         totalAvgs.set(year, totalAvg);
@@ -150,7 +134,7 @@ function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018
     const result = [];
     for (const [quarter, avg] of currentYearAvgs) {
         result.push({
-            properties: { "quarter": quarter, "count": avg, "max": maxAvg },
+            properties: {"quarter": quarter, "count": avg, "max": maxAvg},
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -160,14 +144,12 @@ function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018
 
 
 export default {
-    components: { TotalCrimesMap, BikeMap },
     props: {
         allFeatures: Array,
         beginDate: Date,
         endDate: Date,
         crimeTypes: Set,
         quarterGeometryData: Map,
-        bikeParkingPerQuarter: Map,
         quarterGeometryDataWithoutUnknown: Map,
         quarterGeometrySmall: Object
     },
@@ -191,7 +173,7 @@ export default {
         let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
         // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
         let maxAvg = getAllYearExtrema(yearAverages)[0];
-        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
+        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
 
         //------ MAP  ------
         //create an SVG in the map container, and keep a reference to it
@@ -202,7 +184,7 @@ export default {
             .attr("height", "50vh");
 
         // VIEW
-        const mapcontainerclient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client 
+        const mapContainerClient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client
 
 
         // create a group of SVG elements inside mapSVG
@@ -237,14 +219,13 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const maxCount = properties.max;
-            const totalAvginYear = totalAverages[currentYear - 2018];
+            const totalAvgInYear = totalAverages[currentYear - 2018];
 
-            if (totalAvginYear.value > 0) {
+            if (totalAvgInYear.value > 0) {
                 const selectedColor = linearScaleColour(count, maxCount);
                 d3.select(this).attr("fill", selectedColor);
             } else {
-                const selectedColor = NO_DATA_COLOR;
-                d3.select(this).attr("fill", selectedColor);
+                d3.select(this).attr("fill", NO_DATA_COLOR);
             }
 
             tooltip.style("opacity", 0);
@@ -258,9 +239,9 @@ export default {
             const properties = data["properties"];
             const count = properties.count;
             const quarter = properties.quarter;
-            const totalAvginYear = totalAverages[currentYear - beginYear];
+            const totalAvgInYear = totalAverages[currentYear - beginYear];
 
-            if (totalAvginYear.value > 0) {
+            if (totalAvgInYear.value > 0) {
                 tooltip
                     .html("Regio: " + quarter + "<br>Maandelijks gemiddeld aantal voorvallen in " + currentYear + " : " + (Math.round(count * 100) / 100).toFixed(2))
                     .style("left", ((event.pageX) + 20) + "px")
@@ -277,7 +258,7 @@ export default {
         // ------- MAP:projection and path ---------
         // TODO: fix width references
         const projection = d3.geoMercator()
-            .fitExtent([[20, 20], [mapcontainerclient.width - 20, mapcontainerclient.height - 20]], quarterGeometrySmall);
+            .fitExtent([[20, 20], [mapContainerClient.width - 20, mapContainerClient.height - 20]], quarterGeometrySmall);
         const mapPath = d3.geoPath().projection(projection);
 
         // --------- MAP:draw graph -----------
@@ -312,12 +293,8 @@ export default {
             .data(allCategories)
             .enter()
             .append('option')
-            .text(function (d) {
-                return d;
-            }) // text showed in the menu
-            .attr("value", function (d) {
-                return d;
-            }); // corresponding value returned by the button
+            .text(d => d) // text showed in the menu
+            .attr("value", d => d); // corresponding value returned by the button
 
         // Listen to dropdown
         d3.select("#selectButton").on("change", function (_) {
@@ -325,27 +302,11 @@ export default {
         });
 
         // ----------------------------- slider ------------------------------
-
-        // translate date object to YYYY-MM-DD string
-        function dateObjectToYearMonthDay(date) {
-            return date.toISOString().split('T')[0];
-        }
-
         //translate date obj to Year string (e.g: "2018")
         function dateToYearString(date) {
             return date.getFullYear().toString();
         }
 
-        // function to format data in d3
-        const formatDateIntoYear = d3.timeFormat("%Y");
-        const formatDate = d3.timeFormat("%b %Y");
-
-        // TODO
-        const margin = { top: 50, right: 50, bottom: 0, left: 50 };
-        const width = WIDTH - margin.left - margin.right;
-        const height = HEIGHT - margin.top - margin.bottom;
-
-        // const sliderWidth = 
         const sliderHandleWidth = 12;
         const sliderLeftPadding = 40;
         const sliderTopPadding = 7.5;
@@ -355,7 +316,7 @@ export default {
 
         let sliderIsMoving = false;
 
-        const maxXPositionOnSlider = mapcontainerclient.width;
+        const maxXPositionOnSlider = mapContainerClient.width;
 
         const playButton = d3.select("#playButton");
 
@@ -364,7 +325,7 @@ export default {
         const xScale = d3.scaleTime()
             .domain([new Date(Date.UTC(parseInt(beginYear), 0, 0, 0, 0, 0)), new Date(endYear)])
             .range([sliderLeftPadding, maxXPositionOnSlider])
-            .clamp(true)
+            .clamp(true);
 
         let xPositionOnSlider = xScale(roundtoYear(xScale.invert(0)));
 
@@ -372,14 +333,14 @@ export default {
         const sliderSvg = d3.select("#sliderDiv")
             .append("svg")
             .attr("id", "slider-svg")
-            .attr("width", mapcontainerclient.width + sliderLeftPadding)
+            .attr("width", mapContainerClient.width + sliderLeftPadding)
             .attr("height", heightSlider);
-        const slidercontainerclient = sliderSvg.node().getBoundingClientRect();
+        const sliderContainerClient = sliderSvg.node().getBoundingClientRect();
 
-        //linear value scale for the slider line chart   
+        //linear value scale for the slider line chart
         const yScale = d3.scaleLinear()
             .domain([0, Math.max(...totalAverages.map(obj => obj.value))])
-            .range([slidercontainerclient.height - sliderBottomPadding, sliderTopPadding])
+            .range([sliderContainerClient.height - sliderBottomPadding, sliderTopPadding])
             .nice();
 
         const xAxis = d3.axisBottom(xScale);
@@ -390,7 +351,7 @@ export default {
 
         sliderSvg.append("g")
             .attr("class", "xAxis-slider")
-            .attr("transform", `translate(0, ${slidercontainerclient.height - 25})`)
+            .attr("transform", `translate(0, ${sliderContainerClient.height - 25})`)
             .call(xAxis);
 
         const yAxisg = sliderSvg.append("g")
@@ -404,21 +365,18 @@ export default {
             .text("Totaal Maandelijkse Gemiddelde\n(som van de gemiddelden over heel gent)");
 
         // drag behavior functions
-        function dragmove(e) {
-            var handle = d3.select(this);
+        function dragMove(e) {
+            const handle = d3.select(this);
             handle.style("cursor", "grabbing")
-                  .style("fill", "#3c73d7");
-            var handlew = +handle.attr("width");
+                .style("fill", "#3c73d7");
+            const handlew = +handle.attr("width");
 
-            var rootx = +sliderSvg.attr("x");
-            var rootw = +sliderSvg.attr("width");
-
-            var computedx = Math.max(sliderLeftPadding-handlew/2, Math.min(maxXPositionOnSlider-handlew/2, e.x))
+            const computedx = Math.max(sliderLeftPadding - handlew / 2, Math.min(maxXPositionOnSlider - handlew / 2, e.x));
 
             handle.attr("x", computedx);
         }
 
-        function dragend(e) {
+        function dragend(_) {
             let handle = d3.select(this);
             handle.style("cursor", "grab")
                 .style("fill", "cornflowerblue");
@@ -433,7 +391,7 @@ export default {
         }
 
         const drag = d3.drag()
-            .on("drag", dragmove)
+            .on("drag", dragMove)
             .on("end", dragend);
 
         const handle = sliderSvg.append('rect')
@@ -447,23 +405,24 @@ export default {
             .style("fill", 'cornflowerblue')
             .style("cursor", "grab")
             .style("opacity", 0.5)
-            .on("mousedown", function(d){
-                d3.select(this).style("cursor", "grabbing")
+            .on("mousedown", function (d) {
+                d3.select(this).style("cursor", "grabbing");
             })
-            .on("mouseup", function(d){
-                d3.select(this).style("cursor", "grab")
+            .on("mouseup", function (d) {
+                d3.select(this).style("cursor", "grab");
             })
             .call(drag);
 
         function updateSliderLineChart(data) {
-            const dataWithoutZeroes = data.filter(obj => obj.value > 0)
+            const dataWithoutZeroes = data.filter(obj => obj.value > 0);
             yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
-
             sliderSvg.select('.yAxis-slider')
                 .transition()
                 .call(yAxis);
 
-            var slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function (d) { return d.year });
+            const slider = sliderSvg.selectAll('.slider-linechart').data([dataWithoutZeroes], function (d) {
+                return d.year;
+            });
 
             slider
                 .enter()
@@ -475,15 +434,9 @@ export default {
                 .duration(1000)
                 .attr("d", d3.line()
                     .curve(d3.curveCardinal)
-                    .x(function (d) {
-                        return xScale(new Date(d.year));
-                    })
-                    .y(function (d) {
-                        return yScale(d.value);
-                    })
-                    .defined(function (d) {
-                        return d.value > 0;
-                    }))
+                    .x(d => xScale(new Date(d.year)))
+                    .y(d =>  yScale(d.value))
+                    .defined(d =>  d.value > 0))
                 .attr("fill", "none")
                 .attr("stroke", "#3271e7")
                 .attr("stroke-width", 1.5);
@@ -497,14 +450,14 @@ export default {
             // select the data from the chart that we actually want/need
             if (selectedGroup !== allCategories[0]) {
                 features = features.filter(element => {
-                    return element["properties"]["fact_category"] === selectedGroup;
+                    return element["fact_category"] === selectedGroup;
                 });
             }
 
             currentDataDisplayedBasedOnCategory = features;
-            yearAverages = constructAvgsFromCounts(constructCountsPerYear(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown))
+            yearAverages = constructAvgsFromCounts(constructCountsPerYear(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown));
             maxAvg = getAllYearExtrema(yearAverages)[0];
-            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
+            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
 
 
             // filter the data based on YEAR
@@ -523,23 +476,23 @@ export default {
                     if (totalAvginYear.value > 0) {
                         selectedColor = linearScaleColour(count, maxCount);
                     } else {
-                        selectedColor = NO_DATA_COLOR
+                        selectedColor = NO_DATA_COLOR;
                     }
                     return selectedColor;
                 });
         }
 
 
-        function updateSlideronClick(e) {
+        function updateSliderOnClick(e) {
             const handle = d3.select("#slider-handle");
-            var handlew = +handle.attr("width");
+            const handlew = +handle.attr("width");
             const root = d3.select(this);
 
             const rootclient = root.node().getBoundingClientRect();
-            var rootw = +root.attr("width");
+            const rootw = +root.attr("width");
 
 
-            var computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x - rootclient.x));
+            const computedx = Math.max(0, Math.min(rootw - handlew - 20, e.x - rootclient.x));
 
             let xYear = xScale.invert(computedx);
 
@@ -547,21 +500,19 @@ export default {
             updateSlider(snappedx);
         }
 
-        d3.select("#slider-svg").on("click", updateSlideronClick);
+        d3.select("#slider-svg").on("click", updateSliderOnClick);
 
-        //little interaction helper 
+        //little interaction helper
         sliderSvg.append('title')
-            .text('click anywhere on the line chart\nor drag the highlighted area\nto update the represented year!')
+            .text('click anywhere on the line chart\nor drag the highlighted area\nto update the represented year!');
 
         // ----- Helper function to update the slider's position -----
-        function updatesliderposition(date) {
+        function updateSliderPosition(date) {
             let handlew = +handle.attr("width");
 
             let datex = xScale(date);
 
             handle.transition().attr("x", datex - handlew / 2);
-
-
         }
 
         let timer; // timer we will use to check if slider already needs to move or not
@@ -591,7 +542,7 @@ export default {
             if (nextDate < xScale.domain()[1]) {
                 updateSlider(nextDate);
             }
-            // stop the play button 
+            // stop the play button
             else {
                 sliderIsMoving = false;
                 updateSlider(roundtoYear(xScale.invert(0)));
@@ -608,7 +559,7 @@ export default {
         function updateSlider(date) {
             // TODO: if the tooltip is shown, this should also be updated when we have a change here
             // update position and text of label according to slider scale
-            updatesliderposition(date);
+            updateSliderPosition(date);
 
             const year = date.getFullYear();
             // TODO: only replace year if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
@@ -620,14 +571,14 @@ export default {
                     const count = properties.count;
                     const maxCount = properties.max;
 
-                    const totalAvginYear = totalAverages[currentYear - beginYear];
+                    const totalAvgInYear = totalAverages[currentYear - beginYear];
 
                     let selectedColor;
 
-                    if (totalAvginYear.value > 0) {
+                    if (totalAvgInYear.value > 0) {
                         selectedColor = linearScaleColour(count, maxCount);
                     } else {
-                        selectedColor = NO_DATA_COLOR
+                        selectedColor = NO_DATA_COLOR;
                     }
                     return selectedColor;
                 });
@@ -643,12 +594,12 @@ export default {
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
-        <div id="mapContainer" />
+        <div id="mapContainer"/>
         <div id="sliderContainer">
             <!-- button to play/pause the slider -->
             <button id="playButton" class="paused"><i class="bi bi-play"></i></button>
             <!-- div where we will place the slider -->
-            <div id="sliderDiv" />
+            <div id="sliderDiv"/>
         </div>
     </div>
 </template>

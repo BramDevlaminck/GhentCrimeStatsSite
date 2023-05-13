@@ -5,7 +5,6 @@ import BikeMap from "@/components/maps/BikeMap.vue";
 import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
 import { max } from "d3";
 import colourScales from '../ColourScales'
-import { NO } from "@vue/shared";
 // import '../../assets/patterns.css'
 const { linearScaleColour } = colourScales();
 

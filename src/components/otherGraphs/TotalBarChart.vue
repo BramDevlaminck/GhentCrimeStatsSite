@@ -34,8 +34,8 @@
             <h5>Dalende lijnen</h5>
             <p>
                 Gelukkig zien we ook een paar <b>positieve evoluties</b>,
-                autodiefstal is lichtjes afgenomen (9 naar 7 feiten per maand),
-                geluidshinder daalt de afgelopen jaren standvastig met bijna 10 gevallen per maand
+                autodiefstal is lichtjes afgenomen (9 naar 7 feiten per maand).
+                Geluidshinder daalt de afgelopen jaren standvastig met bijna 10 gevallen per maand
                 en de inbraken in handelszaken zijn na corona laag gebleven in vergelijking met 2018.
                 Ook motordiefstal is de laatste jaren erg beperkt met maar (afgerond) 1 voorval per maand.
             </p>

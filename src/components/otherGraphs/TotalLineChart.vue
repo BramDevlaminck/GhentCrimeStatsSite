@@ -75,7 +75,7 @@ export default {
         const data = preprocessDataPerYearAndMonth(this.data, allCategories);
         const monthFormatter = d3.timeFormat("%b");
         const margin = {top: 10, right: 30, bottom: 30, left: 60},
-            svgWidth = Math.min(window.innerWidth, 1000) - margin.left - margin.right,
+            svgWidth = Math.min(window.innerWidth, 800) - margin.left - margin.right,
             height = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
         const effectiveLineGraphWidth = svgWidth - 100;
 

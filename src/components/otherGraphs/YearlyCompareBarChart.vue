@@ -1,5 +1,11 @@
 <template>
     <div id="textChartWrapper">
+        <div id="chartWrapper">
+            <!-- Dropdown used for all the categories -->
+            <select id="selectButtonYearlyCompareBarChart"></select>
+            <!-- Barchart itself -->
+            <div id="yearlyCompareBarChart"/>
+        </div>
         <div id="text-next-to-slider">
             <p>
                 We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt. (Kleine tip: je kan deze verbergen door op de naam te klikken!)
@@ -9,12 +15,6 @@
                 (Opgelet: Voor 2018 en 2019 is deze data niet beschikbaar!)<br/>
                 Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de jaren zijn bijna alle cijfers beduidend lager.
             </p>
-        </div>
-        <div id="chartWrapper">
-            <!-- Dropdown used for all the categories -->
-            <select id="selectButtonYearlyCompareBarChart"></select>
-            <!-- Barchart itself -->
-            <div id="yearlyCompareBarChart"/>
         </div>
     </div>
 </template>

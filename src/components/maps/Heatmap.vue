@@ -3,7 +3,7 @@
         <div id="chartWrapper">
             <div id="heatmap"/>
         </div>
-        <div>
+        <div id="text-next-to-slider">
             <h5>Zwaktes</h5>
             <p>
                 De <b>binnenstad</b> scoort over het algemeen slecht.
@@ -66,7 +66,7 @@ import colourScales from '../ColourScales';
 
 const {differentialColour} = colourScales();
 
-const WIDTH = window.innerWidth / 2.5;
+const WIDTH = Math.max(window.innerWidth / 2.5, 900);
 
 
 function transformToHeatmapData(data, crimes, quarters, populationPerQuarter) {

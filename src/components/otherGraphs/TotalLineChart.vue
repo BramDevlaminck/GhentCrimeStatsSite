@@ -367,7 +367,7 @@ export default {
             <select id="selectButtonForLineGraph"></select>
             <div id="lineChart"/>
         </div>
-        <div>
+        <div id="text-next-to-slider">
             <h5>Gentse Feesten</h5>
             <p>
                 In <b>juli</b> 2018, 2019 en 2022 valt duidelijk een piek te zien bij het aantal aangiftes van <b>zakkenrollerij</b>, maar in 2020 en 2021 is dit niet zo.

@@ -234,6 +234,10 @@ export default {
         d3.select("#selectButtonTotalBarChart").on("change", function (_) {
             changeCategory(this.value);
         });
+    },
+    beforeUnmount() {
+        // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
+        d3.selectAll('#totalBarChart svg').remove();
     }
 };
 </script>

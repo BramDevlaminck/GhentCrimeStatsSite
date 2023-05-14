@@ -352,6 +352,10 @@ export default {
         function mouseOutHandler(_) {
             hoverLine.style('display', 'none');
         }
+    },
+    beforeUnmount() {
+        // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
+        d3.selectAll('#lineChart svg').remove();
     }
 };
 </script>

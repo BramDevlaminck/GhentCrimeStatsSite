@@ -228,6 +228,10 @@ export default {
             changeYear(this.value, getYearlyData(this.value));
         });
 
+    },
+    beforeUnmount() {
+        // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
+        d3.selectAll('#yearlyCompareBarChart svg').remove();
     }
 }
 </script>

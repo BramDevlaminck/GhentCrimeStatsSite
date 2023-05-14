@@ -82,10 +82,9 @@ function transformToHeatmapData(data, crimes, quarters, populationPerQuarter) {
 
     // put the data in the map
     for (const entry of data) {
-        const properties = entry["properties"];
-        const quarter = properties["quarter"];
-        const count = properties["total"];
-        const crime = properties["fact_category"];
+        const quarter = entry["quarter"];
+        const count = entry["total"];
+        const crime = entry["fact_category"];
         totalsPerQuarterPerCrime.get(quarter).get(crime).push(count);
     }
 

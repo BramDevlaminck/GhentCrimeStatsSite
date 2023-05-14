@@ -1,13 +1,13 @@
 <template>
     <div id="textChartWrapper">
         <div id="text-next-to-slider">
-            <h5></h5>
             <p>
-                We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt.
+                We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt. (Kleine tip: je kan deze verbergen door op de naam te klikken!)
                 Op de tweede plaats komt <b>fietsdiefstal</b>, dit is ook te verwachten in een stad met 80 000 studenten per jaar.
                 Wat daarnaast ook opvalt is dat het aantal <b>verkeersongevallen met lichamelijk letsel</b> meer voorkomt dan woninginbraken.
-                In 2021 en 2022 is dit ook telkens de 3e categorie met de meeste voorvallen dit zijn er meer dan <b>1200</b> per jaar! <br/>
-                Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de rest zijn bijna alle cijfers beduidend minder.
+                In 2021 en 2022 is dit ook telkens de 3<sup>e</sup> categorie met de meeste voorvallen dit zijn er meer dan <b>1200</b> per jaar!
+                (Opgelet: Voor 2018 en 2019 is deze data niet beschikbaar!)<br/>
+                Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de jaren zijn bijna alle cijfers beduidend lager.
             </p>
         </div>
         <div id="chartWrapper">

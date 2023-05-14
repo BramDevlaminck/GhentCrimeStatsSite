@@ -4,7 +4,6 @@ import colourScales from '../ColourScales';
 
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
-// TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#db5252";
@@ -79,8 +78,6 @@ export default {
             .append("svg")
             .attr("width", "25vw")
             .attr("height", "50vh");
-        
-        const mapContainerClient = mapSvg.node().getBoundingClientRect();
 
         const g = mapSvg.append("g");
         g.append("rect")

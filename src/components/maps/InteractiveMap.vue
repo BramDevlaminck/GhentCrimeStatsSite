@@ -1,15 +1,10 @@
 <script>
-//TODO:!https://fonts.googleapis.com/css?family=Special+Elite apply this font in some places?
 import * as d3 from "d3";
-import { max } from "d3";
 
 import colourScales from '../ColourScales';
 
-const { scaleToInterval, linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
+const { linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
 
-// TODO: change this if needed? not really clean this way
-const WIDTH = window.innerWidth / 2;
-const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#db5252";
 const NO_DATA_COLOR = "#f08080";
 
@@ -64,7 +59,6 @@ function constructCountsPerYear(data, quarterGeometryData) {
         const year = obj["year"];
 
         const currentCountMap = yearCounts.get(year);
-
 
         const currentMonthCount = currentCountMap.get(quarter);
         if (currentMonthCount.has(month)) {
@@ -342,7 +336,6 @@ export default {
 
 
         // ------- MAP:projection and path ---------
-        // TODO: fix width references
         const projection = d3.geoMercator()
             .fitExtent([[20, 20], [mapContainerClient.width - 20, mapContainerClient.height - 20]], quarterGeometrySmall);
         const mapPath = d3.geoPath().projection(projection);
@@ -652,12 +645,10 @@ export default {
 
         // this function is called every time the position of the slider changes, here we update the data
         function updateSlider(date) {
-            // TODO: if the tooltip is shown, this should also be updated when we have a change here
             // update position and text of label according to slider scale
             updateSliderPosition(date);
 
             const year = date.getFullYear();
-            // TODO: only replace year if it is different, and only then we should refilter and redraw everything (perhaps also looking if the crime category changed?)
             currentYear = year.toString();
 
             map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))

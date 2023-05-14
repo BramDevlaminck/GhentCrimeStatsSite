@@ -4,7 +4,6 @@ import colourScales from '../ColourScales';
 
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
-// TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#db5252";
@@ -160,8 +159,6 @@ export default {
         const barX = 10;
         const barY = 50;
 
-        // const maxNorm = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, true)[1]));
-        // const maxCrimes = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, false)[1]));
         let currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
 
         // Linear scale for y-axis
@@ -170,7 +167,7 @@ export default {
             .domain([0, currentMax])
             .range([barheight, 0]);
 
-        //call this when changing the catego    ry (and changing the yColourScale.domain)
+        //call this when changing the category (and changing the yColourScale.domain)
         const yColourAxis = d3.axisRight(yColourScale);
 
         const colourAxisTicks = yColourScale.ticks(4);
@@ -218,6 +215,13 @@ export default {
         }
 
         createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+        mapSvg.append("text")
+            .attr("y", barY - 20)
+            .attr("x", barX)
+            .text("Legende: Aantal Feiten")
+            .attr("font-weight", 500)
+            .attr("class", "legend")
+            .style("font-size", "80%");
 
         function updateLegendAxis(currentMax) {
             yColourScale.domain([0, currentMax]);
@@ -316,6 +320,9 @@ export default {
                     const [count, max] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
                     return linearScaleColour(count, max);
                 });
+            const legendText = showDataRelativePerNumberOfResidents? "Legende: Genormaliseerd Aantal Feiten" : "Legende: Aantal Feiten"
+            mapSvg.select(".legend")
+                .text(legendText)
         });
     },
     beforeUnmount() {

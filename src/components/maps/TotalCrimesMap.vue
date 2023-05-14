@@ -241,9 +241,9 @@ export default {
 
         // Listen to dropdown
         d3.select("#selectButtonTotalCrimes").on("change", function (_) {
-            let currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
-            updateLegendAxis(currentMax);
             updateMapWithNewCrimeCategory(this.value);
+            const currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
+            updateLegendAxis(currentMax);
         });
 
 

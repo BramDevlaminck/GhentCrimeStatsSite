@@ -2,7 +2,7 @@
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
 
-const {linearScaleColour} = colourScales();
+const {linearScaleColour} = colourScales(0.07, 1.0);
 
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;

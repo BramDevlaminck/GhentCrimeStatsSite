@@ -171,7 +171,7 @@ export default {
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave);
 
-        // y-axis label:
+        // x-axis label:
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("y", HEIGHT + 40)

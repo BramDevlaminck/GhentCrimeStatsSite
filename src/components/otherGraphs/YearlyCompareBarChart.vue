@@ -1,9 +1,17 @@
 <template>
-    <div id="chartWrapper">
-        <!-- Dropdown used for all the categories -->
-        <select id="selectButtonYearlyCompareBarChart"></select>
-        <!-- Barchart itself -->
-        <div id="yearlyCompareBarChart"/>
+    <div id="textChartWrapper">
+        <div id="text-next-to-slider">
+            <h5></h5>
+            <p>
+
+            </p>
+        </div>
+        <div id="chartWrapper">
+            <!-- Dropdown used for all the categories -->
+            <select id="selectButtonYearlyCompareBarChart"></select>
+            <!-- Barchart itself -->
+            <div id="yearlyCompareBarChart"/>
+        </div>
     </div>
 </template>
 
@@ -162,7 +170,7 @@ export default {
         const yAxis = svg.append("g")
             .call(d3.axisLeft(y));
 
-        yAxis.selectAll('.tick').on("click", function (_, d) {
+        yAxis.selectAll('.tick').style("cursor", "pointer").on("click", function (_, d) {
             clickHandler(years[0], data, d);
         });
 
@@ -183,7 +191,7 @@ export default {
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("y", HEIGHT + 40)
-            .attr("x", WIDTH/2 + 40)
+            .attr("x", WIDTH / 2 + 40)
             .text("Totaal aantal voorvallen")
             .style("font-size", "80%");
 

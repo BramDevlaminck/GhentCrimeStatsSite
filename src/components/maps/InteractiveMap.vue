@@ -192,7 +192,7 @@ export default {
         const barheight = 200;
         const barwidth = 20;
 
-        const barX = mapContainerClient.width - barwidth - 30;
+        const barX = 0;
         const barY = 50;
 
         // Linear scale for y-axis
@@ -250,10 +250,9 @@ export default {
 
         createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
         mapSvg.append("text")
-            .attr("text-anchor", "end")
             .attr("y", barY - 20)
-            .attr("x", barX + 40)
-            .text("Legende: Maandelijks gemiddelde")
+            .attr("x", barX)
+            .text("Legende: Maandelijks Gemiddelde")
             .attr("font-weight", 500)
             .attr("class", "legend")
             .style("font-size", "80%");

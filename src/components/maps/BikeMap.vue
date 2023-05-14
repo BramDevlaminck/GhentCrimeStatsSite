@@ -2,7 +2,7 @@
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
 
-const {linearScaleColour} = colourScales(0.07, 1.0);
+const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;
@@ -172,6 +172,65 @@ export default {
                     return linearScaleColour(count, max);
                 });
         });
+
+
+        // LEGEND
+        const barheight = 200;
+        const barwidth = 20;
+
+        const barX = 50;
+        const barY = 30;
+
+        function createColorScaleLegend(root, x, y, width, height, min, max) {
+            // Linear scale for y-axis
+            const yColourScale = d3
+                .scaleLinear()
+                .domain([min, max])
+                .range([height, 0]);
+
+            const yColorAxis = d3.axisRight(yColourScale);
+            const colourticks = yColourScale.ticks(4);
+            colourticks.push(max);
+            yColorAxis.tickValues(colourticks);
+
+            root.append("g")
+                .attr("class", "colorAxis")
+                .attr("transform", `translate(${x + width},${y})`)
+                .call(yColorAxis)
+                .select(".domain")
+                .attr("visibility", "hidden");
+
+            const colorScale = d3
+                .scaleSequential(interpolateBluesMod)
+                .domain([min, max])
+
+            const ticks = colorScale.ticks().concat(colorScale.domain()[1]);
+
+            const defs = root.append('defs');
+
+            const grad = defs.append('linearGradient')
+                .attr('id', "linear-gradient")
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '100%')
+                .attr('y2', '0%');
+
+            grad.selectAll('stop')
+                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
+                .enter()
+                .append('stop')
+                .style('stop-color', (d) => d.color)
+                .attr('offset', (d) => d.offset);
+
+            root.append('rect')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('width', width)
+                .attr('height', height)
+                .style('fill', 'url(#linear-gradient)');
+        }
+
+        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, 0, Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showNumberOfBikeParkings)[1])));
     },
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated

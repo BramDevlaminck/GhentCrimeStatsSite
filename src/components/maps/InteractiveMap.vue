@@ -194,30 +194,34 @@ export default {
         const barX = mapContainerClient.width - barwidth - 30;
         const barY = 50;
 
-        function createColorScaleLegend(root, x, y, width, height, min, max) {
-            // Linear scale for y-axis
-            const yColourScale = d3
-                .scaleLinear()
-                .domain([min, max])
-                .range([height, 0]);
+        // Linear scale for y-axis
+        const yColourScale = d3
+            .scaleLinear()
+            .domain([0, maxAvg])
+            .range([barheight, 0]);
 
-            const yColorAxis = d3.axisRight(yColourScale);
-            const colourticks = yColourScale.ticks(4);
-            colourticks.push(max);
-            yColorAxis.tickValues(colourticks);
+        //call this when changing the category (and changing the yColourScale.domain)
+        const yColourAxis = d3.axisRight(yColourScale);
+
+        const colourAxisTicks = yColourScale.ticks(4);
+        colourAxisTicks.push(maxAvg);
+        yColourAxis.tickValues(colourAxisTicks);
+
+        const colorScale = d3
+            .scaleSequential(interpolateBluesMod)
+            .domain([0, maxAvg])
+
+        //ticks needed to create the colour gradient (these are not for the axis)
+        const colourticks = colorScale.ticks().concat(colorScale.domain()[1]);
+
+        function createColorScaleLegend(root, x, y, width, height, ticks) {
 
             root.append("g")
-                .attr("class", "colorAxis")
+                .attr("class", "colourAxis")
                 .attr("transform", `translate(${x + width},${y})`)
-                .call(yColorAxis)
+                .call(yColourAxis)
                 .select(".domain")
                 .attr("visibility", "hidden");
-
-            const colorScale = d3
-                .scaleSequential(interpolateBluesMod)
-                .domain([min, max])
-
-            const ticks = colorScale.ticks().concat(colorScale.domain()[1]);
 
             const defs = root.append('defs');
 
@@ -243,7 +247,21 @@ export default {
                 .style('fill', 'url(#linear-gradient)');
         }
 
-        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, 0, maxAvg);
+        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+
+        function updateLegendAxis(maxAvg) {
+            yColourScale.domain([0, maxAvg]);
+
+            const colourAxisTicks = yColourScale.ticks(4);
+            if (!colourAxisTicks.includes(maxAvg)) {
+                colourAxisTicks.push(maxAvg);
+            }
+            yColourAxis.tickValues(colourAxisTicks);
+
+            mapSvg.select('.colourAxis')
+                .transition()
+                .call(yColourAxis);
+        }
 
         // create a group of SVG elements inside mapSVG
         const g = mapSvg.append("g");
@@ -525,6 +543,9 @@ export default {
 
             // filter the data based on YEAR
             updateSliderLineChart(totalAverages);
+
+            //change the colour scale legend axis
+            updateLegendAxis(maxAvg);
 
             // plot the changed map
             map.data(dataToMapDataFormat(yearAverages, quarterGeometryDataWithoutUnknown, maxAvg, currentYear))

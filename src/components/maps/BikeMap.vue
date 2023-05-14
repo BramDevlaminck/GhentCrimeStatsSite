@@ -242,9 +242,11 @@ export default {
             yColourScale.domain([0, currentMax]);
 
             const colourAxisTicks = yColourScale.ticks(4);
-            if (!colourAxisTicks.includes(currentMax)) {
-                colourAxisTicks.push(currentMax);
+            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
+                colourAxisTicks.pop();
             }
+            colourAxisTicks.push(currentMax);
+        
             yColourAxis.tickValues(colourAxisTicks);
 
             mapSvg.select('.colourAxis')

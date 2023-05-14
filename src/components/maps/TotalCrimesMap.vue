@@ -80,6 +80,9 @@ export default {
         const quarterGeometryData = this.quarterGeometryData;
         const numberOfResidentsPerQuarterMap = this.numberOfResidentsPerQuarterMap;
         let showDataRelativePerNumberOfResidents = false;
+
+        let dataInMapFormat = dataToMapDataFormat(allFeatures, quarterGeometryData, numberOfResidentsPerQuarterMap);
+
         const mapSvg = d3
             .select("#totalMapContainer")
             .append("svg")
@@ -148,8 +151,94 @@ export default {
                 return d;
             }); // corresponding value returned by the button
 
+        
+        // LEGEND
+                
+        const barheight = 100;
+        const barwidth = 15;
+
+        const barX = 10;
+        const barY = 50;
+
+        // const maxNorm = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, true)[1]));
+        // const maxCrimes = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, false)[1]));
+        let currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
+
+        // Linear scale for y-axis
+        const yColourScale = d3
+            .scaleLinear()
+            .domain([0, currentMax])
+            .range([barheight, 0]);
+
+        //call this when changing the catego    ry (and changing the yColourScale.domain)
+        const yColourAxis = d3.axisRight(yColourScale);
+
+        const colourAxisTicks = yColourScale.ticks(4);
+        colourAxisTicks.push(currentMax);
+        yColourAxis.tickValues(colourAxisTicks);
+
+        const colorScale = d3
+            .scaleSequential(interpolateBluesMod)
+            .domain([0, currentMax])
+
+        //ticks needed to create the colour gradient (these are not for the axis)
+        const colourticks = colorScale.ticks().concat(colorScale.domain()[1]);
+
+        function createColorScaleLegend(root, x, y, width, height, ticks) {
+
+            root.append("g")
+                .attr("class", "colourAxis")
+                .attr("transform", `translate(${x + width},${y})`)
+                .call(yColourAxis)
+                .select(".domain")
+                .attr("visibility", "hidden");
+
+            const defs = root.append('defs');
+
+            const grad = defs.append('linearGradient')
+                .attr('id', "linear-gradient")
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '100%')
+                .attr('y2', '0%');
+
+            grad.selectAll('stop')
+                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
+                .enter()
+                .append('stop')
+                .style('stop-color', (d) => d.color)
+                .attr('offset', (d) => d.offset);
+
+            root.append('rect')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('width', width)
+                .attr('height', height)
+                .style('fill', 'url(#linear-gradient)');
+        }
+
+        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+
+        function updateLegendAxis(currentMax) {
+            yColourScale.domain([0, currentMax]);
+
+            const colourAxisTicks = yColourScale.ticks(4);
+            
+            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
+                colourAxisTicks.pop();
+            }
+            colourAxisTicks.push(currentMax);
+            yColourAxis.tickValues(colourAxisTicks); 
+
+            mapSvg.select('.colourAxis')
+                .transition()
+                .call(yColourAxis);
+        }
+
         // Listen to dropdown
         d3.select("#selectButtonTotalCrimes").on("change", function (_) {
+            let currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
+            updateLegendAxis(currentMax);
             updateMapWithNewCrimeCategory(this.value);
         });
 
@@ -195,7 +284,6 @@ export default {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
-        let dataInMapFormat = dataToMapDataFormat(allFeatures, quarterGeometryData, numberOfResidentsPerQuarterMap);
         const map = g.append("g")
             .selectAll("path")
             .data(dataInMapFormat)
@@ -214,75 +302,21 @@ export default {
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
+        
 
         // listen to toggle
         d3.select("#totalCrimesMapToggle").on("change", function (_) {
             showDataRelativePerNumberOfResidents = d3.select("#totalCrimesMapToggle").property("checked");
+            currentMax = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
+
+            updateLegendAxis(currentMax);
+
             map.data(dataInMapFormat)
                 .attr("fill", (d, _) => {
                     const [count, max] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
                     return linearScaleColour(count, max);
                 });
         });
-
-
-        // LEGEND
-        const barheight = 200;
-        const barwidth = 20;
-
-        const barX = 50;
-        const barY = 30;
-
-        function createColorScaleLegend(root, x, y, width, height, min, max) {
-            // Linear scale for y-axis
-            const yColourScale = d3
-                .scaleLinear()
-                .domain([min, max])
-                .range([height, 0]);
-
-            const yColorAxis = d3.axisRight(yColourScale);
-            const colourticks = yColourScale.ticks(4);
-            colourticks.push(max);
-            yColorAxis.tickValues(colourticks);
-
-            root.append("g")
-                .attr("class", "colorAxis")
-                .attr("transform", `translate(${x + width},${y})`)
-                .call(yColorAxis)
-                .select(".domain")
-                .attr("visibility", "hidden");
-
-            const colorScale = d3
-                .scaleSequential(interpolateBluesMod)
-                .domain([min, max])
-
-            const ticks = colorScale.ticks().concat(colorScale.domain()[1]);
-
-            const defs = root.append('defs');
-
-            const grad = defs.append('linearGradient')
-                .attr('id', "linear-gradient")
-                .attr('x1', '0%')
-                .attr('x2', '0%')
-                .attr('y1', '100%')
-                .attr('y2', '0%');
-
-            grad.selectAll('stop')
-                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
-                .enter()
-                .append('stop')
-                .style('stop-color', (d) => d.color)
-                .attr('offset', (d) => d.offset);
-
-            root.append('rect')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('width', width)
-                .attr('height', height)
-                .style('fill', 'url(#linear-gradient)');
-        }
-
-        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, 0, Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1])));
     },
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated

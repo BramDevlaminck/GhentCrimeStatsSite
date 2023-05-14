@@ -1,6 +1,7 @@
 <script>
 //TODO:!https://fonts.googleapis.com/css?family=Special+Elite apply this font in some places?
 import * as d3 from "d3";
+import { max } from "d3";
 
 import colourScales from '../ColourScales';
 
@@ -261,9 +262,11 @@ export default {
             yColourScale.domain([0, maxAvg]);
 
             const colourAxisTicks = yColourScale.ticks(4);
-            if (!colourAxisTicks.includes(maxAvg)) {
-                colourAxisTicks.push(maxAvg);
+            if ((maxAvg - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.2) {
+                colourAxisTicks.pop();
             }
+            colourAxisTicks.push(maxAvg);
+        
             yColourAxis.tickValues(colourAxisTicks);
 
             mapSvg.select('.colourAxis')

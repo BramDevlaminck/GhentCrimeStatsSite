@@ -230,6 +230,13 @@ export default {
         }
 
         createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+        mapSvg.append("text")
+            .attr("y", barY - 20)
+            .attr("x", barX)
+            .text("Legende: Aantal Diefstallen")
+            .attr("font-weight", 500)
+            .attr("class", "legend")
+            .style("font-size", "80%");
 
         function updateLegendAxis(currentMax) {
             yColourScale.domain([0, currentMax]);
@@ -254,6 +261,10 @@ export default {
                     const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
                     return linearScaleColour(count, max);
                 });
+
+            const legendText =  showNumberOfBikeParkings? "Legende: Aantal Plaatsen" : "Legende: Aantal Diefstallen"
+            mapSvg.select(".legend")
+                .text(legendText)
         });
 
     },

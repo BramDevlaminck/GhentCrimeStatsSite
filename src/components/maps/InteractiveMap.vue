@@ -248,6 +248,14 @@ export default {
         }
 
         createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+        mapSvg.append("text")
+            .attr("text-anchor", "end")
+            .attr("y", barY - 20)
+            .attr("x", barX + 40)
+            .text("Legende: Maandelijks gemiddelde")
+            .attr("font-weight", 500)
+            .attr("class", "legend")
+            .style("font-size", "80%");
 
         function updateLegendAxis(maxAvg) {
             yColourScale.domain([0, maxAvg]);

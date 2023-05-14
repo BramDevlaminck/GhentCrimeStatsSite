@@ -68,7 +68,7 @@ export default {
         function getYearlyData(year) {
             let yearly = allFeatures;
             yearly = yearly.filter(element => {
-                return element["year"] === year;
+                    return element["year"] === year;
                 }
             );
 
@@ -117,10 +117,8 @@ export default {
                 let crimeData = yearlyData.filter(obj => obj.category === d)[0];
                 const index = yearlyData.findIndex(obj => obj === crimeData);
                 if (crimeData.total === 0) {
-                    console.log(yearlyData);
                     crimeData = getYearlyData(year).filter(obj => obj.category === d)[0];
                     yearlyData[index] = crimeData;
-                    console.log(yearlyData);
                     changeYear(year, yearlyData);
                 } else {
                     crimeData.total = 0;
@@ -157,7 +155,7 @@ export default {
             .domain(data.map(d => d.category))
             .padding(.1);
 
-        const yAxis  = svg.append("g")
+        const yAxis = svg.append("g")
             .call(d3.axisLeft(y));
 
         //Bars

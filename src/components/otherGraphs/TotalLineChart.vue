@@ -355,10 +355,43 @@ export default {
 </script>
 
 <template>
-  <!-- Dropdown used for all the categories -->
-    <div id="chartWrapper">
-        <select id="selectButtonForLineGraph"></select>
-        <div id="lineChart"/>
+    <div id="textChartWrapper">
+        <!-- Dropdown used for all the categories -->
+        <div id="chartWrapper">
+            <select id="selectButtonForLineGraph"></select>
+            <div id="lineChart"/>
+        </div>
+        <div>
+            <h5>Gentse Feesten</h5>
+            <p>
+                In <b>juli</b> 2018, 2019 en 2022 valt duidelijk een piek te zien bij het aantal aangiftes van <b>zakkenrollerij</b>, maar in 2020 en 2021 is dit niet zo.
+                Dit komt net overeen met de periode van de Gentse Feesten, met uitzondering van in 2020 en 2021 wanneer deze niet door konden gaan wegens corona.
+                Ook bij het aantal meldingen van <b>geluidsoverlast</b> valt in juli een piek te zien.
+                Enkel met het verschil dat deze piek ook aanwezig is tijdens de jaren dat er geen Gentse Feesten waren door corona.
+                Vermoedelijk komt dit doordat dit net de periode was na de eerste grote corona-golf <span class="source">(<a href="https://www.belgium.be/nl/node/13178">bron1</a> <a href="https://www.coronaviruscovid19.be/coronavirus-cijfers">bron2</a> <a href="https://www.ad.nl/nlthuis/meer-mensen-blijven-thuis-en-dat-is-hoorbaar-nog-nooit-zoveel-meldingen-van-geluidsoverlast~adcddd1d6/">bron3</a>)</span>.
+            </p>
+
+            <h5>Corona</h5>
+            <p>
+                Het effect van corona valt duidelijk terug te zien bij meerdere categorieën waar in <b>maart-april 2020 een duidelijke dip</b> te zien is.
+                Dit komt overeen met de eerste lockdown.
+                De dip zichtbaar bij <i>Alle categorieën</i> valt vooral te verklaren doordat er duidelijk minder geregistreerde parkeerovertredingen waren.
+                Dit is namelijk het grootste deel van het aantal geregistreerde feiten.
+            </p>
+
+            <h5>Studenten</h5>
+            <p>
+                Het aantal <b>fietsdiefstallen</b> bereikt een <b>piek</b> in <b>oktober</b>.
+                Dit is wanneer de studenten allemaal terug naar Gent komen, vaak met een <i>nieuwe</i> fiets.
+                Daarna daalt dit om vervolgens continu een lichte stijging te hebben naarmate we verder komen in het jaar.
+                Dit valt mogelijk te verklaren aan de hand van het weer dat beter wordt in de lente en zomer.
+            </p>
+            <p>
+                Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral door de daling van parkeerovertredingen die maand.
+                We vermoeden dat dit het effect is van de vakantie. In juli is dit ook zichtbaar sinds 2020, voordien was dit net eerder een piek.
+                Mogelijks zitten de Gentse Feesten hier voor iets tussen, maar dit valt moeilijk in te schatten.
+            </p>
+        </div>
     </div>
 </template>
 

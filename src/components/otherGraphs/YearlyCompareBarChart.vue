@@ -10,7 +10,7 @@
 <script>
 import * as d3 from "d3";
 
-const margin = {top: 10, right: 30, bottom: 40, left: 175};
+const margin = {top: 10, right: 30, bottom: 40, left: 200};
 const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;
 const HEIGHT = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
 

@@ -43,7 +43,7 @@ export default {
             const subgroupName = d.year;
             const subgroupValue = d.total;
             tooltip
-                .html("Year: " + subgroupName + "<br>" + "Monthly average: " + subgroupValue)
+                .html("Jaar: " + subgroupName + "<br>" + "Totaal: " + subgroupValue)
                 .style("opacity", 1);
         };
         const mousemove = function (event, _) {
@@ -100,8 +100,7 @@ export default {
             return max;
         }
 
-        function changeYear(year) {
-            const yearlyData = getYearlyData(year);
+        function changeYear(year, yearlyData) {
             const max = getMaxValue(yearlyData);
             // rescale x-axis
             x.domain([0, max]).nice();
@@ -113,6 +112,22 @@ export default {
             yAxis.transition()
                 .duration(1000)
                 .call(d3.axisLeft(y));
+
+            yAxis.selectAll('.tick').on("click", function (_, d) {
+                let crimeData = yearlyData.filter(obj => obj.category === d)[0];
+                const index = yearlyData.findIndex(obj => obj === crimeData);
+                if (crimeData.total === 0) {
+                    console.log(yearlyData);
+                    crimeData = getYearlyData(year).filter(obj => obj.category === d)[0];
+                    yearlyData[index] = crimeData;
+                    console.log(yearlyData);
+                    changeYear(year, yearlyData);
+                } else {
+                    crimeData.total = 0;
+                    yearlyData[index] = crimeData;
+                    changeYear(year, yearlyData);
+                }
+            });
 
             const bars = svg.selectAll("rect").data(yearlyData);
 
@@ -175,7 +190,7 @@ export default {
 
         // Listen to dropdown
         d3.select("#selectButtonYearlyCompareBarChart").on("change", function (_) {
-            changeYear(this.value);
+            changeYear(this.value, getYearlyData(this.value));
         });
 
     }

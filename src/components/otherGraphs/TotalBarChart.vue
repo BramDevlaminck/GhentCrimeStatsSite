@@ -40,7 +40,7 @@ export default {
             const subgroupName = d.year;
             const subgroupValue = d.total;
             tooltip
-                .html("Year: " + subgroupName + "<br>" + "Monthly average: " + subgroupValue)
+                .html("Jaar: " + subgroupName + "<br>" + "Maandelijks gemiddelde: " + subgroupValue)
                 .style("opacity", 1);
         };
         const mousemove = function (event, _) {

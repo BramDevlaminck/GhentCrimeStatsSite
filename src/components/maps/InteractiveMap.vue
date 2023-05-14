@@ -584,6 +584,10 @@ export default {
                 });
         }
 
+    },
+    beforeUnmount() {
+        d3.selectAll('#mapContainer svg').remove();
+        d3.selectAll('#sliderContainer svg').remove();
     }
 };
 </script>

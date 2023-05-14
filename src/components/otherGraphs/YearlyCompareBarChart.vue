@@ -108,23 +108,13 @@ export default {
                 .duration(1000)
                 .call(d3.axisBottom(x));
 
-            y.domain(yearlyData.map(d => d.category)).padding(.1);
+            y.domain(yearlyData.map(d => d.category));
             yAxis.transition()
                 .duration(1000)
                 .call(d3.axisLeft(y));
 
             yAxis.selectAll('.tick').on("click", function (_, d) {
-                let crimeData = yearlyData.filter(obj => obj.category === d)[0];
-                const index = yearlyData.findIndex(obj => obj === crimeData);
-                if (crimeData.total === 0) {
-                    crimeData = getYearlyData(year).filter(obj => obj.category === d)[0];
-                    yearlyData[index] = crimeData;
-                    changeYear(year, yearlyData);
-                } else {
-                    crimeData.total = 0;
-                    yearlyData[index] = crimeData;
-                    changeYear(year, yearlyData);
-                }
+                clickHandler(year, yearlyData, d);
             });
 
             const bars = svg.selectAll("rect").data(yearlyData);
@@ -158,18 +148,36 @@ export default {
         const yAxis = svg.append("g")
             .call(d3.axisLeft(y));
 
+        yAxis.selectAll('.tick').on("click", function (_, d) {
+            clickHandler(years[0], data, d);
+        });
+
         //Bars
         svg.selectAll("myRect")
             .data(data)
             .join("rect")
             .attr("x", x(0))
-            .attr("y", d => y(d.year))
+            .attr("y", d => y(d.category))
             .attr("width", d => x(d.total))
             .attr("height", y.bandwidth())
             .attr("fill", "#31688e")
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave);
+
+        function clickHandler(year, yearlyData, selectData) {
+            let crimeData = yearlyData.filter(obj => obj.category === selectData)[0];
+            const index = yearlyData.findIndex(obj => obj === crimeData);
+            if (crimeData.total === 0) {
+                crimeData = getYearlyData(year).filter(obj => obj.category === selectData)[0];
+                yearlyData[index] = crimeData;
+                changeYear(year, yearlyData);
+            } else {
+                crimeData.total = 0;
+                yearlyData[index] = crimeData;
+                changeYear(year, yearlyData);
+            }
+        }
 
         //--------------------- dropdown ----------------------------------------
 

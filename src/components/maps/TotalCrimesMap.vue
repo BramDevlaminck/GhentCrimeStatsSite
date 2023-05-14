@@ -228,6 +228,8 @@ export default {
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
         d3.selectAll('#totalMapContainer svg').remove();
+        d3.selectAll('#selectButtonTotalCrimes option').remove();
+
     }
 };
 </script>

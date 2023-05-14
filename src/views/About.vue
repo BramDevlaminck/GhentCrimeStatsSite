@@ -3,14 +3,14 @@
         <h1>Informatie</h1>
         <div>
             <p>
-                Deze website is gemaakt met een combinatie van <a href="https://vuejs.org/">Vue.js</a>, <a href="https://d3js.org/">D3</a> en <a href="https://getbootstrap.com/">Bootstrap</a>, samen met wat eigen css om alles samen te brengen.
+                Deze website is gemaakt met een combinatie van <a href="https://vuejs.org/">Vue.js</a>, <a href="https://d3js.org/">D3</a> en <a href="https://getbootstrap.com/">Bootstrap</a>, samen met wat eigen CSS om alles samen te brengen.
             </p>
             <p>
                 Alle broncode samen met links en scripts die de gebruikte datasets automatisch ophalen kunnen teruggevonden worden op de <a href="https://github.com/BramDevlaminck/GhentCrimeStatsSite">Github repository</a> van dit project.
             </p>
             <p>
                 Zelf hebben we ook nog enkele andere datasets samengesteld die we uiteindelijk minder hebben kunnen gebruiken.
-                Deze scripts en datasets kunnen op <a href="https://github.com/BramDevlaminck/DatavisualisationPreprocessing">deze</a> GitHub repository terug gevonden worden.
+                De scripts en datasets hiervoor kunnen op <a href="https://github.com/BramDevlaminck/DatavisualisationPreprocessing">deze</a> GitHub repository terug gevonden worden.
                 Origineel was het idee het aantal fietsdiefstallen nog te verbinden met het aantal campussen per wijk.
                 De data bleek echter niet precies genoeg om dit succesvol te doen.
                 Op deze manier stellen we toch nog deze data beschikbaar.

@@ -16,10 +16,14 @@ body {
 #textChartWrapper {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
 #text-next-to-slider {
     margin-top: 4rem;
+    width: 800px;
 }
 
 .source {

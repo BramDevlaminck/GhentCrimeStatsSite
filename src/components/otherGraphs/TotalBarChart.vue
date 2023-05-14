@@ -1,11 +1,5 @@
 <template xmlns="http://www.w3.org/1999/html">
     <div id="textChartWrapper">
-        <div id="chartWrapper">
-            <!-- Dropdown used for all the categories -->
-            <select id="selectButtonTotalBarChart"></select>
-            <!-- Barchart itself -->
-            <div id="totalBarChart"/>
-        </div>
         <div id="text-next-to-slider">
             <h5>Corona</h5>
             <p>
@@ -39,6 +33,12 @@
                 en de inbraken in handelszaken zijn na corona laag gebleven in vergelijking met 2018.
                 Ook motordiefstal is de laatste jaren erg beperkt met maar (afgerond) 1 voorval per maand.
             </p>
+        </div>
+        <div id="chartWrapper">
+            <!-- Dropdown used for all the categories -->
+            <select id="selectButtonTotalBarChart"></select>
+            <!-- Barchart itself -->
+            <div id="totalBarChart"/>
         </div>
     </div>
 </template>
@@ -234,6 +234,10 @@ export default {
         d3.select("#selectButtonTotalBarChart").on("change", function (_) {
             changeCategory(this.value);
         });
+    },
+    beforeUnmount() {
+        // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
+        d3.selectAll('#totalBarChart svg').remove();
     }
 };
 </script>

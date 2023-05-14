@@ -1,9 +1,21 @@
 <template>
-    <div id="chartWrapper">
-        <!-- Dropdown used for all the categories -->
-        <select id="selectButtonYearlyCompareBarChart"></select>
-        <!-- Barchart itself -->
-        <div id="yearlyCompareBarChart"/>
+    <div id="textChartWrapper">
+        <div id="text-next-to-slider">
+            <p>
+                We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt. (Kleine tip: je kan deze verbergen door op de naam te klikken!)
+                Op de tweede plaats komt <b>fietsdiefstal</b>, dit is ook te verwachten in een stad met 80 000 studenten per jaar.
+                Wat daarnaast ook opvalt is dat het aantal <b>verkeersongevallen met lichamelijk letsel</b> meer voorkomt dan woninginbraken.
+                In 2021 en 2022 is dit ook telkens de 3<sup>e</sup> categorie met de meeste voorvallen dit zijn er meer dan <b>1200</b> per jaar!
+                (Opgelet: Voor 2018 en 2019 is deze data niet beschikbaar!)<br/>
+                Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de jaren zijn bijna alle cijfers beduidend lager.
+            </p>
+        </div>
+        <div id="chartWrapper">
+            <!-- Dropdown used for all the categories -->
+            <select id="selectButtonYearlyCompareBarChart"></select>
+            <!-- Barchart itself -->
+            <div id="yearlyCompareBarChart"/>
+        </div>
     </div>
 </template>
 
@@ -162,7 +174,7 @@ export default {
         const yAxis = svg.append("g")
             .call(d3.axisLeft(y));
 
-        yAxis.selectAll('.tick').on("click", function (_, d) {
+        yAxis.selectAll('.tick').style("cursor", "pointer").on("click", function (_, d) {
             clickHandler(years[0], data, d);
         });
 
@@ -183,7 +195,7 @@ export default {
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("y", HEIGHT + 40)
-            .attr("x", WIDTH/2 + 40)
+            .attr("x", WIDTH / 2 + 40)
             .text("Totaal aantal voorvallen")
             .style("font-size", "80%");
 

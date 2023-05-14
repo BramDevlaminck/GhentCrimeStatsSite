@@ -214,14 +214,15 @@ export default {
                 // run this in promise to not block everything and first let the transition go to 0, and then hide the values
                 new Promise(() => {
                     setTimeout(function () {
-                        d3.selectAll(".year2018").style("opacity", 0);
-                        d3.selectAll(".year2019").style("opacity", 0);
+                        d3.selectAll(".year2018").style("opacity", 0).style("cursor", "default");
+                        d3.selectAll(".year2019").style("opacity", 0).style("cursor", "default");
                     }, 1000);
                 });
             } else {
                 if (d3.selectAll(".year2018").style("opacity") === "0") {
                     d3.selectAll(".year2018").style("opacity", 1);
                     d3.selectAll(".year2019").style("opacity", 1);
+                    d3.selectAll(".legend").style("opacity", 1).style("cursor", "pointer");
                 }
             }
         }
@@ -257,7 +258,7 @@ export default {
             .data(labels)
             .enter()
             .append("text")
-            .attr("class", d => "year" + d)
+            .attr("class", d => "year" + d + " legend")
             .attr("x", effectiveLineGraphWidth + margin.left + margin.right + 20)
             .attr("y", (d, i) => 100 + i * 25) // 100 is where the first label appears. 25 is the distance between labels
             .style("fill", d => color(d))
@@ -265,6 +266,7 @@ export default {
             .style("font-size", "90%")
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
+            .style("cursor", "pointer")
             .on("click", function (event, data) {
                 const selector = ".year" + data;
                 // is the element currently visible ?

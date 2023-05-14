@@ -238,6 +238,7 @@ export default {
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
         d3.selectAll('#totalBarChart svg').remove();
+        d3.selectAll('#selectButtonTotalBarChart option').remove();
     }
 };
 </script>

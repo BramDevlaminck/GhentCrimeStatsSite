@@ -232,6 +232,7 @@ export default {
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated
         d3.selectAll('#yearlyCompareBarChart svg').remove();
+        d3.selectAll('#selectButtonYearlyCompareBarChart option').remove();
     }
 }
 </script>

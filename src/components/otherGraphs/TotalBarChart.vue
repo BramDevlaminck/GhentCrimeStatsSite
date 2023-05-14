@@ -10,7 +10,7 @@
 <script>
 import * as d3 from "d3";
 
-const margin = {top: 10, right: 30, bottom: 40, left: 60};
+const margin = {top: 10, right: 30, bottom: 80, left: 60};
 const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;
 const HEIGHT = Math.min(window.innerHeight / 2, 320) - margin.top - margin.bottom;
 
@@ -170,6 +170,14 @@ export default {
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave);
+
+        // y-axis label:
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("y", HEIGHT + 40)
+            .attr("x", WIDTH/2 + margin.left - 10)
+            .text("Maandelijks gemiddelde")
+            .style("font-size", "80%");
 
         //--------------------- dropdown ----------------------------------------
 

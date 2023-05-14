@@ -1,5 +1,5 @@
 <template>
-    <div class="container-lg">
+    <div class="wrapper">
         <h1>Introductie</h1>
         <h5>Wat?</h5>
         <p>
@@ -49,3 +49,11 @@
         </p>
     </div>
 </template>
+
+<style scoped>
+.wrapper {
+    margin: 1rem auto auto;
+    padding-bottom: 4rem;
+    width: 75%;
+}
+</style>

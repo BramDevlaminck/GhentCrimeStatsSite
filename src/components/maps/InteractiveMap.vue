@@ -3,7 +3,6 @@
 import * as d3 from "d3";
 
 import colourScales from '../ColourScales';
-import Legend from '../Legend';
 
 const { scaleToInterval, linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
 

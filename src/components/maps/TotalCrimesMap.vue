@@ -275,7 +275,7 @@ export default {
             const quarter = properties.quarter;
             const numberOfResidents = properties.numberOfResidents;
             tooltip
-                .html("Regio: " + quarter + "<br>Aantal inwonders: " + numberOfResidents + "<br>Aantal geregistreerde voorvallen: " + count)
+                .html("Regio: " + quarter + "<br>Aantal inwoners: " + numberOfResidents + "<br>Aantal geregistreerde voorvallen: " + count)
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
         }

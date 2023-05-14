@@ -1,9 +1,10 @@
 <template>
     <footer class="choice-bar bg-body-tertiary">
         <div class="choice-bar-choice" :class="{ active: activeType === 'maps' }" aria-current="page"
-           @click="onClick('maps')">Kaarten</div>
-        <div class="choice-bar-choice" :class="{ active: activeType === 'other' }" @click="onClick('other')">Andere
-            Statistieken</div>
+           @click="onClick('maps')">Per wijk</div>
+        <div class="choice-bar-choice" :class="{ active: activeType === 'other' }" @click="onClick('other')">
+            Algemene inzichten
+        </div>
     </footer>
 </template>
 

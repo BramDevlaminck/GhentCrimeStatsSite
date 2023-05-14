@@ -39,6 +39,15 @@
             Bovendien is het niet mogelijk om meerdere datasets samen te visualiseren.
             Dit is net iets wat ons heel erg interessant leek omdat dit de mogelijkheid geeft de <b>evolutie doorheen de tijd</b> te bekijken.
         </p>
+        <p>
+            Bij de dataset zelf missen we enkele belangrijke categorieën. Er is bijvoorbeeld geen informatie over:
+        </p>
+        <ul>
+            <li>Aanrandingen</li>
+            <li>Drugsgebruik</li>
+            <li>Verkeersovertredingen (snelheidsovertredingen, rijden onder invloed, ...)</li>
+            <li>Huishoudelijk geweld</li>
+        </ul>
         <h5>Onderzoek</h5>
         <p>
             Enkele vragen die direct bij ons opkwamen toen we de dataset aan het verkennen waren (en die we hopen te beantwoorden) zijn:

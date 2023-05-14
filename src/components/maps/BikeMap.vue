@@ -2,12 +2,11 @@
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
 
-const {linearScaleColour} = colourScales();
+const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
-// TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;
-const HOVER_COLOR = "#d36f80";
+const HOVER_COLOR = "#db5252";
 
 // transform the data to the format we use for the map
 function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
@@ -103,7 +102,6 @@ export default {
             .style("padding", "5px")
             .style("position", "absolute");
 
-
         // -------------------------- effect handlers for the map -----------------
         function mouseOverHandler(event, _) {
             d3.select(this).attr("fill", HOVER_COLOR);
@@ -162,16 +160,112 @@ export default {
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
+        
+        // LEGEND
+        
+        const barheight = 100;
+        const barwidth = 15;
 
+        const barX = 10;
+        const barY = 50;
+
+        const maxBikes = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, true)[1]));
+        const maxThefts = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, false)[1]));
+        const currentMax = showNumberOfBikeParkings ? maxBikes : maxThefts;
+
+        // Linear scale for y-axis
+        const yColourScale = d3
+            .scaleLinear()
+            .domain([0, currentMax])
+            .range([barheight, 0]);
+
+        //call this when changing the category (and changing the yColourScale.domain)
+        const yColourAxis = d3.axisRight(yColourScale);
+
+        const colourAxisTicks = yColourScale.ticks(4);
+        colourAxisTicks.push(currentMax);
+        yColourAxis.tickValues(colourAxisTicks);
+
+        const colorScale = d3
+            .scaleSequential(interpolateBluesMod)
+            .domain([0, currentMax])
+
+        //ticks needed to create the colour gradient (these are not for the axis)
+        const colourticks = colorScale.ticks().concat(colorScale.domain()[1]);
+
+        function createColorScaleLegend(root, x, y, width, height, ticks) {
+
+            root.append("g")
+                .attr("class", "colourAxis")
+                .attr("transform", `translate(${x + width},${y})`)
+                .call(yColourAxis)
+                .select(".domain")
+                .attr("visibility", "hidden");
+
+            const defs = root.append('defs');
+
+            const grad = defs.append('linearGradient')
+                .attr('id', "linear-gradient")
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '100%')
+                .attr('y2', '0%');
+
+            grad.selectAll('stop')
+                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
+                .enter()
+                .append('stop')
+                .style('stop-color', (d) => d.color)
+                .attr('offset', (d) => d.offset);
+
+            root.append('rect')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('width', width)
+                .attr('height', height)
+                .style('fill', 'url(#linear-gradient)');
+        }
+
+        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
+        mapSvg.append("text")
+            .attr("y", barY - 20)
+            .attr("x", barX)
+            .text("Legende: Aantal Diefstallen")
+            .attr("font-weight", 500)
+            .attr("class", "legend")
+            .style("font-size", "80%");
+
+        function updateLegendAxis(currentMax) {
+            yColourScale.domain([0, currentMax]);
+
+            const colourAxisTicks = yColourScale.ticks(4);
+            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
+                colourAxisTicks.pop();
+            }
+            colourAxisTicks.push(currentMax);
+        
+            yColourAxis.tickValues(colourAxisTicks);
+
+            mapSvg.select('.colourAxis')
+                .transition()
+                .call(yColourAxis);
+        }
         // listen to toggle
         d3.select("#mapToggle").on("change", function (_) {
             showNumberOfBikeParkings = d3.select("#mapToggle").property("checked");
+
+            updateLegendAxis(showNumberOfBikeParkings?maxBikes:maxThefts);
             map.data(dataInMapFormat)
                 .attr("fill", (d, _) => {
                     const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
                     return linearScaleColour(count, max);
                 });
+
+            const legendText =  showNumberOfBikeParkings? "Legende: Aantal Plaatsen" : "Legende: Aantal Diefstallen"
+            mapSvg.select(".legend")
+                .text(legendText)
         });
+
     },
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated

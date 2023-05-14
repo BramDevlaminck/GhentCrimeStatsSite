@@ -18,10 +18,9 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
     }
 
     data.forEach(obj => {
-        const properties = obj["properties"];
-        const quarter = properties["quarter"];
+        const quarter = obj["quarter"];
         const currentCount = totalCounts.get(quarter);
-        totalCounts.set(quarter, currentCount + properties["total"]);
+        totalCounts.set(quarter, currentCount + obj["total"]);
     });
 
     // get the max this happens per quarter
@@ -70,7 +69,7 @@ export default {
     name: "BikeMap",
     mounted() {
         let showNumberOfBikeParkings = false;
-        const allFeatures = this.allFeatures.filter(feature => feature["properties"]["fact_category"] === "Fietsdiefstal");
+        const allFeatures = this.allFeatures.filter(feature => feature["fact_category"] === "Fietsdiefstal");
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const bikeParkingPerQuarter = this.bikeParkingPerQuarter;
         const quarterGeometryData = this.quarterGeometryData;

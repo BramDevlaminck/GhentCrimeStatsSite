@@ -2,11 +2,11 @@
 import InteractiveMap from "@/components/maps/InteractiveMap.vue";
 import TotalCrimesMap from "@/components/maps/TotalCrimesMap.vue";
 import BikeMap from "@/components/maps/BikeMap.vue";
+import Heatmap from "@/components/maps/Heatmap.vue";
 
 export default {
-    components: {BikeMap, TotalCrimesMap, InteractiveMap},
+    components: {Heatmap, BikeMap, TotalCrimesMap, InteractiveMap},
     props: {
-        allFeatures: Array,
         beginDate: Date,
         endDate: Date,
         crimeTypes: Set,
@@ -35,7 +35,6 @@ export default {
                         :end-date="endDate"
                         :crime-types="crimeTypes"
                         :quarter-geometry-data="quarterGeometryData"
-                        :bike-parking-per-quarter="bikeParkingPerQuarter"
                         :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
                         :quarter-geometry-small="quarterGeometrySmall"/>
         <h1>
@@ -61,6 +60,16 @@ export default {
                         :quarter-geometry-data="quarterGeometryDataWithoutUnknown"
                         :crime-types="crimeTypes"
                         :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
+
+        <h1>
+            Heatmap van misdrijven per wijk
+        </h1>
+        <h5>
+            Deze heatmap geeft een overzicht van het aantal misdrijven van een bepaalde categorie per regio.
+            De kleuren zijn genormaliseerd per aantal inwoners. Dit geeft het effect dat een regio met veel inwoners meer registraties van een bepaald feit mag hebben voordat dit als slechter gezien wordt.
+            Dit laat ons toe te zien welke regio's een uitzonderlijk hoog of laag aantal registraties hebben in verhouding met het aantal inwoners.
+        </h5>
+        <Heatmap :crime-types="crimeTypes" :all-features="allFeaturesWithoutUnknown" :residents-per-quarter="numberOfResidentsPerQuarterMap" />
     </div>
 </template>
 

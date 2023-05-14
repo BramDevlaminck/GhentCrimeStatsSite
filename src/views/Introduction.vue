@@ -3,17 +3,23 @@
         <h1>Introductie</h1>
         <h5>Wat?</h5>
         <p>
-            Als project voor het vak <b>Datavisualisatie</b> aan UGent (gegeven door prof. dr. Bart Mesuere) is het de bedoeling om een dataset te toegankelijker/interpreteerbaarder te maken aan de hand van visualisaties.
-            Een eerste stap was het zoeken van een geschikte dataset die ons interesseerde.
-        </p>
+            Als project voor het vak <b>Datavisualisatie</b> aan UGent (gegeven door prof. dr. Bart Mesuere) is het de bedoeling om een dataset toegankelijker/interpreteerbaarder te maken aan de hand van visualisaties.
+            Het proces om dit te doen bestaat ruw omschreven uit volgende stappen
+            </p>
+        <ul>
+            <li>Zoek een interessante dataset</li>
+            <li>Verken de dataset</li>
+            <li>Maak de nodige visualisaties om de dataset toegankelijk te maken</li>
+            <li>Vertel aan de hand van de visualisaties wat te zien valt</li>
+        </ul>
         <h5>Zoektocht naar een dataset</h5>
         <p>
             Onze bedoeling was om te werken met data die geen ver-van-mijn-bedshow is voor de meeste mensen.
-            Aangezien stad <b>Gent</b> heel veel data beschikbaar maakt voor iedereen leek ons dit een goeie plaats om een interessant onderwerp te vinden.
+            Aangezien stad <b>Gent</b> redelijk wat data publiek beschikbaar stelt, vonden we dit een goeie plaats om een interessant onderwerp te zoeken.
             Deze datasets gaan over een grote variëteit aan onderwerpen.
             Zo zijn er datasets die eerder een culturele waarde (UiT in Gent) hebben, andere dan weer praktisch (Ivago).
-            Uiteindelijk viel 1 categorie van datasets viel ons op.
-            Dit waren datasets ter beschikking gesteld door de <b>politie</b> en deze bevatten een overzicht per maand van geregistreerde feiten per wijk.
+            Uiteindelijk viel 1 categorie van datasets ons op.
+            Dit waren datasets ter beschikking gesteld door de <b>politie</b>. Deze bevatten een overzicht per maand van de geregistreerde feiten per wijk.
         </p>
         <h5>Wat bestaat al?</h5>
         <p>
@@ -30,8 +36,8 @@
         <p>
             Deze laatste 2 zijn kunnen erg interessant zijn om de data <b>toegankelijk</b> te maken naar het brede publiek.
             Ons viel echter al snel op dat deze opties best ingewikkeld zijn om mee te werken en niet in 1 oog opzicht de data kunnen voorstellen.
-            Bovendien is het rechtuit niet mogelijk om meerdere datasets samen te visualiseren.
-            Iets wat ons heel erg interesseerde omdat het ons toe zou laten te zien hoe het aantal geregistreerde feiten <b>evolueert doorheen de tijd</b>.
+            Bovendien is het niet mogelijk om meerdere datasets samen te visualiseren.
+            Dit is net its wat ons heel erg interessant leek omdat dit de mogelijkheid geeft de <b>evolutie doorheen de tijd</b> te bekijken.
         </p>
         <h5>Onderzoek</h5>
         <p>

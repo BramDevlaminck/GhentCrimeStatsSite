@@ -34,19 +34,19 @@
         </ul>
         <h5>Huidige tekortkomingen</h5>
         <p>
-            Deze laatste 2 zijn kunnen erg interessant zijn om de data <b>toegankelijk</b> te maken naar het brede publiek.
+            Deze laatste 2 zijn erg interessant om de data <b>toegankelijk</b> te maken naar het brede publiek.
             Ons viel echter al snel op dat deze opties best ingewikkeld zijn om mee te werken en niet in 1 oog opzicht de data kunnen voorstellen.
             Bovendien is het niet mogelijk om meerdere datasets samen te visualiseren.
-            Dit is net its wat ons heel erg interessant leek omdat dit de mogelijkheid geeft de <b>evolutie doorheen de tijd</b> te bekijken.
+            Dit is net iets wat ons heel erg interessant leek omdat dit de mogelijkheid geeft de <b>evolutie doorheen de tijd</b> te bekijken.
         </p>
         <h5>Onderzoek</h5>
         <p>
-            Enkele vragen die direct bij ons opkwamen toen we de dataset aan het verkennen waren (en die we hopen te beantwoorden zijn):
+            Enkele vragen die direct bij ons opkwamen toen we de dataset aan het verkennen waren (en die we hopen te beantwoorden) zijn:
         </p>
         <ul>
             <li>Hoeveel fietsdiefstallen zijn er effectief en in welke regio's is dit vooral?</li>
             <li>Welke wijken hebben een verhoogd aantal geregistreerde feiten vergeleken met de rest van Gent?</li>
-            <li>Wat is de invloed van corona en de Gentse feesten op de data?</li>
+            <li>Wat is de invloed van corona en de Gentse feesten op het aantal feiten?</li>
         </ul>
 
         <p>

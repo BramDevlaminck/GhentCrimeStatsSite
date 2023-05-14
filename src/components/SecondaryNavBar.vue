@@ -1,9 +1,9 @@
 <template>
     <footer class="choice-bar bg-body-tertiary">
-        <a class="choice-bar-choice" :class="{ active: activeType === 'maps' }" aria-current="page" href="#"
-           @click="onClick('maps')">Kaarten</a>
-        <a class="choice-bar-choice" :class="{ active: activeType === 'other' }" href="#" @click="onClick('other')">Andere
-            Statistieken</a>
+        <div class="choice-bar-choice" :class="{ active: activeType === 'maps' }" aria-current="page"
+           @click="onClick('maps')">Kaarten</div>
+        <div class="choice-bar-choice" :class="{ active: activeType === 'other' }" @click="onClick('other')">Andere
+            Statistieken</div>
     </footer>
 </template>
 
@@ -41,6 +41,10 @@ export default {
     color: dimgrey;
     text-decoration: none;
     padding: 0.5rem;
+
+}
+.choice-bar-choice:hover {
+    cursor: pointer;
 }
 
 .active {

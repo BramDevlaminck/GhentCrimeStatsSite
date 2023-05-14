@@ -227,8 +227,7 @@ export default {
             yColourScale.domain([0, currentMax]);
 
             const colourAxisTicks = yColourScale.ticks(4);
-            
-            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
+            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.24) {
                 colourAxisTicks.pop();
             }
             colourAxisTicks.push(currentMax);

@@ -151,17 +151,6 @@ export default {
     methods: {
         tabChange(value) {
             this.currentShownTab = value;
-        },
-        saveFile: function () {
-            const data = JSON.stringify(allData);
-            const blob = new Blob([data], {type: 'text/plain'});
-            const e = document.createEvent('MouseEvents'),
-                a = document.createElement('a');
-            a.download = "test1.json";
-            a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-            e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            a.dispatchEvent(e);
         }
     },
 };
@@ -183,7 +172,6 @@ export default {
                   :all-features-without-unknown="allFeaturesWithoutUnknown"
                   :quarter-geometry-data-without-unknown="quarterGeometryDataWithoutUnknown"
                   :number-of-residents-per-quarter-map="numberOfResidentsPerQuarterMap"/>
-            <button class="btn btn-outline-dark" type="button" v-on:click="saveFile()">Save AllData json file</button>
         </div>
         <h4 v-if="!dataIsAvailable">No data available</h4>
     </div>

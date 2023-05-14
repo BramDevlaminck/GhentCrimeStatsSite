@@ -26,6 +26,7 @@ export default {
         const crimeTypes = this.crimeTypes;
         const years = [...new Set(allFeatures.map(item => item["year"]))];
         const data = getYearlyData(years[0]);
+        const invisibleCategory = [];
 
         // --------------------------  create a tooltip --------------------
         const tooltip = d3.select("#yearlyCompareBarChart")
@@ -93,7 +94,13 @@ export default {
         }
 
         function getMaxValue(iterable) {
-            let max = Math.max(...iterable.map(obj => obj.total));
+            let max = Math.max(...iterable.map(obj => {
+                if (invisibleCategory.includes(obj.category)) {
+                    return 0;
+                } else {
+                    return obj.total;
+                }
+            }));
             if (max === 0) {
                 max = 10;
             }
@@ -126,7 +133,14 @@ export default {
                 .attr("y", d => y(d.category))
                 .attr("width", d => x(d.total))
                 .attr("height", y.bandwidth())
-                .attr("fill", "#31688e");
+                .attr("fill", "#31688e")
+                .style("opacity", d => {
+                    if (invisibleCategory.includes(d.category)) {
+                        return 0.2;
+                    } else {
+                        return 1;
+                    }
+                });
         }
 
         // Add X axis
@@ -166,17 +180,12 @@ export default {
             .on("mouseleave", mouseleave);
 
         function clickHandler(year, yearlyData, selectData) {
-            let crimeData = yearlyData.filter(obj => obj.category === selectData)[0];
-            const index = yearlyData.findIndex(obj => obj === crimeData);
-            if (crimeData.total === 0) {
-                crimeData = getYearlyData(year).filter(obj => obj.category === selectData)[0];
-                yearlyData[index] = crimeData;
-                changeYear(year, yearlyData);
+            if (invisibleCategory.includes(selectData)) {
+                invisibleCategory.splice(invisibleCategory.indexOf(selectData));
             } else {
-                crimeData.total = 0;
-                yearlyData[index] = crimeData;
-                changeYear(year, yearlyData);
+                invisibleCategory.push(selectData);
             }
+            changeYear(year, yearlyData);
         }
 
         //--------------------- dropdown ----------------------------------------

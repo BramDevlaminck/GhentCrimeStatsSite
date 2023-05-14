@@ -13,7 +13,7 @@
                 Zoals eerder vermeld is dit vrij logisch, mensen waren verplicht binnen te blijven in het begin van 2020 en werden daarna beperkt in hun vrijheid.
                 We zien deze daling bij alle soorten <b>diefstal</b> (gewapend, fiets, ongewapend), <b>inbraken</b> in handelszaken en ook in het aantal <b>parkeerovertredingen</b>. <br>
                 Het meest opvallende hier is het aantal <b> woninginbraken en zakkenrollerij </b>. Mensen werkten van thuis uit en verlieten hun woning minder. Hierdoor waren er minder opportuniteiten om in te breken.
-                Ook zijn de Gentse feesten deze jaren niet doorgegaan waardoor zakkenrollers minder succesvol waren.
+                Ook de Gentse Feesten zijn deze jaren niet doorgegaan waardoor zakkenrollers minder succesvol waren.
                 Deze cijfers zijn na corona wel grotendeels <b>terug naar hun oude niveau</b> gekomen.
             </p>
             <h5>Stijgende lijnen</h5>

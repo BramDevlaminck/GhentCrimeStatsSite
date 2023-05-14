@@ -102,7 +102,7 @@ export default {
             let categoryList = [];
 
             for (const [year, total] of Object.entries(counts)) {
-                categoryList.push({year: year, total: Math.ceil(total / months[year])});
+                categoryList.push({year: year, total: (total / months[year]).toFixed(2)});
             }
 
             return categoryList;

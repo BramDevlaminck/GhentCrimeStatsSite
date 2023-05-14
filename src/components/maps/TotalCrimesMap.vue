@@ -7,7 +7,7 @@ const {linearScaleColour} = colourScales();
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;
-const HOVER_COLOR = "#d36f80";
+const HOVER_COLOR = "#db5252";
 
 // transform the data to the format we use for the map
 function dataToMapDataFormat(data, quarterGeometryData, numberOfResidentsPerQuarterMap) {

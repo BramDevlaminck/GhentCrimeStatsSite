@@ -2,8 +2,8 @@ import * as d3 from "d3";
 /*
 Define some colours scales we will use from this repository: https://github.com/d3/d3-scale-chromatic
 */
-export default function colourScales() {
-    function scaleToInterval(currentVal, newMin, newMax) {
+export default function colourScales(newMin, newMax) {
+    function scaleToInterval(currentVal) {
         return currentVal * (newMax - newMin) + newMin;
     }
 
@@ -11,7 +11,12 @@ export default function colourScales() {
         const rawColour = maxCount === 0 ? 0 : count / maxCount;
 
         // interpolateBlues expect a number between [0, 1]
-        return d3.interpolateBlues(scaleToInterval(rawColour, 0.07, 1.0));
+        return d3.interpolateBlues(scaleToInterval(rawColour));
+    }
+    
+    //create an interpolator based on interpolateBlues
+    function interpolateBluesMod(value){
+        return d3.interpolateBlues(scaleToInterval(value));
     }
 
     function categoricalScaleColour(domain) {
@@ -41,7 +46,9 @@ export default function colourScales() {
     }
 
     return {
+        scaleToInterval,
         linearScaleColour,
+        interpolateBluesMod,
         categoricalScaleColour,
         differentialColour
     };

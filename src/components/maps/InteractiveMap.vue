@@ -1,9 +1,11 @@
 <script>
 //TODO:!https://fonts.googleapis.com/css?family=Special+Elite apply this font in some places?
 import * as d3 from "d3";
-import colourScales from '../ColourScales';
 
-const {linearScaleColour} = colourScales();
+import colourScales from '../ColourScales';
+import Legend from '../Legend';
+
+const { scaleToInterval, linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
 
 // TODO: change this if needed? not really clean this way
 const WIDTH = window.innerWidth / 2;
@@ -134,7 +136,7 @@ function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018
     const result = [];
     for (const [quarter, avg] of currentYearAvgs) {
         result.push({
-            properties: {"quarter": quarter, "count": avg, "max": maxAvg},
+            properties: { "quarter": quarter, "count": avg, "max": maxAvg },
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -173,7 +175,7 @@ export default {
         let yearAverages = constructAvgsFromCounts(constructCountsPerYear(allFeaturesWithoutUnknown, quarterGeometryDataWithoutUnknown));
         // initial maxAvg value ( for default values: 2018, All categories) to be used in colour scale legend
         let maxAvg = getAllYearExtrema(yearAverages)[0];
-        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
+        let totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
 
         //------ MAP  ------
         //create an SVG in the map container, and keep a reference to it
@@ -186,6 +188,63 @@ export default {
         // VIEW
         const mapContainerClient = mapSvg.node().getBoundingClientRect(); //to get component width as rendered on the client
 
+        // LEGEND
+        const barheight = 200;
+        const barwidth = 20;
+
+        const barX = mapContainerClient.width - barwidth - 30;
+        const barY = 50;
+
+        function createColorScaleLegend(root, x, y, width, height, min, max) {
+            // Linear scale for y-axis
+            const yColourScale = d3
+                .scaleLinear()
+                .domain([min, max])
+                .range([height, 0]);
+
+            const yColorAxis = d3.axisRight(yColourScale);
+            const colourticks = yColourScale.ticks(4);
+            colourticks.push(max);
+            yColorAxis.tickValues(colourticks);
+
+            root.append("g")
+                .attr("class", "colorAxis")
+                .attr("transform", `translate(${x + width},${y})`)
+                .call(yColorAxis)
+                .select(".domain")
+                .attr("visibility", "hidden");
+
+            const colorScale = d3
+                .scaleSequential(interpolateBluesMod)
+                .domain([min, max])
+
+            const ticks = colorScale.ticks().concat(colorScale.domain()[1]);
+
+            const defs = root.append('defs');
+
+            const grad = defs.append('linearGradient')
+                .attr('id', "linear-gradient")
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '100%')
+                .attr('y2', '0%');
+
+            grad.selectAll('stop')
+                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
+                .enter()
+                .append('stop')
+                .style('stop-color', (d) => d.color)
+                .attr('offset', (d) => d.offset);
+
+            root.append('rect')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('width', width)
+                .attr('height', height)
+                .style('fill', 'url(#linear-gradient)');
+        }
+
+        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, 0, maxAvg);
 
         // create a group of SVG elements inside mapSVG
         const g = mapSvg.append("g");
@@ -343,12 +402,14 @@ export default {
             .range([sliderContainerClient.height - sliderBottomPadding, sliderTopPadding])
             .nice();
 
+        //SLIDER TIME SCALE
         const xAxis = d3.axisBottom(xScale);
         xAxis.ticks((+endYear) - (+beginYear) + 1, "%Y");
-
+        //SLIDER VALUE SCALE
         const yAxis = d3.axisLeft(yScale);
         yAxis.ticks(3);
 
+        //Append axis svgs
         sliderSvg.append("g")
             .attr("class", "xAxis-slider")
             .attr("transform", `translate(0, ${sliderContainerClient.height - 25})`)
@@ -358,7 +419,7 @@ export default {
             .attr("class", "yAxis-slider")
             .attr("transform", `translate(${sliderLeftPadding}, 0)`)
             .call(yAxis);
-
+        //y axis title on hover
         yAxisg
             .style('cursor', 'alias')
             .append('title')
@@ -394,6 +455,7 @@ export default {
             .on("drag", dragMove)
             .on("end", dragend);
 
+        //slider's handle
         const handle = sliderSvg.append('rect')
             .attr("id", "slider-handle")
             .attr("x", xPositionOnSlider - sliderHandleWidth / 2)
@@ -413,6 +475,7 @@ export default {
             })
             .call(drag);
 
+        //change slider's background line chart (on category change)
         function updateSliderLineChart(data) {
             const dataWithoutZeroes = data.filter(obj => obj.value > 0);
             yScale.domain([0, Math.max(...data.map(obj => obj.value))]);
@@ -435,15 +498,16 @@ export default {
                 .attr("d", d3.line()
                     .curve(d3.curveCardinal)
                     .x(d => xScale(new Date(d.year)))
-                    .y(d =>  yScale(d.value))
-                    .defined(d =>  d.value > 0))
+                    .y(d => yScale(d.value))
+                    .defined(d => d.value > 0))
                 .attr("fill", "none")
                 .attr("stroke", "#3271e7")
                 .attr("stroke-width", 1.5);
         }
-
+        //first call
         updateSliderLineChart(totalAverages);
 
+        //later calls here
         function updateMapWithNewCrimeCategory(selectedGroup) {
             let features = allFeaturesWithoutUnknown;
 
@@ -457,7 +521,7 @@ export default {
             currentDataDisplayedBasedOnCategory = features;
             yearAverages = constructAvgsFromCounts(constructCountsPerYear(currentDataDisplayedBasedOnCategory, quarterGeometryDataWithoutUnknown));
             maxAvg = getAllYearExtrema(yearAverages)[0];
-            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
+            totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
 
 
             // filter the data based on YEAR
@@ -482,7 +546,7 @@ export default {
                 });
         }
 
-
+        //clicking somewhere on the slider moves the handle 
         function updateSliderOnClick(e) {
             const handle = d3.select("#slider-handle");
             const handlew = +handle.attr("width");
@@ -504,7 +568,7 @@ export default {
 
         //little interaction helper
         sliderSvg.append('title')
-            .text('click anywhere on the line chart\nor drag the highlighted area\nto update the represented year!');
+            .text('klik waar dan ook op deze graaf\nof probeer de gekleurde rechthoek te slepen\nom het getoond jaar te veranderen!');
 
         // ----- Helper function to update the slider's position -----
         function updateSliderPosition(date) {
@@ -515,6 +579,7 @@ export default {
             handle.transition().attr("x", datex - handlew / 2);
         }
 
+        // ------- Automatic play animation -------
         let timer; // timer we will use to check if slider already needs to move or not
         playButton
             .on("click", function () {
@@ -535,7 +600,7 @@ export default {
                 }
             });
 
-        // execute 1 step on the slider
+        // execute 1 step on the slider (helper)
         function stepOnSlider() {
 
             const nextDate = toNextRoundYear(currentYear);
@@ -598,12 +663,12 @@ export default {
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
-        <div id="mapContainer"/>
+        <div id="mapContainer" />
         <div id="sliderContainer">
             <!-- button to play/pause the slider -->
             <button id="playButton" class="paused"><i class="bi bi-play"></i></button>
             <!-- div where we will place the slider -->
-            <div id="sliderDiv"/>
+            <div id="sliderDiv" />
         </div>
     </div>
 </template>

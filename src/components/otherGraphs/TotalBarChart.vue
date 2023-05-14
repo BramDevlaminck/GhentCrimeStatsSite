@@ -10,7 +10,7 @@
             <h5>Corona</h5>
             <p>
                 Als we naar de grafiek kijken over alle categorieën zien we een daling in de jaren van de coronacrisis.
-                Zoals eerder vermeld is dit vrij logisch, mensen moesten binnen blijven in 2020 en werden daarna beperkt in hun vrijheid.
+                Zoals eerder vermeld is dit vrij logisch, mensen waren verplicht binnen te blijven in het begin van 2020 en werden daarna beperkt in hun vrijheid.
                 We zien deze daling bij alle soorten <b>diefstal</b> (gewapend, fiets, ongewapend), <b>inbraken</b> in handelszaken en ook in het aantal <b>parkeerovertredingen</b>. <br>
                 Het meest opvallende hier is het aantal <b> woninginbraken en zakkenrollerij </b>, mensen werkten van thuis en verlieten hun woning minder waardoor er minder opportuniteiten waren om in te breken.
                 Ook zijn de Gentse feesten deze jaren niet doorgegaan waardoor zakkenrollers minder succesvol waren.

@@ -1,9 +1,10 @@
 <script>
 import TotalLineChart from "@/components/otherGraphs/TotalLineChart.vue";
 import TotalBarChart from "@/components/otherGraphs/TotalBarChart.vue";
+import YearlyCompareBarChart from "./YearlyCompareBarChart.vue";
 
 export default {
-    components: {TotalBarChart, TotalLineChart},
+    components: {YearlyCompareBarChart, TotalBarChart, TotalLineChart},
     props: {
         combinedData: Array,
         crimeTypes: Set
@@ -30,6 +31,7 @@ export default {
             De dropdown kan gebruikt worden om een categorie te selecteren.
         </h5>
         <TotalBarChart :all-features="combinedData" :crime-types="crimeTypes"/>
+        <YearlyCompareBarChart :all-features="combinedData" :crime-types="crimeTypes"/>
     </div>
 </template>
 

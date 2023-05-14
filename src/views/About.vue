@@ -13,7 +13,7 @@
                 De scripts en datasets hiervoor kunnen op <a href="https://github.com/BramDevlaminck/DatavisualisationPreprocessing">deze</a> GitHub repository terug gevonden worden.
                 Origineel was het idee het aantal fietsdiefstallen nog te verbinden met het aantal campussen per wijk.
                 De data bleek echter niet precies genoeg om dit succesvol te doen.
-                Op deze manier stellen we toch nog deze data beschikbaar.
+                Op deze manier stellen we toch nog deze data ter beschikking.
             </p>
             <p>
                 Tot slot willen we graag de dienst van het <a href="https://data.stad.gent/explore/?disjunctive.keyword&disjunctive.theme&sort=modified">Open Data Portaal</a> van stad Gent bedanken.

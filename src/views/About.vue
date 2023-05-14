@@ -1,5 +1,5 @@
 <template>
-    <div class="container-lg">
+    <div class="wrapper">
         <h1>Informatie</h1>
         <div>
             <p>
@@ -28,3 +28,11 @@
         </div>
     </div>
 </template>
+
+<style scoped>
+.wrapper {
+    margin: 1rem auto auto;
+    padding-bottom: 4rem;
+    width: 75%;
+}
+</style>

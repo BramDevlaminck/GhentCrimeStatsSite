@@ -16,8 +16,8 @@ wget -O "${path}/bike_parkings_per_quarter.json" "https://raw.githubusercontent.
 # quarters dataset
 wget -O "${path}/quarter_shapes_dirty.geojson" "https://data.stad.gent/api/explore/v2.1/catalog/datasets/stadswijken-gent/exports/geojson"
 
-echo "cleanup up data"
+echo "extracting the needed data..."
 python3 datacleanup.py
 
-echo "removing unneeded datasets"
+echo "removing unneeded datasets..."
 cd $path ; ls | grep "_dirty" | xargs rm

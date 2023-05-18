@@ -62,7 +62,6 @@ export default {
         const crimeTypes = this.crimeTypes;
         const quarterGeometryData = this.quarterGeometryData;
         const numberOfResidentsPerQuarterMap = this.numberOfResidentsPerQuarterMap;
-        let showDataRelativePerNumberOfResidents = false;
         class TotalCrimeMap extends D3ToggleMap {
             constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap) {
                 super(id, "#totalCrimesMapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Genormaliseerd Aantal Feiten", "Aantal Feiten");
@@ -163,7 +162,7 @@ export default {
             }
 
         }
-        const tcmap = new TotalCrimeMap("#totalMapContainer", allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap);
+        new TotalCrimeMap("#totalMapContainer", allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap);
 
     },
     beforeUnmount() {

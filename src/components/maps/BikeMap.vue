@@ -1,8 +1,8 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
-import {createMap, drawMap} from "../D3MapFunctions";
-import {createTooltip} from "../D3Functions";
+import {createMap, D3ToggleMap, drawMap} from "../D3MapFunctions";
+import createDropdown, {createTooltip} from "../D3Functions";
 
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
@@ -46,20 +46,6 @@ function dataToMapDataFormat(data, bikeParkingPerQuarter, quarterGeometryData) {
     return result;
 }
 
-function getInfoForColouringMap(data, conditional) {
-    const properties = data["properties"];
-    let count;
-    let maxCount;
-    if (conditional) {
-        count = properties.number_of_parkings;
-        maxCount = properties.max_bike_parkings;
-    } else {
-        count = properties.count;
-        maxCount = properties.max;
-    }
-    return [count, maxCount];
-}
-
 export default {
     props: {
         bikeParkingPerQuarter: Map,
@@ -69,174 +55,77 @@ export default {
     },
     name: "BikeMap",
     mounted() {
-        let showNumberOfBikeParkings = false;
         const allFeatures = this.allFeatures.filter(feature => feature["fact_category"] === "Fietsdiefstal");
         const quarterGeometrySmall = this.quarterGeometrySmall;
         const bikeParkingPerQuarter = this.bikeParkingPerQuarter;
         const quarterGeometryData = this.quarterGeometryData;
 
-        const { mapSvg, g } = createMap("#bikeMapContainer", WIDTH, HEIGHT);
-
-        // --------------------------  create a tooltip --------------------
-        const tooltip = createTooltip("#mapContainer")
-
-        // -------------------------- effect handlers for the map -----------------
-        function mouseOverHandler(event, _) {
-            d3.select(this).attr("fill", HOVER_COLOR);
-            tooltip.style("opacity", 1);
-        }
-
-        function mouseMoveHandler(event, data) {
-            updateTooltip(event, data);
-        }
-
-        function mouseOutHandler(event, data) {
-            const [count, max] = getInfoForColouringMap(data, showNumberOfBikeParkings);
-            const selectedColor = linearScaleColour(count, max);
-            d3.select(this).attr("fill", selectedColor);
-
-            tooltip.style("opacity", 0);
-        }
-
-        function clickHandler(event, data) {
-            updateTooltip(event, data);
-        }
-
-        function updateTooltip(event, data) {
-            const properties = data["properties"];
-            const count = properties.count;
-            const quarter = properties.quarter;
-            const numberOfParkings = properties.number_of_parkings;
-            tooltip
-                .html("Regio: " + quarter + "<br>Aantal fietsdiefstallen: " + count + "<br>Aantal plaatsen in fietsenstallingen: " + numberOfParkings)
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px");
-        }
-
-        // --------------------- projection and path ----------------------------
-        const projection = d3.geoMercator()
-            .fitExtent([[20, 20], [WIDTH - 20, HEIGHT - 20]], quarterGeometrySmall);
-        const path = d3.geoPath().projection(projection);
-
-
-        // ---------------------------------- draw graph ------------------------------------
-        // Draw districts and register event listeners
-        const dataInMapFormat = dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData);
-        const map = drawMap(g, dataInMapFormat, path, colorMap);
-        map.on("mouseover", mouseOverHandler)
-            .on("mousemove", mouseMoveHandler)
-            .on("mouseout", mouseOutHandler)
-            .on("click", clickHandler);
-
-        function colorMap(d, _) {
-            const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
-            return linearScaleColour(count, max);
-        }
-        
-        // LEGEND
-        
-        const barheight = 100;
-        const barwidth = 15;
-
-        const barX = 10;
-        const barY = 50;
-
-        const maxBikes = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, true)[1]));
-        const maxThefts = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, false)[1]));
-        const currentMax = showNumberOfBikeParkings ? maxBikes : maxThefts;
-
-        // Linear scale for y-axis
-        const yColourScale = d3
-            .scaleLinear()
-            .domain([0, currentMax])
-            .range([barheight, 0]);
-
-        //call this when changing the category (and changing the yColourScale.domain)
-        const yColourAxis = d3.axisRight(yColourScale);
-
-        const colourAxisTicks = yColourScale.ticks(4);
-        colourAxisTicks.push(currentMax);
-        yColourAxis.tickValues(colourAxisTicks);
-
-        const colorScale = d3
-            .scaleSequential(interpolateBluesMod)
-            .domain([0, currentMax])
-
-        //ticks needed to create the colour gradient (these are not for the axis)
-        const colourticks = colorScale.ticks().concat(colorScale.domain()[1]);
-
-        function createColorScaleLegend(root, x, y, width, height, ticks) {
-
-            root.append("g")
-                .attr("class", "colourAxis")
-                .attr("transform", `translate(${x + width},${y})`)
-                .call(yColourAxis)
-                .select(".domain")
-                .attr("visibility", "hidden");
-
-            const defs = root.append('defs');
-
-            const grad = defs.append('linearGradient')
-                .attr('id', "linear-gradient")
-                .attr('x1', '0%')
-                .attr('x2', '0%')
-                .attr('y1', '100%')
-                .attr('y2', '0%');
-
-            grad.selectAll('stop')
-                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
-                .enter()
-                .append('stop')
-                .style('stop-color', (d) => d.color)
-                .attr('offset', (d) => d.offset);
-
-            root.append('rect')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('width', width)
-                .attr('height', height)
-                .style('fill', 'url(#linear-gradient)');
-        }
-
-        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
-        mapSvg.append("text")
-            .attr("y", barY - 20)
-            .attr("x", barX)
-            .text("Legende: Aantal Diefstallen")
-            .attr("font-weight", 500)
-            .attr("class", "legend")
-            .style("font-size", "80%");
-
-        function updateLegendAxis(currentMax) {
-            yColourScale.domain([0, currentMax]);
-
-            const colourAxisTicks = yColourScale.ticks(4);
-            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
-                colourAxisTicks.pop();
+        class BikeMap extends D3ToggleMap {
+            constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap) {
+                super(id, "#mapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Aantal Plaatsen", "Aantal Diefstallen");
             }
-            colourAxisTicks.push(currentMax);
-        
-            yColourAxis.tickValues(colourAxisTicks);
 
-            mapSvg.select('.colourAxis')
-                .transition()
-                .call(yColourAxis);
+            dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {
+                return dataToMapDataFormat(data, totalPerQuarter, quarterGeometryData);
+            }
+
+            updateTooltip(event, data) {
+                const properties = data["properties"];
+                const count = properties.count;
+                const quarter = properties.quarter;
+                const numberOfParkings = properties.number_of_parkings;
+                this.tooltip
+                    .html("Regio: " + quarter + "<br>Aantal fietsdiefstallen: " + count + "<br>Aantal plaatsen in fietsenstallingen: " + numberOfParkings)
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
+            }
+
+            getInfoForColouringMap(data, conditional) {
+                const properties = data["properties"];
+                let count;
+                let maxCount;
+                if (conditional) {
+                    count = properties.number_of_parkings;
+                    maxCount = properties.max_bike_parkings;
+                } else {
+                    count = properties.count;
+                    maxCount = properties.max;
+                }
+                return [count, maxCount];
+            }
+
+            colorMap(d, _) {
+                const [count, max] = this.getInfoForColouringMap(d, this.isToggled);
+                return linearScaleColour(count, max);
+            }
+
+            getCurrentMax() {
+                this.maxBikes = Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, true)[1]));
+                this.maxThefts = Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, false)[1]));
+                return this.isToggled ? this.maxBikes : this.maxThefts;
+            }
+
+            updateLegendAxis(currentMax) {
+                this.yColourScale.domain([0, currentMax]);
+
+                const colourAxisTicks = this.yColourScale.ticks(4);
+                if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.15) {
+                    colourAxisTicks.pop();
+                }
+                colourAxisTicks.push(currentMax);
+
+                this.yColourAxis.tickValues(colourAxisTicks);
+
+                this.mapSvg.select('.colourAxis')
+                    .transition()
+                    .call(this.yColourAxis);
+            }
+
+            updateAndCalcLegendAxis(isToggled) {
+                this.updateLegendAxis(isToggled?this.maxBikes:this.maxThefts)
+            }
         }
-        // listen to toggle
-        d3.select("#mapToggle").on("change", function (_) {
-            showNumberOfBikeParkings = d3.select("#mapToggle").property("checked");
-
-            updateLegendAxis(showNumberOfBikeParkings?maxBikes:maxThefts);
-            map.data(dataInMapFormat)
-                .attr("fill", (d, _) => {
-                    const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
-                    return linearScaleColour(count, max);
-                });
-
-            const legendText =  showNumberOfBikeParkings? "Legende: Aantal Plaatsen" : "Legende: Aantal Diefstallen"
-            mapSvg.select(".legend")
-                .text(legendText)
-        });
+        new BikeMap("#bikeMapContainer", allFeatures, quarterGeometrySmall, quarterGeometryData, bikeParkingPerQuarter);
 
     },
     beforeUnmount() {

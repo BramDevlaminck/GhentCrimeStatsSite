@@ -42,7 +42,7 @@ export function drawMap(g, data, path, fillFunction) {
 }
 
 export class D3ToggleMap {
-    constructor(id, toggleId, allFeatures, quarterGeometrySmall, isToggled, quarterGeometryData, totalPerQuarter, textOff, textOn) {
+    constructor(id, toggleId, allFeatures, quarterGeometrySmall, isToggled, quarterGeometryData, totalPerQuarter, textOn, textOff) {
         this.id = id;
         this.toggleId = toggleId;
         this.allFeatures = allFeatures;
@@ -70,7 +70,7 @@ export class D3ToggleMap {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
-        this.map = drawMap(g, this.dataInMapFormat, this.path, this.colorMap);
+        this.map = drawMap(g, this.dataInMapFormat, this.path, this.colorMap.bind(this));
 
         this.map.on("mouseover", this.mouseOverHandler.bind(this))
             .on("mousemove", this.mouseMoveHandler.bind(this))

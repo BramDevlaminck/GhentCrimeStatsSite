@@ -16,23 +16,26 @@ export default function createDropdown(id, data, callback) {
     });
 }
 
-export function createBarChartSvg(id, width, height, margin) {
-    return d3.select(id)
+export function createSvg(id, width, height, margin) {
+    const svg = d3.select(id)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.right})`)
+        .attr("height", height + margin.top + margin.bottom);
+
+    const chart = svg.append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    return {svg, chart}
 }
 
-export function configureBarChartAxis(svg, width, height, xDomain, yDomain) {
+export function configureBarChartAxis(chart, width, height, xDomain, yDomain) {
     // Add X axis
     const x = d3.scaleLinear()
         .domain(xDomain)
         .range([0, width])
         .nice();
 
-    const xAxis = svg.append("g")
+    const xAxis = chart.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
 
@@ -42,13 +45,13 @@ export function configureBarChartAxis(svg, width, height, xDomain, yDomain) {
         .domain(yDomain)
         .padding(.1);
 
-    const yAxis = svg.append("g")
+    const yAxis = chart.append("g")
         .call(d3.axisLeft(y));
-    return { x, xAxis, y, yAxis }
+    return {x, xAxis, y, yAxis}
 }
 
-export function createText(svg, y, x, text) {
-    return svg.append("text")
+export function createText(chart, y, x, text) {
+    return chart.append("text")
         .attr("text-anchor", "end")
         .attr("y", y)
         .attr("x", x)

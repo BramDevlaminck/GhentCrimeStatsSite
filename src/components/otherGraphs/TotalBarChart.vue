@@ -4,9 +4,12 @@
             <h5>Corona</h5>
             <p>
                 Als we naar de grafiek kijken over alle categorieën zien we een daling in de jaren van de coronacrisis.
-                Zoals eerder vermeld is dit vrij logisch, mensen waren verplicht binnen te blijven in het begin van 2020 en werden daarna beperkt in hun vrijheid.
-                We zien deze daling bij alle soorten <b>diefstal</b> (gewapend, fiets, ongewapend), <b>inbraken</b> in handelszaken en ook in het aantal <b>parkeerovertredingen</b>. <br>
-                Het meest opvallende hier is het aantal <b> woninginbraken en zakkenrollerij </b>. Mensen werkten van thuis uit en verlieten hun woning minder. Hierdoor waren er minder opportuniteiten om in te breken.
+                Zoals eerder vermeld is dit vrij logisch, mensen waren verplicht binnen te blijven in het begin van 2020
+                en werden daarna beperkt in hun vrijheid.
+                We zien deze daling bij alle soorten <b>diefstal</b> (gewapend, fiets, ongewapend), <b>inbraken</b> in
+                handelszaken en ook in het aantal <b>parkeerovertredingen</b>. <br>
+                Het meest opvallende hier is het aantal <b> woninginbraken en zakkenrollerij </b>. Mensen werkten van
+                thuis uit en verlieten hun woning minder. Hierdoor waren er minder opportuniteiten om in te breken.
                 Ook de Gentse Feesten zijn deze jaren niet doorgegaan waardoor zakkenrollers minder succesvol waren.
                 Deze cijfers zijn na corona wel grotendeels <b>terug naar hun oude niveau</b> gekomen.
             </p>
@@ -16,13 +19,14 @@
             </p>
             <ul>
                 <li>
-                    <b>Bromfietsdiefstal</b>  is verdubbeld vanaf 2021 ten opzichte van 2018
+                    <b>Bromfietsdiefstal</b> is verdubbeld vanaf 2021 ten opzichte van 2018
                 </li>
                 <li>
                     Het aantal gevallen van <b>graffiti</b> is van 8 naar 13 per maand gegaan de laatste jaren
                 </li>
                 <li>
-                    <b>Sluikstorten</b> is van ongeveer 60 maandelijkse gevallen naar meer dan 90 gevallen in 2021 en 2023 gegaan (86 in 2022)
+                    <b>Sluikstorten</b> is van ongeveer 60 maandelijkse gevallen naar meer dan 90 gevallen in 2021 en
+                    2023 gegaan (86 in 2022)
                 </li>
             </ul>
             <h5>Dalende lijnen</h5>
@@ -45,7 +49,7 @@
 
 <script>
 import * as d3 from "d3";
-import createDropdown, {configureBarChartAxis, createBarChartSvg, createText, createTooltip} from "./D3Functions";
+import createDropdown, {configureBarChartAxis, createSvg, createText, createTooltip} from "./D3Functions";
 
 const margin = {top: 10, right: 30, bottom: 80, left: 60};
 const WIDTH = Math.min(window.innerWidth, 800) - margin.left - margin.right;
@@ -83,7 +87,7 @@ export default {
 
         // --------------------------  bar chart --------------------
 
-        const svg = createBarChartSvg("#totalBarChart", WIDTH, HEIGHT, margin);
+        const {_, chart} = createSvg("#totalBarChart", WIDTH, HEIGHT, margin);
 
         const allFeatures = this.allFeatures;
 
@@ -148,7 +152,7 @@ export default {
                 .duration(1000)
                 .call(d3.axisBottom(x));
 
-            const bars = svg.selectAll("rect").data(categoryData);
+            const bars = chart.selectAll("rect").data(categoryData);
 
             bars.join("rect")
                 .transition()
@@ -168,10 +172,10 @@ export default {
             xAxis,
             y,
             yAxis
-        } = configureBarChartAxis(svg, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.year))
+        } = configureBarChartAxis(chart, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.year))
 
         //Bars
-        svg.selectAll("myRect")
+        chart.selectAll("myRect")
             .data(data)
             .join("rect")
             .attr("x", x(0))
@@ -184,7 +188,7 @@ export default {
             .on("mouseleave", mouseleave);
 
         // x-axis label:
-        createText(svg, HEIGHT + 40, WIDTH/2 + margin.left - 10, "Maandelijks gemiddelde");
+        createText(chart, HEIGHT + 40, WIDTH / 2 + margin.left - 10, "Maandelijks gemiddelde");
 
         //--------------------- dropdown ----------------------------------------
 

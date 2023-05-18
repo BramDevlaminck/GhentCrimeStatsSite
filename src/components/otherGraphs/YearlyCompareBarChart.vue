@@ -26,7 +26,7 @@
 
 <script>
 import * as d3 from "d3";
-import createDropdown, {configureBarChartAxis, createBarChartSvg, createText, createTooltip} from "./D3Functions";
+import createDropdown, {configureBarChartAxis, createSvg, createText, createTooltip} from "./D3Functions";
 
 const margin = {top: 10, right: 30, bottom: 80, left: 200};
 const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;
@@ -67,7 +67,7 @@ export default {
         };
 
         // --------------------------  bar chart --------------------
-        const svg = createBarChartSvg("#yearlyCompareBarChart", WIDTH, HEIGHT, margin)
+        const {_, chart} = createSvg("#yearlyCompareBarChart", WIDTH, HEIGHT, margin)
 
         function getYearlyData(year) {
             let yearly = allFeatures;
@@ -127,7 +127,7 @@ export default {
                 clickHandler(year, yearlyData, d);
             });
 
-            const bars = svg.selectAll("rect").data(yearlyData);
+            const bars = chart.selectAll("rect").data(yearlyData);
 
             bars.join("rect")
                 .transition()
@@ -152,14 +152,14 @@ export default {
             xAxis,
             y,
             yAxis
-        } = configureBarChartAxis(svg, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.category))
+        } = configureBarChartAxis(chart, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.category))
 
         yAxis.selectAll('.tick').style("cursor", "pointer").on("click", function (_, d) {
             clickHandler(years[0], data, d);
         });
 
         //Bars
-        svg.selectAll("myRect")
+        chart.selectAll("myRect")
             .data(data)
             .join("rect")
             .attr("x", x(0))
@@ -172,7 +172,7 @@ export default {
             .on("mouseleave", mouseleave);
 
         // x-axis label:
-        createText(svg, HEIGHT + 40, WIDTH / 2 + 40, "Totaal aantal voorvallen");
+        createText(chart, HEIGHT + 40, WIDTH / 2 + 40, "Totaal aantal voorvallen");
 
         function clickHandler(year, yearlyData, selectData) {
             if (invisibleCategory.includes(selectData)) {
@@ -187,7 +187,7 @@ export default {
 
         createDropdown("#selectButtonYearlyCompareBarChart", years, (year) => {
             changeYear(year, getYearlyData(year))
-        })
+        });
 
     },
     beforeUnmount() {

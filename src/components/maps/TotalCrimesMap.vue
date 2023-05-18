@@ -1,14 +1,10 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
-import {createMap, drawMap} from "../D3MapFunctions";
-import createDropdown, {createTooltip} from "../D3Functions";
+import {D3ToggleMap} from "../D3MapFunctions";
+import createDropdown from "../D3Functions";
 
-const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
-
-const WIDTH = window.innerWidth / 4;
-const HEIGHT = window.innerHeight / 2;
-const HOVER_COLOR = "#db5252";
+const {linearScaleColour} = colourScales(0.07, 1.0);
 
 // transform the data to the format we use for the map
 function dataToMapDataFormat(data, quarterGeometryData, numberOfResidentsPerQuarterMap) {
@@ -50,20 +46,6 @@ function dataToMapDataFormat(data, quarterGeometryData, numberOfResidentsPerQuar
     return result;
 }
 
-function getInfoForColouringMap(data, conditional) {
-    const properties = data["properties"];
-    let count;
-    let maxCount;
-    if (conditional) {
-        count = properties.relativeCrimesPerQuarter;
-        maxCount = properties.maxNumberOfRelativeCrimesPerQuarter;
-    } else {
-        count = properties.count;
-        maxCount = properties.max;
-    }
-    return [count, maxCount];
-}
-
 
 export default {
     props: {
@@ -81,214 +63,108 @@ export default {
         const quarterGeometryData = this.quarterGeometryData;
         const numberOfResidentsPerQuarterMap = this.numberOfResidentsPerQuarterMap;
         let showDataRelativePerNumberOfResidents = false;
-
-        let dataInMapFormat = dataToMapDataFormat(allFeatures, quarterGeometryData, numberOfResidentsPerQuarterMap);
-
-        const { mapSvg, g } = createMap("#totalMapContainer", WIDTH, HEIGHT);
-
-        // --------------------------  create a tooltip --------------------
-        const tooltip = createTooltip("#mapContainer")
-
-        //--------------------- dropdown ----------------------------------------
-
-        const allCategories = ["Alle Categorieën"].concat([...crimeTypes]);
-
-        // Function to update the map if a new crime category is chosen
-        function updateMapWithNewCrimeCategory(selectedGroup) {
-            let features = allFeatures;
-
-            // select the data from the chart that we actually want/need
-            if (selectedGroup !== allCategories[0]) {
-                features = features.filter(element => {
-                    return element["fact_category"] === selectedGroup;
-                });
+        class TotalCrimeMap extends D3ToggleMap {
+            constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap) {
+                super(id, "#totalCrimesMapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Genormaliseerd Aantal Feiten", "Aantal Feiten");
+                this.setDropDown();
             }
 
-            dataInMapFormat = dataToMapDataFormat(features, quarterGeometryData, numberOfResidentsPerQuarterMap);
-            // plot the changed map
-            map.data(dataInMapFormat)
-                .attr("fill", (d, _) => {
-                    const [count, maxCount] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
-                    return linearScaleColour(count, maxCount);
-                });
-        }
-
-        // add the options to the button
-        createDropdown("#selectButtonTotalCrimes", allCategories, (value) => {changeCallback(value)});
-
-        
-        // LEGEND
-                
-        const barheight = 100;
-        const barwidth = 15;
-
-        const barX = 10;
-        const barY = 50;
-
-        let currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
-
-        // Linear scale for y-axis
-        const yColourScale = d3
-            .scaleLinear()
-            .domain([0, currentMax])
-            .range([barheight, 0]);
-
-        //call this when changing the category (and changing the yColourScale.domain)
-        const yColourAxis = d3.axisRight(yColourScale);
-
-        const colourAxisTicks = yColourScale.ticks(4);
-        colourAxisTicks.push(currentMax);
-        yColourAxis.tickValues(colourAxisTicks);
-
-        const colorScale = d3
-            .scaleSequential(interpolateBluesMod)
-            .domain([0, currentMax])
-
-        //ticks needed to create the colour gradient (these are not for the axis)
-        const colourticks = colorScale.ticks().concat(colorScale.domain()[1]);
-
-        function createColorScaleLegend(root, x, y, width, height, ticks) {
-
-            root.append("g")
-                .attr("class", "colourAxis")
-                .attr("transform", `translate(${x + width},${y})`)
-                .call(yColourAxis)
-                .select(".domain")
-                .attr("visibility", "hidden");
-
-            const defs = root.append('defs');
-
-            const grad = defs.append('linearGradient')
-                .attr('id', "linear-gradient")
-                .attr('x1', '0%')
-                .attr('x2', '0%')
-                .attr('y1', '100%')
-                .attr('y2', '0%');
-
-            grad.selectAll('stop')
-                .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: colorScale(t) })))
-                .enter()
-                .append('stop')
-                .style('stop-color', (d) => d.color)
-                .attr('offset', (d) => d.offset);
-
-            root.append('rect')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('width', width)
-                .attr('height', height)
-                .style('fill', 'url(#linear-gradient)');
-        }
-
-        createColorScaleLegend(mapSvg, barX, barY, barwidth, barheight, colourticks);
-        mapSvg.append("text")
-            .attr("y", barY - 20)
-            .attr("x", barX)
-            .text("Legende: Aantal Feiten")
-            .attr("font-weight", 500)
-            .attr("class", "legend")
-            .style("font-size", "80%");
-
-        function updateLegendAxis(currentMax) {
-            yColourScale.domain([0, currentMax]);
-
-            const colourAxisTicks = yColourScale.ticks(4);
-            if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.24) {
-                colourAxisTicks.pop();
+            dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {
+                return dataToMapDataFormat(data, quarterGeometryData, totalPerQuarter);
             }
-            colourAxisTicks.push(currentMax);
-            yColourAxis.tickValues(colourAxisTicks); 
 
-            mapSvg.select('.colourAxis')
-                .transition()
-                .call(yColourAxis);
+            updateTooltip(event, data) {
+                const properties = data["properties"];
+                const count = properties.count;
+                const quarter = properties.quarter;
+                const numberOfResidents = properties.numberOfResidents;
+                this.tooltip
+                    .html("Regio: " + quarter + "<br>Aantal inwoners: " + numberOfResidents + "<br>Aantal geregistreerde voorvallen: " + count)
+                    .style("left", ((event.pageX) + 20) + "px")
+                    .style("top", (event.pageY) + "px");
+            }
+
+            getInfoForColouringMap(data, conditional) {
+                const properties = data["properties"];
+                let count;
+                let maxCount;
+                if (conditional) {
+                    count = properties.relativeCrimesPerQuarter;
+                    maxCount = properties.maxNumberOfRelativeCrimesPerQuarter;
+                } else {
+                    count = properties.count;
+                    maxCount = properties.max;
+                }
+                return [count, maxCount];
+            }
+
+            colorMap(d, _) {
+                const properties = d["properties"];
+                const count = properties.count;
+                const max = properties.max;
+                return linearScaleColour(count, max);
+            }
+
+            getCurrentMax() {
+                return Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
+            }
+
+            updateLegendAxis(currentMax) {
+                this.yColourScale.domain([0, currentMax]);
+
+                const colourAxisTicks = this.yColourScale.ticks(4);
+                if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.24) {
+                    colourAxisTicks.pop();
+                }
+                colourAxisTicks.push(currentMax);
+                this.yColourAxis.tickValues(colourAxisTicks);
+
+                this.mapSvg.select('.colourAxis')
+                    .transition()
+                    .call(this.yColourAxis);
+            }
+
+            updateAndCalcLegendAxis(isToggled) {
+                this.currentMax = Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
+
+                this.updateLegendAxis(this.currentMax);
+            }
+
+            //--------------------- dropdown ----------------------------------------
+            setDropDown() {
+                this.allCategories = ["Alle Categorieën"].concat([...crimeTypes]);
+                // add the options to the button
+                createDropdown("#selectButtonTotalCrimes", this.allCategories, (value) => {this.changeCallback(value)});
+            }
+
+            updateMapWithNewCrimeCategory(selectedGroup) {
+                let features = this.allFeatures;
+
+                // select the data from the chart that we actually want/need
+                if (selectedGroup !== this.allCategories[0]) {
+                    features = features.filter(element => {
+                        return element["fact_category"] === selectedGroup;
+                    });
+                }
+
+                this.dataInMapFormat = this.dataToMapFormat(features, this.quarterGeometryData, this.totalPerQuarter);
+                // plot the changed map
+                this.map.data(this.dataInMapFormat)
+                    .attr("fill", (d, _) => {
+                        const [count, maxCount] = this.getInfoForColouringMap(d, this.isToggled);
+                        return linearScaleColour(count, maxCount);
+                    });
+            }
+
+            changeCallback(value) {
+                this.updateMapWithNewCrimeCategory(value);
+                const currentMax =  Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
+                this.updateLegendAxis(currentMax);
+            }
+
         }
+        const tcmap = new TotalCrimeMap("#totalMapContainer", allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap);
 
-        // Listen to dropdown
-        d3.select("#selectButtonTotalCrimes").on("change", function (_) {
-            updateMapWithNewCrimeCategory(this.value);
-            const currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
-            updateLegendAxis(currentMax);
-        });
-
-        function changeCallback(value) {
-            updateMapWithNewCrimeCategory(value);
-            const currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
-            updateLegendAxis(currentMax);
-        }
-
-
-        // -------------------------- effect handlers for the map -----------------
-        function mouseOverHandler(event, _) {
-            d3.select(this).attr("fill", HOVER_COLOR);
-            tooltip.style("opacity", 1);
-        }
-
-        function mouseMoveHandler(event, data) {
-            updateTooltip(event, data);
-        }
-
-        function mouseOutHandler(event, data) {
-            const [count, max] = getInfoForColouringMap(data, showDataRelativePerNumberOfResidents);
-            const selectedColor = linearScaleColour(count, max);
-            d3.select(this).attr("fill", selectedColor);
-
-            tooltip.style("opacity", 0);
-        }
-
-        function clickHandler(event, data) {
-            updateTooltip(event, data);
-        }
-
-        function updateTooltip(event, data) {
-            const properties = data["properties"];
-            const count = properties.count;
-            const quarter = properties.quarter;
-            const numberOfResidents = properties.numberOfResidents;
-            tooltip
-                .html("Regio: " + quarter + "<br>Aantal inwoners: " + numberOfResidents + "<br>Aantal geregistreerde voorvallen: " + count)
-                .style("left", ((event.pageX) + 20) + "px")
-                .style("top", (event.pageY) + "px");
-        }
-
-        // --------------------- projection and path ----------------------------
-        const projection = d3.geoMercator()
-            .fitExtent([[20, 20], [WIDTH - 20, HEIGHT - 20]], quarterGeometrySmall);
-        const path = d3.geoPath().projection(projection);
-
-
-        // ---------------------------------- draw graph ------------------------------------
-        // Draw districts and register event listeners
-        const map = drawMap(g, dataInMapFormat, path, colorMap);
-
-        map.on("mouseover", mouseOverHandler)
-            .on("mousemove", mouseMoveHandler)
-            .on("mouseout", mouseOutHandler)
-            .on("click", clickHandler);
-
-        function colorMap(d, _) {
-            const properties = d["properties"];
-            const count = properties.count;
-            const max = properties.max;
-            return linearScaleColour(count, max);
-        }
-
-        // listen to toggle
-        d3.select("#totalCrimesMapToggle").on("change", function (_) {
-            showDataRelativePerNumberOfResidents = d3.select("#totalCrimesMapToggle").property("checked");
-            currentMax = Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
-
-            updateLegendAxis(currentMax);
-
-            map.data(dataInMapFormat)
-                .attr("fill", (d, _) => {
-                    const [count, max] = getInfoForColouringMap(d, showDataRelativePerNumberOfResidents);
-                    return linearScaleColour(count, max);
-                });
-            const legendText = showDataRelativePerNumberOfResidents? "Legende: Genormaliseerd Aantal Feiten" : "Legende: Aantal Feiten"
-            mapSvg.select(".legend")
-                .text(legendText)
-        });
     },
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated

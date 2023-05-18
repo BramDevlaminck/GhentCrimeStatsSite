@@ -8,12 +8,17 @@
         </div>
         <div id="text-next-to-slider">
             <p>
-                We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt. (Kleine tip: je kan deze verbergen door op de naam te klikken!)
-                Op de tweede plaats komt <b>fietsdiefstal</b>, dit is ook te verwachten in een stad met 80 000 studenten per jaar.
-                Wat daarnaast ook opvalt is dat het aantal <b>verkeersongevallen met lichamelijk letsel</b> meer voorkomt dan woninginbraken.
-                In 2021 en 2022 is dit ook telkens de 3<sup>e</sup> categorie met de meeste voorvallen dit zijn er meer dan <b>1200</b> per jaar!
+                We kunnen duidelijk zien dat het aantal parkeerovertredingen met kop en schouders boven de rest uitkomt.
+                (Kleine tip: je kan deze verbergen door op de naam te klikken!)
+                Op de tweede plaats komt <b>fietsdiefstal</b>, dit is ook te verwachten in een stad met 80 000 studenten
+                per jaar.
+                Wat daarnaast ook opvalt is dat het aantal <b>verkeersongevallen met lichamelijk letsel</b> meer
+                voorkomt dan woninginbraken.
+                In 2021 en 2022 is dit ook telkens de 3<sup>e</sup> categorie met de meeste voorvallen dit zijn er meer
+                dan <b>1200</b> per jaar!
                 (Opgelet: Voor 2018 en 2019 is deze data niet beschikbaar!)<br/>
-                Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de jaren zijn bijna alle cijfers beduidend lager.
+                Verder is ook hier het effect van corona duidelijk te zien, als we 2020 bekijken ten opzichte van de
+                jaren zijn bijna alle cijfers beduidend lager.
             </p>
         </div>
     </div>
@@ -21,6 +26,7 @@
 
 <script>
 import * as d3 from "d3";
+import createDropdown, {configureBarChartAxis, createBarChartSvg, createText, createTooltip} from "./D3Functions";
 
 const margin = {top: 10, right: 30, bottom: 80, left: 200};
 const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;
@@ -41,16 +47,7 @@ export default {
         const invisibleCategory = [];
 
         // --------------------------  create a tooltip --------------------
-        const tooltip = d3.select("#yearlyCompareBarChart")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#yearlyCompareBarChart");
 
         const mouseover = function (event, d) {
             const subgroupName = d.year;
@@ -70,13 +67,7 @@ export default {
         };
 
         // --------------------------  bar chart --------------------
-
-        const svg = d3.select("#yearlyCompareBarChart")
-            .append("svg")
-            .attr("width", WIDTH + margin.left + margin.right)
-            .attr("height", HEIGHT + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.right})`);
+        const svg = createBarChartSvg("#yearlyCompareBarChart", WIDTH, HEIGHT, margin)
 
         function getYearlyData(year) {
             let yearly = allFeatures;
@@ -155,24 +146,13 @@ export default {
                 });
         }
 
-        // Add X axis
-        const x = d3.scaleLinear()
-            .domain([0, getMaxValue(data)])
-            .range([0, WIDTH])
-            .nice();
-
-        const xAxis = svg.append("g")
-            .attr("transform", `translate(0, ${HEIGHT})`)
-            .call(d3.axisBottom(x));
-
-        // Y axis
-        const y = d3.scaleBand()
-            .range([0, HEIGHT])
-            .domain(data.map(d => d.category))
-            .padding(.1);
-
-        const yAxis = svg.append("g")
-            .call(d3.axisLeft(y));
+        // Add x- and y-axis
+        const {
+            x,
+            xAxis,
+            y,
+            yAxis
+        } = configureBarChartAxis(svg, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.category))
 
         yAxis.selectAll('.tick').style("cursor", "pointer").on("click", function (_, d) {
             clickHandler(years[0], data, d);
@@ -192,12 +172,7 @@ export default {
             .on("mouseleave", mouseleave);
 
         // x-axis label:
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("y", HEIGHT + 40)
-            .attr("x", WIDTH / 2 + 40)
-            .text("Totaal aantal voorvallen")
-            .style("font-size", "80%");
+        createText(svg, HEIGHT + 40, WIDTH / 2 + 40, "Totaal aantal voorvallen");
 
         function clickHandler(year, yearlyData, selectData) {
             if (invisibleCategory.includes(selectData)) {
@@ -210,23 +185,9 @@ export default {
 
         //--------------------- dropdown ----------------------------------------
 
-        // add the options to the button
-        d3.select("#selectButtonYearlyCompareBarChart")
-            .selectAll('myOptions')
-            .data(years)
-            .enter()
-            .append('option')
-            .text(function (d) {
-                return d;
-            }) // text showed in the menu
-            .attr("value", function (d) {
-                return d;
-            }); // corresponding value returned by the button
-
-        // Listen to dropdown
-        d3.select("#selectButtonYearlyCompareBarChart").on("change", function (_) {
-            changeYear(this.value, getYearlyData(this.value));
-        });
+        createDropdown("#selectButtonYearlyCompareBarChart", years, (year) => {
+            changeYear(year, getYearlyData(year))
+        })
 
     },
     beforeUnmount() {

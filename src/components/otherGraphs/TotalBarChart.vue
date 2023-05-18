@@ -45,6 +45,7 @@
 
 <script>
 import * as d3 from "d3";
+import createDropdown, {configureBarChartAxis, createBarChartSvg, createText, createTooltip} from "./D3Functions";
 
 const margin = {top: 10, right: 30, bottom: 80, left: 60};
 const WIDTH = Math.min(window.innerWidth, 800) - margin.left - margin.right;
@@ -61,16 +62,7 @@ export default {
         const allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
 
         // --------------------------  create a tooltip --------------------
-        const tooltip = d3.select("#totalBarChart")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#totalBarChart");
 
         const mouseover = function (event, d) {
             const subgroupName = d.year;
@@ -91,12 +83,7 @@ export default {
 
         // --------------------------  bar chart --------------------
 
-        const svg = d3.select("#totalBarChart")
-            .append("svg")
-            .attr("width", WIDTH + margin.left + margin.right)
-            .attr("height", HEIGHT + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.right})`);
+        const svg = createBarChartSvg("#totalBarChart", WIDTH, HEIGHT, margin);
 
         const allFeatures = this.allFeatures;
 
@@ -157,7 +144,7 @@ export default {
             const max = getMaxValue(categoryData);
             // rescale x-axis
             x.domain([0, max]).nice();
-            axis.transition()
+            xAxis.transition()
                 .duration(1000)
                 .call(d3.axisBottom(x));
 
@@ -175,24 +162,13 @@ export default {
 
         const data = getCategoryData(allCategories[0]);
 
-        // Add X axis
-        const x = d3.scaleLinear()
-            .domain([0, getMaxValue(data)])
-            .range([0, WIDTH])
-            .nice();
-
-        const axis = svg.append("g")
-            .attr("transform", `translate(0, ${HEIGHT})`)
-            .call(d3.axisBottom(x));
-
-        // Y axis
-        const y = d3.scaleBand()
-            .range([0, HEIGHT])
-            .domain(data.map(d => d.year))
-            .padding(.1);
-
-        svg.append("g")
-            .call(d3.axisLeft(y));
+        // Add x- and y-axis
+        const {
+            x,
+            xAxis,
+            y,
+            yAxis
+        } = configureBarChartAxis(svg, WIDTH, HEIGHT, [0, getMaxValue(data)], data.map(d => d.year))
 
         //Bars
         svg.selectAll("myRect")
@@ -208,32 +184,13 @@ export default {
             .on("mouseleave", mouseleave);
 
         // x-axis label:
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("y", HEIGHT + 40)
-            .attr("x", WIDTH/2 + margin.left - 10)
-            .text("Maandelijks gemiddelde")
-            .style("font-size", "80%");
+        createText(svg, HEIGHT + 40, WIDTH/2 + margin.left - 10, "Maandelijks gemiddelde");
 
         //--------------------- dropdown ----------------------------------------
 
-        // add the options to the button
-        d3.select("#selectButtonTotalBarChart")
-            .selectAll('myOptions')
-            .data(allCategories)
-            .enter()
-            .append('option')
-            .text(function (d) {
-                return d;
-            }) // text showed in the menu
-            .attr("value", function (d) {
-                return d;
-            }); // corresponding value returned by the button
-
-        // Listen to dropdown
-        d3.select("#selectButtonTotalBarChart").on("change", function (_) {
-            changeCategory(this.value);
-        });
+        createDropdown("#selectButtonTotalBarChart", allCategories, (value) => {
+            changeCategory(value);
+        })
     },
     beforeUnmount() {
         // remove all the data we add just before we unmount! otherwise the graphs will be duplicated

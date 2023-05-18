@@ -2,6 +2,7 @@
 import * as d3 from "d3";
 
 import colourScales from '../ColourScales';
+import createDropdown, {createTooltip} from "../otherGraphs/D3Functions";
 
 const { linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
 
@@ -272,17 +273,7 @@ export default {
 
         // ------  Tooltip -------
         // tooltip is a little box that will contain information on a part of the map
-        const tooltip = d3.select("#mapContainer")
-            .append("div")
-            .style("opacity", 0)
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#mapContainer");
 
 
         // -------- effect handlers for the map tooltip ---------
@@ -367,18 +358,7 @@ export default {
         // Function to update the map if a new crime category is chosen
 
         // add the options to the button
-        d3.select("#selectButton")
-            .selectAll('myOptions')
-            .data(allCategories)
-            .enter()
-            .append('option')
-            .text(d => d) // text showed in the menu
-            .attr("value", d => d); // corresponding value returned by the button
-
-        // Listen to dropdown
-        d3.select("#selectButton").on("change", function (_) {
-            updateMapWithNewCrimeCategory(this.value);
-        });
+        createDropdown("#selectButton", allCategories, (value) => updateMapWithNewCrimeCategory(value));
 
         // ----------------------------- slider ------------------------------
         //translate date obj to Year string (e.g: "2018")

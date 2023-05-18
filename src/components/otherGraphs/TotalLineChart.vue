@@ -1,7 +1,7 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
-import createDropdown, {createSvg, createText} from "./D3Functions";
+import createDropdown, {createSvg, createText} from "../D3Functions";
 
 const {categoricalScaleColour} = colourScales();
 

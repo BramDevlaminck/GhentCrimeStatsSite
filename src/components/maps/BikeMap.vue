@@ -1,6 +1,8 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
+import {createMap, drawMap} from "../D3MapFunctions";
+import {createTooltip} from "../D3Functions";
 
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
@@ -73,34 +75,10 @@ export default {
         const bikeParkingPerQuarter = this.bikeParkingPerQuarter;
         const quarterGeometryData = this.quarterGeometryData;
 
-        const mapSvg = d3
-            .select("#bikeMapContainer")
-            .append("svg")
-            .attr("width", "25vw")
-            .attr("height", "50vh");
-
-        const g = mapSvg.append("g");
-        g.append("rect")
-            .attr("width", WIDTH)
-            .attr("height", HEIGHT)
-            .attr(
-                "transform",
-                `translate(-${WIDTH},-${HEIGHT})`
-            )
-            .style("fill", "none")
-            .style("pointer-events", "all");
+        const { mapSvg, g } = createMap("#bikeMapContainer", WIDTH, HEIGHT);
 
         // --------------------------  create a tooltip --------------------
-        const tooltip = d3.select("#mapContainer")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#mapContainer")
 
         // -------------------------- effect handlers for the map -----------------
         function mouseOverHandler(event, _) {
@@ -144,22 +122,16 @@ export default {
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
         const dataInMapFormat = dataToMapDataFormat(allFeatures, bikeParkingPerQuarter, quarterGeometryData);
-        const map = g.append("g")
-            .selectAll("path")
-            .data(dataInMapFormat)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .attr("fill", (d, _) => {
-                const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
-                return linearScaleColour(count, max);
-            })
-            .attr("stroke", "#FFF")
-            .attr("stroke-width", 0.5)
-            .on("mouseover", mouseOverHandler)
+        const map = drawMap(g, dataInMapFormat, path, colorMap);
+        map.on("mouseover", mouseOverHandler)
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
+
+        function colorMap(d, _) {
+            const [count, max] = getInfoForColouringMap(d, showNumberOfBikeParkings);
+            return linearScaleColour(count, max);
+        }
         
         // LEGEND
         

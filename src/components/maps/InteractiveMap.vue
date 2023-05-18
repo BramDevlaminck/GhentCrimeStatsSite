@@ -2,7 +2,7 @@
 import * as d3 from "d3";
 
 import colourScales from '../ColourScales';
-import createDropdown, {createTooltip} from "../otherGraphs/D3Functions";
+import createDropdown, {createTooltip} from "../D3Functions";
 
 const { linearScaleColour, interpolateBluesMod } = colourScales(0.07, 1.0);
 

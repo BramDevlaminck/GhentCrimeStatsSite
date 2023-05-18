@@ -1,6 +1,8 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
+import {createMap, drawMap} from "../D3MapFunctions";
+import createDropdown, {createTooltip} from "../D3Functions";
 
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
@@ -82,36 +84,10 @@ export default {
 
         let dataInMapFormat = dataToMapDataFormat(allFeatures, quarterGeometryData, numberOfResidentsPerQuarterMap);
 
-        const mapSvg = d3
-            .select("#totalMapContainer")
-            .append("svg")
-            .attr("width", "25vw")
-            .attr("height", "50vh");
-
-        const g = mapSvg.append("g");
-        g.append("rect")
-            .attr("width", WIDTH)
-            .attr("height", HEIGHT)
-            .attr(
-                "transform",
-                `translate(-${WIDTH},-${HEIGHT})`
-            )
-            .style("fill", "none")
-            .style("pointer-events", "all");
+        const { mapSvg, g } = createMap("#totalMapContainer", WIDTH, HEIGHT);
 
         // --------------------------  create a tooltip --------------------
-        const tooltip = d3.select("#mapContainer")
-            .append("div")
-            .style("opacity", 0)
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .attr("class", "tab")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#mapContainer")
 
         //--------------------- dropdown ----------------------------------------
 
@@ -138,17 +114,7 @@ export default {
         }
 
         // add the options to the button
-        d3.select("#selectButtonTotalCrimes")
-            .selectAll('myOptions')
-            .data(allCategories)
-            .enter()
-            .append('option')
-            .text(function (d) {
-                return d;
-            }) // text showed in the menu
-            .attr("value", function (d) {
-                return d;
-            }); // corresponding value returned by the button
+        createDropdown("#selectButtonTotalCrimes", allCategories, (value) => {changeCallback(value)});
 
         
         // LEGEND
@@ -245,6 +211,12 @@ export default {
             updateLegendAxis(currentMax);
         });
 
+        function changeCallback(value) {
+            updateMapWithNewCrimeCategory(value);
+            const currentMax =  Math.max(...dataInMapFormat.map(entry => getInfoForColouringMap(entry, showDataRelativePerNumberOfResidents)[1]));
+            updateLegendAxis(currentMax);
+        }
+
 
         // -------------------------- effect handlers for the map -----------------
         function mouseOverHandler(event, _) {
@@ -287,25 +259,19 @@ export default {
 
         // ---------------------------------- draw graph ------------------------------------
         // Draw districts and register event listeners
-        const map = g.append("g")
-            .selectAll("path")
-            .data(dataInMapFormat)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .attr("fill", (d, _) => {
-                const properties = d["properties"];
-                const count = properties.count;
-                const max = properties.max;
-                return linearScaleColour(count, max);
-            })
-            .attr("stroke", "#FFF")
-            .attr("stroke-width", 0.5)
-            .on("mouseover", mouseOverHandler)
+        const map = drawMap(g, dataInMapFormat, path, colorMap);
+
+        map.on("mouseover", mouseOverHandler)
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler)
             .on("click", clickHandler);
-        
+
+        function colorMap(d, _) {
+            const properties = d["properties"];
+            const count = properties.count;
+            const max = properties.max;
+            return linearScaleColour(count, max);
+        }
 
         // listen to toggle
         d3.select("#totalCrimesMapToggle").on("change", function (_) {

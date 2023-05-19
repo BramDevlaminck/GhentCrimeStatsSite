@@ -44,12 +44,12 @@ export default {
         <!-- Dropdown used for all the categories -->
         <select id="selectButton"></select>
         <!-- container where the map, tooltip and slider itself will be placed -->
-        <div id="mapContainer" />
+        <div id="mapContainer"/>
         <div id="sliderContainer">
             <!-- button to play/pause the slider -->
             <button id="playButton" class="paused"><i class="bi bi-play"></i></button>
             <!-- div where we will place the slider -->
-            <div id="sliderDiv" />
+            <div id="sliderDiv"/>
         </div>
     </div>
 </template>

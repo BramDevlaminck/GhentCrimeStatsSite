@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-export default function createDropdown(id, data, callback) {
+export function createDropdown(id, data, callback) {
     // add the options to the button
     d3.select(id)
         .selectAll('myOptions')

@@ -37,7 +37,8 @@
                 inwoners.
                 Zeker als we dit vergelijken met de andere wijken zien we hier erg veel geel en rood. De <b>eerste regio
                 bevat de Blaarmeersen en Watersportbaan</b>.
-                Dit zijn allebei populaire plaatsen in Gent. Zeker in de Blaarmeersen kan het erg druk worden in de zomer <span
+                Dit zijn allebei populaire plaatsen in Gent. Zeker in de Blaarmeersen kan het erg druk worden in de
+                zomer <span
                     class="source">(<a
                     href="https://www.vrt.be/vrtnws/nl/2022/06/27/gent-zet-camera-s-in-op-blaarmeersen-om-in-te-grijpen-bij-te-gro/">bron</a>)</span>.
                 Deze <b>tweede wijk ligt vlak bij de binnenstad</b> en bevat campussen zoals deze van LUCA School of
@@ -45,12 +46,14 @@
                 Enkele van de meest gekende adresjes in Gent zijn hier ook terug te vinden zoals, De Kastart, Bocca, De
                 Gekroonde Hoofden,…
                 Ook hier is dus een gelijkaardige verklaring als voor het hoge aantal feiten in de binnenstad.
-                De extra drukte van studenten en toeristen die hier zijn om te overnachten of ontspannen heeft een zichtbare
+                De extra drukte van studenten en toeristen die hier zijn om te overnachten of ontspannen heeft een
+                zichtbare
                 invloed <span class="source">(<a href="https://hoeveelin.stad.gent/wijken/elisabethbegijnhof-papegaai/">bron</a>)</span>.
             </p>
             <h5>Sterktes</h5>
             <p>
-                De wijken Oostakker, sint-amandsberg, Moscou-vogelhoek, Zwijnaarde, Mariakerke, Drongen en Wondelgem vertonen in
+                De wijken Oostakker, sint-amandsberg, Moscou-vogelhoek, Zwijnaarde, Mariakerke, Drongen en Wondelgem
+                vertonen in
                 het algemeen een erg lage hoeveelheid geregistreerde feiten ten opzichte van hun aantal inwoners.
                 Deze liggen allemaal wat <b>verder van het stadscentrum</b> .
                 Toerisme is hier niet veelvoorkomend en voor de meeste studenten is dit te ver van hun campussen om hier
@@ -63,7 +66,7 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
-import {createSvg, createTooltip} from "../D3Functions";
+import {createTooltip} from "../D3Functions";
 
 const {differentialColour} = colourScales();
 
@@ -185,7 +188,12 @@ export default {
         const graphBandSize = Math.min(width, height)
 
         // append the svg object to the body of the page
-        const svg = createSvg("#heatmap", graphBandSize, graphBandSize * 0.66, margin);
+        const svg = d3.select("#heatmap")
+            .append("svg")
+            .attr("width", graphBandSize + margin.left + margin.right)
+            .attr("height", graphBandSize * 0.66 + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
         const dataInHeatmapFormat = transformToHeatmapData(

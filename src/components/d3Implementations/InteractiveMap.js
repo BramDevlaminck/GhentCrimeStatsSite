@@ -1,7 +1,7 @@
 import colourScales from "../ColourScales";
-import {D3Map, D3ToggleMap} from "./D3MapFunctions";
+import {D3Map} from "./D3MapFunctions";
 import * as d3 from "d3";
-import createDropdown from "../D3Functions";
+import {createDropdown} from "../D3Functions";
 
 const {linearScaleColour} = colourScales(0.07, 1.0);
 const NO_DATA_COLOR = "#f08080";
@@ -127,7 +127,7 @@ function dataToMapDataFormat(yearAvgs, quarterGeometryData, maxAvg, year = "2018
     const result = [];
     for (const [quarter, avg] of currentYearAvgs) {
         result.push({
-            properties: { "quarter": quarter, "count": avg, "max": maxAvg },
+            properties: {"quarter": quarter, "count": avg, "max": maxAvg},
             type: "Feature",
             geometry: quarterGeometryData.get(quarter)
         });
@@ -145,7 +145,7 @@ export class InteractiveMap extends D3Map {
         this.beginYear = this.dateToYearString(beginDate);
         this.endYear = this.dateToYearString(endDate);
         this.currentYear = "2018"
-        this.totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({ year, value }));
+        this.totalAverages = Array.from(constructTotalYearAvgs(yearAverages), ([year, value]) => ({year, value}));
         this.currentMax = getAllYearExtrema(yearAverages)[0];
         this.allCategories = ["Alle Categorieën"].concat([...this.crimeTypes]);
         this.create();
@@ -199,9 +199,6 @@ export class InteractiveMap extends D3Map {
         const count = properties.count;
         const maxCount = properties.max;
 
-        console.log(this.totalAverages)
-        console.log(this.currentYear)
-        console.log(this.beginYear)
         const totalAvgInYear = this.totalAverages[this.currentYear - this.beginYear];
 
         let selectedColor;
@@ -230,7 +227,12 @@ export class InteractiveMap extends D3Map {
     slider() {
         // ----------------------------- slider ------------------------------
 
-        this.sliderDimensions = { sliderHandleWidth: 12, sliderLeftPadding: 40, sliderTopPadding: 7.5, sliderBottomPadding: 25 }
+        this.sliderDimensions = {
+            sliderHandleWidth: 12,
+            sliderLeftPadding: 40,
+            sliderTopPadding: 7.5,
+            sliderBottomPadding: 25
+        }
 
         const heightSlider = 90;
 
@@ -389,7 +391,10 @@ export class InteractiveMap extends D3Map {
         this.currentDataDisplayedBasedOnCategory = features;
         this.totalPerQuarter = constructAvgsFromCounts(constructCountsPerYear(this.currentDataDisplayedBasedOnCategory, this.quarterGeometryData));
         this.currentMax = getAllYearExtrema(this.totalPerQuarter)[0];
-        this.totalAverages = Array.from(constructTotalYearAvgs(this.totalPerQuarter), ([year, value]) => ({ year, value }));
+        this.totalAverages = Array.from(constructTotalYearAvgs(this.totalPerQuarter), ([year, value]) => ({
+            year,
+            value
+        }));
 
 
         // filter the data based on YEAR

@@ -78,7 +78,7 @@ export class D3Map {
     getWidthAndHeight() {
         const WIDTH = window.innerWidth / 2;
         const HEIGHT = window.innerHeight / 2;
-        return { WIDTH, HEIGHT };
+        return {WIDTH, HEIGHT};
     }
 
     dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {
@@ -120,13 +120,14 @@ export class D3Map {
     getCurrentMax() {
         throw "Abstract function is not implemented";
     }
-    
+
     getLegendSize() {
         return {
             barheight: 200,
             barwidth: 20,
             barX: 0,
-            barY: 50 }
+            barY: 50
+        }
     }
 
     createLegend() {
@@ -134,7 +135,8 @@ export class D3Map {
             barheight,
             barwidth,
             barX,
-            barY } = this.getLegendSize();
+            barY
+        } = this.getLegendSize();
 
         this.currentMax = this.getCurrentMax();
         // Linear scale for y-axis
@@ -215,7 +217,7 @@ export class D3Map {
     }
 }
 
-export class D3ToggleMap extends D3Map{
+export class D3ToggleMap extends D3Map {
     constructor(id, toggleId, allFeatures, quarterGeometrySmall, isToggled, quarterGeometryData, totalPerQuarter, textOn, textOff) {
         super(id, allFeatures, quarterGeometrySmall, quarterGeometryData, totalPerQuarter, textOff);
         this.id = id;
@@ -228,10 +230,11 @@ export class D3ToggleMap extends D3Map{
         this.textOn = textOn;
         this.addToggleListener(toggleId);
     }
+
     getWidthAndHeight() {
         const WIDTH = window.innerWidth / 4;
         const HEIGHT = window.innerHeight / 2;
-        return { WIDTH, HEIGHT };
+        return {WIDTH, HEIGHT};
     }
 
     // -------------------------- effect handlers for the map -----------------
@@ -249,7 +252,8 @@ export class D3ToggleMap extends D3Map{
             barheight: 100,
             barwidth: 15,
             barX: 10,
-            barY: 50 }
+            barY: 50
+        }
     }
 
     addToggleListener(id) {

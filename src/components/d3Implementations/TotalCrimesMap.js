@@ -1,6 +1,6 @@
 import colourScales from "../ColourScales";
 import {D3ToggleMap} from "./D3MapFunctions";
-import createDropdown from "../D3Functions";
+import {createDropdown} from "../D3Functions";
 
 const {linearScaleColour} = colourScales(0.07, 1.0);
 

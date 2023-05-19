@@ -26,7 +26,13 @@
 
 <script>
 import * as d3 from "d3";
-import createDropdown, {configureBarChartAxis, createSvg, createText, createTooltip} from "../D3Functions";
+import {
+    configureBarChartAxis,
+    createDropdown,
+    createSvg,
+    createText,
+    createTooltip
+} from "../D3Functions";
 
 const margin = {top: 10, right: 30, bottom: 80, left: 200};
 const WIDTH = Math.min(window.innerWidth, 1000) - margin.left - margin.right;

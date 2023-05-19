@@ -158,7 +158,7 @@ export class D3ToggleMap {
         this.mapSvg.append("text")
             .attr("y", barY - 20)
             .attr("x", barX)
-            .text("Legende: Aantal Feiten")
+            .text(`Legende: ${this.textOff}`)
             .attr("font-weight", 500)
             .attr("class", "legend")
             .style("font-size", "80%");

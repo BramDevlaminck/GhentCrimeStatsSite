@@ -1,6 +1,7 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
+import {createDropdown, createSvg, createText} from "../D3Functions";
 
 const {categoricalScaleColour} = colourScales();
 
@@ -80,16 +81,12 @@ export default {
         const effectiveLineGraphWidth = svgWidth - 100;
 
         // append the svg object to the body of the page
-        const svg = d3.select("#lineChart")
-            .append("svg")
-            .attr("width", svgWidth + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .on("mouseover", mouseOverHandler)
+        const {svg, chart} = createSvg("#lineChart", svgWidth, height, margin);
+        svg.on("mouseover", mouseOverHandler)
             .on("mousemove", mouseMoveHandler)
             .on("mouseout", mouseOutHandler);
-        const lineGraph = svg.append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
+
+        const lineGraph = chart;
 
         let currentDataDisplayedBasedOnCategory = selectCategoryFromData(data, allCategories[0]); // all data of the current category!
         // group the data: I want to draw one line per group
@@ -119,13 +116,7 @@ export default {
             .call(yAxis);
 
         // y-axis label:
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("transform", "rotate(-90)")
-            .attr("y", -margin.left + 80)
-            .attr("x", -margin.top - 80)
-            .text("Aantal voorvallen")
-            .style("font-size", "80%");
+        createText(svg, -margin.left + 80, -margin.top - 80, "Aantal voorvallen")
 
         // color palette
         const res = [];
@@ -228,17 +219,8 @@ export default {
         }
 
         // add the options to the button
-        d3.select("#selectButtonForLineGraph")
-            .selectAll('myOptions')
-            .data(allCategories)
-            .enter()
-            .append('option')
-            .text(d => d) // text showed in the menu
-            .attr("value", d => d); // corresponding value returned by the button
-
-        // Listen to dropdown
-        d3.select("#selectButtonForLineGraph").on("change", function (_) {
-            updateMapWithNewCrimeCategory(this.value);
+        createDropdown("#selectButtonForLineGraph", allCategories, (value) => {
+            updateMapWithNewCrimeCategory(value)
         });
 
         // ------------------------- legend --------------------------
@@ -371,18 +353,26 @@ export default {
         <div id="text-next-to-slider">
             <h5>Gentse Feesten</h5>
             <p>
-                In <b>juli</b> 2018, 2019 en 2022 valt duidelijk een piek te zien bij het aantal aangiftes van <b>zakkenrollerij</b>, maar in 2020 en 2021 is dit niet zo.
-                Dit komt net overeen met de periode van de Gentse Feesten, met uitzondering van in 2020 en 2021 wanneer deze niet door konden gaan wegens corona.
+                In <b>juli</b> 2018, 2019 en 2022 valt duidelijk een piek te zien bij het aantal aangiftes van <b>zakkenrollerij</b>,
+                maar in 2020 en 2021 is dit niet zo.
+                Dit komt net overeen met de periode van de Gentse Feesten, met uitzondering van in 2020 en 2021 wanneer
+                deze niet door konden gaan wegens corona.
                 Ook bij het aantal meldingen van <b>geluidsoverlast</b> valt in juli een piek te zien.
-                Enkel met het verschil dat deze piek ook aanwezig is tijdens de jaren dat er geen Gentse Feesten waren door corona.
-                Vermoedelijk komt dit doordat dit net de periode was na de eerste grote corona-golf <span class="source">(<a href="https://www.belgium.be/nl/node/13178">bron1</a> <a href="https://www.coronaviruscovid19.be/coronavirus-cijfers">bron2</a> <a href="https://www.ad.nl/nlthuis/meer-mensen-blijven-thuis-en-dat-is-hoorbaar-nog-nooit-zoveel-meldingen-van-geluidsoverlast~adcddd1d6/">bron3</a>)</span>.
+                Enkel met het verschil dat deze piek ook aanwezig is tijdens de jaren dat er geen Gentse Feesten waren
+                door corona.
+                Vermoedelijk komt dit doordat dit net de periode was na de eerste grote corona-golf <span
+                    class="source">(<a href="https://www.belgium.be/nl/node/13178">bron1</a> <a
+                    href="https://www.coronaviruscovid19.be/coronavirus-cijfers">bron2</a> <a
+                    href="https://www.ad.nl/nlthuis/meer-mensen-blijven-thuis-en-dat-is-hoorbaar-nog-nooit-zoveel-meldingen-van-geluidsoverlast~adcddd1d6/">bron3</a>)</span>.
             </p>
 
             <h5>Corona</h5>
             <p>
-                Het effect van corona valt duidelijk terug te zien bij meerdere categorieën waar in <b>maart-april 2020 een duidelijke dip</b> te zien is.
+                Het effect van corona valt duidelijk terug te zien bij meerdere categorieën waar in <b>maart-april 2020
+                een duidelijke dip</b> te zien is.
                 Dit komt overeen met de eerste lockdown.
-                De dip zichtbaar bij <i>Alle categorieën</i> valt vooral te verklaren doordat er duidelijk minder geregistreerde parkeerovertredingen waren.
+                De dip zichtbaar bij <i>Alle categorieën</i> valt vooral te verklaren doordat er duidelijk minder
+                geregistreerde parkeerovertredingen waren.
                 Dit is namelijk het grootste deel van het aantal geregistreerde feiten.
             </p>
 
@@ -390,12 +380,15 @@ export default {
             <p>
                 Het aantal <b>fietsdiefstallen</b> bereikt een <b>piek</b> in <b>oktober</b>.
                 Dit is wanneer de studenten allemaal terug naar Gent komen, vaak met een <i>nieuwe</i> fiets.
-                Daarna daalt dit om vervolgens continu een lichte stijging te hebben naarmate we verder komen in het jaar.
+                Daarna daalt dit om vervolgens continu een lichte stijging te hebben naarmate we verder komen in het
+                jaar.
                 Dit valt mogelijk te verklaren aan de hand van het weer dat beter wordt in de lente en zomer.
             </p>
             <p>
-                Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral door de daling van parkeerovertredingen die maand.
-                We vermoeden dat dit het effect is van de vakantie. In juli is dit ook zichtbaar sinds 2020, voordien was dit net eerder een piek.
+                Bovendien valt te zien dat in augustus een algemene daling is van geregistreerde feiten, dit komt vooral
+                door de daling van parkeerovertredingen die maand.
+                We vermoeden dat dit het effect is van de vakantie. In juli is dit ook zichtbaar sinds 2020, voordien
+                was dit net eerder een piek.
                 Mogelijks zitten de Gentse Feesten hier voor iets tussen, maar dit valt moeilijk in te schatten.
             </p>
         </div>

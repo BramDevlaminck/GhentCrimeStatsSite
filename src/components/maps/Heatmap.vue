@@ -37,7 +37,8 @@
                 inwoners.
                 Zeker als we dit vergelijken met de andere wijken zien we hier erg veel geel en rood. De <b>eerste regio
                 bevat de Blaarmeersen en Watersportbaan</b>.
-                Dit zijn allebei populaire plaatsen in Gent. Zeker in de Blaarmeersen kan het erg druk worden in de zomer <span
+                Dit zijn allebei populaire plaatsen in Gent. Zeker in de Blaarmeersen kan het erg druk worden in de
+                zomer <span
                     class="source">(<a
                     href="https://www.vrt.be/vrtnws/nl/2022/06/27/gent-zet-camera-s-in-op-blaarmeersen-om-in-te-grijpen-bij-te-gro/">bron</a>)</span>.
                 Deze <b>tweede wijk ligt vlak bij de binnenstad</b> en bevat campussen zoals deze van LUCA School of
@@ -45,12 +46,14 @@
                 Enkele van de meest gekende adresjes in Gent zijn hier ook terug te vinden zoals, De Kastart, Bocca, De
                 Gekroonde Hoofden,…
                 Ook hier is dus een gelijkaardige verklaring als voor het hoge aantal feiten in de binnenstad.
-                De extra drukte van studenten en toeristen die hier zijn om te overnachten of ontspannen heeft een zichtbare
+                De extra drukte van studenten en toeristen die hier zijn om te overnachten of ontspannen heeft een
+                zichtbare
                 invloed <span class="source">(<a href="https://hoeveelin.stad.gent/wijken/elisabethbegijnhof-papegaai/">bron</a>)</span>.
             </p>
             <h5>Sterktes</h5>
             <p>
-                De wijken Oostakker, sint-amandsberg, Moscou-vogelhoek, Zwijnaarde, Mariakerke, Drongen en Wondelgem vertonen in
+                De wijken Oostakker, sint-amandsberg, Moscou-vogelhoek, Zwijnaarde, Mariakerke, Drongen en Wondelgem
+                vertonen in
                 het algemeen een erg lage hoeveelheid geregistreerde feiten ten opzichte van hun aantal inwoners.
                 Deze liggen allemaal wat <b>verder van het stadscentrum</b> .
                 Toerisme is hier niet veelvoorkomend en voor de meeste studenten is dit te ver van hun campussen om hier
@@ -63,6 +66,7 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
+import {createTooltip} from "../D3Functions";
 
 const {differentialColour} = colourScales();
 
@@ -227,16 +231,8 @@ export default {
             .select(".domain").remove();
 
         // create a tooltip
-        const tooltip = d3.select("#heatmap")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#heatmap");
+
 
         // Three function that change the tooltip when user hover / move / leave a cell
         const mouseover = function (event, _) {

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import {createTooltip} from "./D3Functions";
-import colourScales from "./ColourScales";
+import {createTooltip} from "../D3Functions";
+import colourScales from "../ColourScales";
 
 const WIDTH = window.innerWidth / 4;
 const HEIGHT = window.innerHeight / 2;

@@ -63,6 +63,7 @@
 <script>
 import * as d3 from "d3";
 import colourScales from '../ColourScales';
+import {createSvg, createTooltip} from "../D3Functions";
 
 const {differentialColour} = colourScales();
 
@@ -184,12 +185,7 @@ export default {
         const graphBandSize = Math.min(width, height)
 
         // append the svg object to the body of the page
-        const svg = d3.select("#heatmap")
-            .append("svg")
-            .attr("width", graphBandSize + margin.left + margin.right)
-            .attr("height", graphBandSize * 0.66 + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        const svg = createSvg("#heatmap", graphBandSize, graphBandSize * 0.66, margin);
 
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
         const dataInHeatmapFormat = transformToHeatmapData(
@@ -227,16 +223,8 @@ export default {
             .select(".domain").remove();
 
         // create a tooltip
-        const tooltip = d3.select("#heatmap")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("position", "absolute");
+        const tooltip = createTooltip("#heatmap");
+
 
         // Three function that change the tooltip when user hover / move / leave a cell
         const mouseover = function (event, _) {

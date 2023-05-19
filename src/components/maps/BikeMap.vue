@@ -1,5 +1,6 @@
 <script>
 import * as d3 from "d3";
+import {BikeMap} from "../d3Implementations/BikeMap";
 
 export default {
     props: {

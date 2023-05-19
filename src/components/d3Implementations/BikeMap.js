@@ -6,6 +6,7 @@ const {linearScaleColour} = colourScales(0.07, 1.0);
 export class BikeMap extends D3ToggleMap {
     constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap) {
         super(id, "#mapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Aantal Plaatsen", "Aantal Diefstallen");
+        this.create();
     }
 
     dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {

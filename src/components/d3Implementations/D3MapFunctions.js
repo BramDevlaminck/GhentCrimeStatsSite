@@ -2,8 +2,6 @@ import * as d3 from "d3";
 import {createTooltip} from "../D3Functions";
 import colourScales from "../ColourScales";
 
-const WIDTH = window.innerWidth / 4;
-const HEIGHT = window.innerHeight / 2;
 const HOVER_COLOR = "#db5252";
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
@@ -12,8 +10,8 @@ export function createMap(id, width, height) {
     const mapSvg = d3
         .select(id)
         .append("svg")
-        .attr("width", "25vw")
-        .attr("height", "50vh");
+        .attr("width", width)
+        .attr("height", height);
 
     const g = mapSvg.append("g");
     g.append("rect")
@@ -41,23 +39,19 @@ export function drawMap(g, data, path, fillFunction) {
         .attr("stroke-width", 0.5)
 }
 
-export class D3ToggleMap {
-    constructor(id, toggleId, allFeatures, quarterGeometrySmall, isToggled, quarterGeometryData, totalPerQuarter, textOn, textOff) {
+export class D3Map {
+    constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, totalPerQuarter, text) {
         this.id = id;
-        this.toggleId = toggleId;
         this.allFeatures = allFeatures;
         this.quarterGeometrySmall = quarterGeometrySmall;
-        this.isToggled = isToggled;
         this.quarterGeometryData = quarterGeometryData;
         this.totalPerQuarter = totalPerQuarter;
-        this.textOff = textOff;
-        this.textOn = textOn;
-        this.create();
+        this.text = text;
     }
 
     create() {
         this.dataInMapFormat = this.dataToMapFormat(this.allFeatures, this.quarterGeometryData, this.totalPerQuarter);
-
+        const {WIDTH, HEIGHT} = this.getWidthAndHeight();
         const {mapSvg, g} = createMap(this.id, WIDTH, HEIGHT);
         this.mapSvg = mapSvg;
         // --------------------------  create a tooltip --------------------
@@ -79,7 +73,12 @@ export class D3ToggleMap {
 
         // ---------------------------------- legend ------------------------------------
         this.createLegend();
-        this.addToggleListener(this.toggleId);
+    }
+
+    getWidthAndHeight() {
+        const WIDTH = window.innerWidth / 2;
+        const HEIGHT = window.innerHeight / 2;
+        return { WIDTH, HEIGHT };
     }
 
     dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {
@@ -105,11 +104,7 @@ export class D3ToggleMap {
     }
 
     mouseOutHandler(event, data) {
-        const [count, max] = this.getInfoForColouringMap(data, this.isToggled);
-        const selectedColor = linearScaleColour(count, max);
-        d3.select(event.target).attr("fill", selectedColor);
-
-        this.tooltip.style("opacity", 0);
+        throw "Abstract function is not implemented";
     }
 
     clickHandler(event, data) {
@@ -125,13 +120,21 @@ export class D3ToggleMap {
     getCurrentMax() {
         throw "Abstract function is not implemented";
     }
+    
+    getLegendSize() {
+        return {
+            barheight: 200,
+            barwidth: 20,
+            barX: 0,
+            barY: 50 }
+    }
 
     createLegend() {
-        const barheight = 100;
-        const barwidth = 15;
-
-        const barX = 10;
-        const barY = 50;
+        const {
+            barheight,
+            barwidth,
+            barX,
+            barY } = this.getLegendSize();
 
         this.currentMax = this.getCurrentMax();
         // Linear scale for y-axis
@@ -158,14 +161,13 @@ export class D3ToggleMap {
         this.mapSvg.append("text")
             .attr("y", barY - 20)
             .attr("x", barX)
-            .text(`Legende: ${this.textOff}`)
+            .text(`Legende: ${this.text}`)
             .attr("font-weight", 500)
             .attr("class", "legend")
             .style("font-size", "80%");
     }
 
     createColorScaleLegend(root, x, y, width, height, ticks) {
-
         root.append("g")
             .attr("class", "colourAxis")
             .attr("transform", `translate(${x + width},${y})`)
@@ -211,9 +213,43 @@ export class D3ToggleMap {
             .transition()
             .call(this.yColourAxis);
     }
+}
 
-    updateAndCalcLegendAxis(isToggled) {
-        throw "Abstract function is not implemented";
+export class D3ToggleMap extends D3Map{
+    constructor(id, toggleId, allFeatures, quarterGeometrySmall, isToggled, quarterGeometryData, totalPerQuarter, textOn, textOff) {
+        super(id, allFeatures, quarterGeometrySmall, quarterGeometryData, totalPerQuarter, textOff);
+        this.id = id;
+        this.allFeatures = allFeatures;
+        this.quarterGeometrySmall = quarterGeometrySmall;
+        this.isToggled = isToggled;
+        this.quarterGeometryData = quarterGeometryData;
+        this.totalPerQuarter = totalPerQuarter;
+        this.textOff = textOff;
+        this.textOn = textOn;
+        this.addToggleListener(toggleId);
+    }
+    getWidthAndHeight() {
+        const WIDTH = window.innerWidth / 4;
+        const HEIGHT = window.innerHeight / 2;
+        return { WIDTH, HEIGHT };
+    }
+
+    // -------------------------- effect handlers for the map -----------------
+    mouseOutHandler(event, data) {
+        const [count, max] = this.getInfoForColouringMap(data, this.isToggled);
+        const selectedColor = linearScaleColour(count, max);
+        d3.select(event.target).attr("fill", selectedColor);
+
+        this.tooltip.style("opacity", 0);
+    }
+
+    // ---------------------------------- legend ------------------------------------
+    getLegendSize() {
+        return {
+            barheight: 100,
+            barwidth: 15,
+            barX: 10,
+            barY: 50 }
     }
 
     addToggleListener(id) {

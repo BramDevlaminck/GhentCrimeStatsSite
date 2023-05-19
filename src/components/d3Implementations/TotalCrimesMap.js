@@ -8,6 +8,7 @@ export class TotalCrimeMap extends D3ToggleMap {
     constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap, crimeTypes) {
         super(id, "#totalCrimesMapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Genormaliseerd Aantal Feiten", "Aantal Feiten");
         this.crimeTypes = crimeTypes
+        this.create();
         this.setDropDown();
     }
 

@@ -62,6 +62,7 @@ export default {
         const crimeTypes = this.crimeTypes;
         const quarterGeometryData = this.quarterGeometryData;
         const numberOfResidentsPerQuarterMap = this.numberOfResidentsPerQuarterMap;
+
         class TotalCrimeMap extends D3ToggleMap {
             constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap) {
                 super(id, "#totalCrimesMapToggle", allFeatures, quarterGeometrySmall, false, quarterGeometryData, numberOfResidentsPerQuarterMap, "Genormaliseerd Aantal Feiten", "Aantal Feiten");
@@ -108,21 +109,6 @@ export default {
                 return Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
             }
 
-            updateLegendAxis(currentMax) {
-                this.yColourScale.domain([0, currentMax]);
-
-                const colourAxisTicks = this.yColourScale.ticks(4);
-                if ((currentMax - colourAxisTicks[colourAxisTicks.length-1])/(colourAxisTicks[colourAxisTicks.length-1] - colourAxisTicks[colourAxisTicks.length-2]) < 0.24) {
-                    colourAxisTicks.pop();
-                }
-                colourAxisTicks.push(currentMax);
-                this.yColourAxis.tickValues(colourAxisTicks);
-
-                this.mapSvg.select('.colourAxis')
-                    .transition()
-                    .call(this.yColourAxis);
-            }
-
             updateAndCalcLegendAxis(isToggled) {
                 this.currentMax = Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
 
@@ -133,7 +119,9 @@ export default {
             setDropDown() {
                 this.allCategories = ["Alle Categorieën"].concat([...crimeTypes]);
                 // add the options to the button
-                createDropdown("#selectButtonTotalCrimes", this.allCategories, (value) => {this.changeCallback(value)});
+                createDropdown("#selectButtonTotalCrimes", this.allCategories, (value) => {
+                    this.changeCallback(value)
+                });
             }
 
             updateMapWithNewCrimeCategory(selectedGroup) {
@@ -157,11 +145,12 @@ export default {
 
             changeCallback(value) {
                 this.updateMapWithNewCrimeCategory(value);
-                const currentMax =  Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
+                const currentMax = Math.max(...this.dataInMapFormat.map(entry => this.getInfoForColouringMap(entry, this.isToggled)[1]));
                 this.updateLegendAxis(currentMax);
             }
 
         }
+
         new TotalCrimeMap("#totalMapContainer", allFeatures, quarterGeometrySmall, quarterGeometryData, numberOfResidentsPerQuarterMap);
 
     },
@@ -184,7 +173,8 @@ export default {
                 die gebeuren, zakkenrollers die buit kunnen maken,…
             </p>
             <p>
-                Als we ons focussen op de wijken rond de binnenstad valt vooral de wijk <b>Brugse Poort - Rooigem</b> op.
+                Als we ons focussen op de wijken rond de binnenstad valt vooral de wijk <b>Brugse Poort - Rooigem</b>
+                op.
                 Deze heeft duidelijk meer <b>geregistreerde feiten dan de omliggende wijken</b>.
                 Dit blijkt een erg <b>dicht bebouwde</b> wijk te zijn (bebouwingsgraad van 26.5% terwijl het gemiddelde
                 in Gent 13.3% is).
@@ -193,7 +183,7 @@ export default {
             <p>
                 <b>50% van de inwoners in deze wijk geeft aan dat ze vaak buurthinder ondervinden</b>.
                 Vooral klachten over vuiligheid en veiligheid blijken veelvoudig voor te komen <span class="source">(<a
-                href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>)</span>.
+                    href="https://hoeveelin.stad.gent/wijken/brugse-poort-rooigem/">bron</a>)</span>.
             </p>
             <ul>
                 <li>1/5 geeft aan bewust plekken in hun buurt te vermijden</li>

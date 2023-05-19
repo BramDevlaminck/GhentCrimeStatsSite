@@ -26,7 +26,7 @@ export function createMap(id, width, height) {
         .style("fill", "none")
         .style("pointer-events", "all");
 
-    return { mapSvg, g }
+    return {mapSvg, g}
 }
 
 export function drawMap(g, data, path, fillFunction) {
@@ -58,7 +58,7 @@ export class D3ToggleMap {
     create() {
         this.dataInMapFormat = this.dataToMapFormat(this.allFeatures, this.quarterGeometryData, this.totalPerQuarter);
 
-        const { mapSvg, g } = createMap(this.id, WIDTH, HEIGHT);
+        const {mapSvg, g} = createMap(this.id, WIDTH, HEIGHT);
         this.mapSvg = mapSvg;
         // --------------------------  create a tooltip --------------------
         this.tooltip = createTooltip("#mapContainer")
@@ -183,7 +183,7 @@ export class D3ToggleMap {
             .attr('y2', '0%');
 
         grad.selectAll('stop')
-            .data(ticks.map((t, i, n) => ({ offset: `${100 * i / n.length}%`, color: this.colorScale(t) })))
+            .data(ticks.map((t, i, n) => ({offset: `${100 * i / n.length}%`, color: this.colorScale(t)})))
             .enter()
             .append('stop')
             .style('stop-color', (d) => d.color)
@@ -198,7 +198,18 @@ export class D3ToggleMap {
     }
 
     updateLegendAxis(currentMax) {
-        throw "Abstract function is not implemented";
+        this.yColourScale.domain([0, currentMax]);
+
+        const colourAxisTicks = this.yColourScale.ticks(4);
+        if ((currentMax - colourAxisTicks[colourAxisTicks.length - 1]) / (colourAxisTicks[colourAxisTicks.length - 1] - colourAxisTicks[colourAxisTicks.length - 2]) < 0.24) {
+            colourAxisTicks.pop();
+        }
+        colourAxisTicks.push(currentMax);
+        this.yColourAxis.tickValues(colourAxisTicks);
+
+        this.mapSvg.select('.colourAxis')
+            .transition()
+            .call(this.yColourAxis);
     }
 
     updateAndCalcLegendAxis(isToggled) {
@@ -215,7 +226,7 @@ export class D3ToggleMap {
                     const [count, max] = this.getInfoForColouringMap(d, this.isToggled);
                     return linearScaleColour(count, max);
                 });
-            const legendText = this.isToggled? `Legende: ${this.textOn}` : `Legende: ${this.textOff}`
+            const legendText = this.isToggled ? `Legende: ${this.textOn}` : `Legende: ${this.textOff}`
             this.mapSvg.select(".legend")
                 .text(legendText)
         });

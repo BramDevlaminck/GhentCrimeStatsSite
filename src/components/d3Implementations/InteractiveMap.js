@@ -152,6 +152,15 @@ export class InteractiveMap extends D3Map {
         this.mapContainerClient = this.mapSvg.node().getBoundingClientRect();
         this.setDropDown();
         this.slider();
+        this.lastShownTooltipQuarter = null;
+        this.map.on("automaticTooltipUpdate", this.autoMouseUpdateHandler.bind(this));
+    }
+
+    autoMouseUpdateHandler(event, data) {
+        // only update the tooltip when the event is for the correct quarter!
+        if (this.lastShownTooltipQuarter === data["properties"].quarter) {
+            this.updateTooltip(event, data);
+        }
     }
 
     dataToMapFormat(data, quarterGeometryData, totalPerQuarter) {
@@ -175,6 +184,8 @@ export class InteractiveMap extends D3Map {
                 .style("left", ((event.pageX) + 20) + "px")
                 .style("top", (event.pageY) + "px");
         }
+        // update the quarter that the tooltip is showing
+        this.lastShownTooltipQuarter = quarter;
     }
 
     mouseOutHandler(event, data) {
@@ -528,7 +539,7 @@ export class InteractiveMap extends D3Map {
             });
         // update tooltip if needed, do this by just triggering mousemove event
         if (this.tooltip.style("opacity") === "1") {
-            const mousemove = new Event("mousemove");
+            const mousemove = new Event("automaticTooltipUpdate");
             this.map.nodes().forEach(node => {
                 node.dispatchEvent(mousemove);
             });

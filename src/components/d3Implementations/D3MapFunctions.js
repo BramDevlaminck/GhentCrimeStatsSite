@@ -2,7 +2,6 @@ import * as d3 from "d3";
 import {createTooltip} from "../D3Functions";
 import colourScales from "../ColourScales";
 
-const HOVER_COLOR = "#db5252";
 const {linearScaleColour, interpolateBluesMod} = colourScales(0.07, 1.0);
 
 
@@ -40,6 +39,9 @@ export function drawMap(g, data, path, fillFunction) {
 }
 
 export class D3Map {
+
+    static HOVER_COLOR = "#db5252";
+
     constructor(id, allFeatures, quarterGeometrySmall, quarterGeometryData, totalPerQuarter, text) {
         this.id = id;
         this.allFeatures = allFeatures;
@@ -95,7 +97,7 @@ export class D3Map {
 
     // -------------------------- effect handlers for the map -----------------
     mouseOverHandler(event, _) {
-        d3.select(event.target).attr("fill", HOVER_COLOR);
+        d3.select(event.target).attr("fill", D3Map.HOVER_COLOR);
         this.tooltip.style("opacity", 1);
     }
 

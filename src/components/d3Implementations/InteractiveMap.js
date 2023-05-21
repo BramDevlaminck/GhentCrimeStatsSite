@@ -505,7 +505,12 @@ export class InteractiveMap extends D3Map {
         this.currentYear = year.toString();
 
         this.map.data(dataToMapDataFormat(this.totalPerQuarter, this.quarterGeometryData, this.currentMax, this.currentYear))
-            .attr("fill", (d, _) => {
+            .attr("fill", (d, i, element) => {
+                // select the current quarter, if it is hovered, don't change the colour!
+                // This is because when the slider is automatically updated, it will still be hovered.
+                if (d3.select(element[i]).attr("fill") === D3Map.HOVER_COLOR) {
+                    return D3Map.HOVER_COLOR;
+                }
                 const properties = d["properties"];
                 const count = properties.count;
                 const maxCount = properties.max;
@@ -521,5 +526,13 @@ export class InteractiveMap extends D3Map {
                 }
                 return selectedColor;
             });
+        // update tooltip if needed, do this by just triggering mousemove event
+        if (this.tooltip.style("opacity") === "1") {
+            const mousemove = new Event("mousemove")
+            // const event = new Event("mousemove");
+            this.map.nodes().forEach(node => {
+                node.dispatchEvent(mousemove)
+            })
+        }
     }
 }

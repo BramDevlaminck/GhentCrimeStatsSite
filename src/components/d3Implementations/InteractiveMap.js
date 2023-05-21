@@ -529,7 +529,6 @@ export class InteractiveMap extends D3Map {
         // update tooltip if needed, do this by just triggering mousemove event
         if (this.tooltip.style("opacity") === "1") {
             const mousemove = new Event("mousemove")
-            // const event = new Event("mousemove");
             this.map.nodes().forEach(node => {
                 node.dispatchEvent(mousemove)
             })

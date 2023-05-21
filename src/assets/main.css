@@ -20,6 +20,13 @@ body {
     justify-content: center;
 }
 
+#textChartWrapperSmall {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
 #text-next-to-slider {
     margin-top: 4rem;
     max-width: 1250px;
@@ -29,8 +36,17 @@ body {
     font-size: 80%;
 }
 
-@media screen and (max-width: 1919px) {
+@media screen and (max-width: 1750px) {
     #textChartWrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    #textChartWrapperSmall {
         display: flex;
         flex-direction: column;
         align-items: center;

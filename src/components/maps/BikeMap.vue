@@ -26,7 +26,7 @@ export default {
 </script>
 
 <template>
-    <div id="textChartWrapper">
+    <div id="textChartWrapperSmall">
         <div id="chartWrapper">
             <div id="toggleDiv">
                 <!-- Rounded switch -->

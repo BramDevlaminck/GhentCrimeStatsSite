@@ -31,7 +31,7 @@ export default {
 </script>
 
 <template>
-    <div id="textChartWrapper">
+    <div id="textChartWrapperSmall">
         <div id="text-next-to-slider">
             <p>
                 Ook hier zien we vooral veel geregistreerde feiten in de <b>binnenstad</b>.

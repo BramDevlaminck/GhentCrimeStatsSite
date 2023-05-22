@@ -15,6 +15,7 @@ export default {
         onClick(type) {
             this.activeType = type;
             this.$emit("tabSelected", type);
+            window.scrollTo(0, 0);
         }
     },
     data() {
